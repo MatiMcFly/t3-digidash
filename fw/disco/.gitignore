@@ -1,0 +1,87 @@
+# Build directories
+build/
+CM4/build/
+CM7/build/
+*/build/
+
+# Build artifacts
+*.elf
+*.hex
+*.bin
+*.map
+*.lst
+*.o
+*.a
+*.lib
+*.so
+*.dylib
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+*.cmake
+compile_commands.json
+
+# IDE - VS Code
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+*.code-workspace
+.history/
+
+# IDE - STM32CubeIDE / Eclipse
+.project
+.cproject
+.launch
+*.launch
+RemoteSystemsTempFiles/
+
+# IDE - Other
+.idea/
+*.iml
+*.swp
+*.swo
+*~
+
+# IDE - Keil uVision
+*.uvproj
+*.uvprojx
+*.uvopt
+
+# STLink/OpenOCD
+*.jlink
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+*.egg
+
+# Node (if using web tools)
+node_modules/
+package-lock.json
+yarn.lock
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+*.lnk
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+
+# STM32 temp files
+mx.scratch
+
+# Preserve project configuration
+!.settings
