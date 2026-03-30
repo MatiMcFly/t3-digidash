@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "App.h"
 
 /* USER CODE END Includes */
 
@@ -151,13 +152,12 @@ Error_Handler();
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
-  while (1)
-  {
+  AppRun();
+  // this does not return! However to prevent nasal demons, we add an infinite loop here as well
+  for(;;) {}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
   /* USER CODE END 3 */
 }
 
