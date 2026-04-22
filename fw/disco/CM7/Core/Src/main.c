@@ -82,6 +82,86 @@ static void MX_FMC_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+#define SDRAM_MODEREG_BURST_LENGTH_1             0x0000U
+#define SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL      0x0000U
+#define SDRAM_MODEREG_CAS_LATENCY_2              0x0020U
+#define SDRAM_MODEREG_OPERATING_MODE_STANDARD    0x0000U
+#define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE     0x0200U
+
+static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram)
+{
+  FMC_SDRAM_CommandTypeDef command = {0};
+  uint32_t mode = 0U;
+
+  command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK2;
+  command.AutoRefreshNumber = 1U;
+  command.ModeRegisterDefinition = 0U;
+
+  command.CommandMode = FMC_SDRAM_CMD_CLK_ENABLE;
+  if (HAL_SDRAM_SendCommand(hsdram, &command, HAL_MAX_DELAY) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  HAL_Delay(1);
+
+  command.CommandMode = FMC_SDRAM_CMD_PALL;
+  if (HAL_SDRAM_SendCommand(hsdram, &command, HAL_MAX_DELAY) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  command.CommandMode = FMC_SDRAM_CMD_AUTOREFRESH_MODE;
+  command.AutoRefreshNumber = 8U;
+  if (HAL_SDRAM_SendCommand(hsdram, &command, HAL_MAX_DELAY) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  mode = SDRAM_MODEREG_BURST_LENGTH_1 |
+         SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL |
+         SDRAM_MODEREG_CAS_LATENCY_2 |
+         SDRAM_MODEREG_OPERATING_MODE_STANDARD |
+         SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;
+
+  command.CommandMode = FMC_SDRAM_CMD_LOAD_MODE;
+  command.AutoRefreshNumber = 1U;
+  command.ModeRegisterDefinition = mode;
+  if (HAL_SDRAM_SendCommand(hsdram, &command, HAL_MAX_DELAY) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /* 32MHz SDRAM clock: (64ms / 8192) * 32MHz - margin(20) = 230 */
+  if (HAL_SDRAM_ProgramRefreshRate(hsdram, 230U) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+static void ConfigureMpuForSdram(void)
+{
+  MPU_Region_InitTypeDef region = {0};
+
+  HAL_MPU_Disable();
+
+  /* Framebuffer in SDRAM Bank2 @ 0xD0000000, keep non-cacheable for LTDC coherency. */
+  region.Enable = MPU_REGION_ENABLE;
+  region.Number = MPU_REGION_NUMBER1;
+  region.BaseAddress = 0xD0000000U;
+  region.Size = MPU_REGION_SIZE_16MB;
+  region.SubRegionDisable = 0x00U;
+  region.TypeExtField = MPU_TEX_LEVEL0;
+  region.AccessPermission = MPU_REGION_FULL_ACCESS;
+  region.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
+  region.IsShareable = MPU_ACCESS_SHAREABLE;
+  region.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
+  region.IsBufferable = MPU_ACCESS_BUFFERABLE;
+
+  HAL_MPU_ConfigRegion(&region);
+  HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -159,6 +239,8 @@ Error_Handler();
   MX_LTDC_Init();
   MX_FMC_Init();
   /* USER CODE BEGIN 2 */
+
+  ConfigureMpuForSdram();
 
   /* USER CODE END 2 */
 
@@ -411,8 +493,8 @@ static void MX_LTDC_Init(void)
   pLayerCfg.WindowY0 = 0;
   pLayerCfg.WindowY1 = 720;
   pLayerCfg.PixelFormat = LTDC_PIXEL_FORMAT_RGB888;
-  pLayerCfg.Alpha = 0;
-  pLayerCfg.Alpha0 = 0;
+  pLayerCfg.Alpha = 255;
+  pLayerCfg.Alpha0 = 255;
   pLayerCfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_CA;
   pLayerCfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_CA;
   pLayerCfg.FBStartAdress = 0xD0000000;
@@ -522,6 +604,8 @@ void MX_FMC_Init(void)
   }
 
   /* USER CODE BEGIN FMC_Init 2 */
+
+  SDRAM_Initialization_Sequence(&hsdram1);
 
   /* USER CODE END FMC_Init 2 */
 }
