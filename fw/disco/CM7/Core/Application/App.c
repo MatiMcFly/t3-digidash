@@ -7,8 +7,13 @@
 
 /// @brief Main application file
 #include "App.h"
+#include "Display.h"
 
 #include "stm32h7xx_hal.h"
+#include "main.h"
+
+#include <stddef.h>
+#include <stdint.h>
 
 // * ************************************************************************ *
 // *                                DEFINES                                   *
@@ -30,11 +35,11 @@
 // *                             GLOBAL FUNCTIONS                             *
 // * ************************************************************************ *
 void AppRun(void) {
+  DisplayInit();
 
-  // main application endless loop
+  /* Keep running after first-light test pattern setup. */
   for (;;) {
-    /* Toggle Backlight every 1 second */
-    HAL_GPIO_TogglePin(GPIOJ, GPIO_PIN_12);
+    DisplayTask();
     HAL_Delay(1000);
   }
 }

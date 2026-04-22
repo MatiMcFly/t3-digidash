@@ -61,6 +61,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
     Core/Application/App.c
+    Core/Application/Display.c
 )
 
 # Link directories setup
