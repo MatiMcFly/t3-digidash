@@ -451,6 +451,17 @@ static void MX_DSIHOST_DSI_Init(void)
   }
   /* USER CODE BEGIN DSIHOST_Init 2 */
 
+  /* Workarounds for DSI link not entering LP-11 stop state:
+   * 1) Enable automatic clock-lane control so the clock lane is
+   *    parked in LP-11 between HS bursts and the PHY can do LP
+   *    escape cleanly before any video has been streamed.
+   * 2) Raise TXEscapeCkdiv so the LP clock is within the MIPI
+   *    spec maximum of 20 MHz. With byte clock = 125 MHz, ckdiv=4
+   *    gives ~31 MHz (out of spec); ckdiv=8 gives ~15.6 MHz.
+   */
+  hdsi.Instance->CLCR |= DSI_CLCR_ACR;        /* Auto clock lane control */
+  hdsi.Instance->CCR  = (hdsi.Instance->CCR & ~DSI_CCR_TXECKDIV) | 8U;
+
   /* USER CODE END DSIHOST_Init 2 */
 
 }

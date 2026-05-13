@@ -41,18 +41,19 @@
 void AppRun(void) {
   // DisplayInit();
   BacklightInit();
+  DisplayInit();
 
   for (;;) {
     /* Ramp up: 0 -> 100 % */
     for (uint8_t d = 0U; d <= BACKLIGHT_DUTY_MAX; d++) {
       BacklightSetDuty(d);
-      // DisplayTask();
+      DisplayTask();
       HAL_Delay(BL_GLOW_STEP_MS);
     }
     /* Ramp down: 100 -> 0 % */
     for (uint8_t d = BACKLIGHT_DUTY_MAX; d-- > 0U; ) {
       BacklightSetDuty(d);
-      // DisplayTask();
+      DisplayTask();
       HAL_Delay(BL_GLOW_STEP_MS);
     }
   }

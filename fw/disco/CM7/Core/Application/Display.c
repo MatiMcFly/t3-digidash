@@ -54,7 +54,7 @@ static const LcdInitCmd kLcdInitSequence[] = {
     {0x00E1U, 1U, {0x93U}},
     {0x00E2U, 1U, {0x65U}},
     {0x00E3U, 1U, {0xF8U}},
-    {0x0080U, 1U, {0x00U}}, // 0x00 = 1-lane (0x01 = 2-lane, 0x03 = 4-lane)
+    {0x0080U, 1U, {0x01U}}, // 0x00 = 1-lane (0x01 = 2-lane, 0x03 = 4-lane)
     {0x00E0U, 1U, {0x01U}},
     {0x0000U, 1U, {0x00U}},
     {0x0001U, 1U, {0x41U}},
@@ -244,11 +244,20 @@ static const LcdInitCmd kLcdInitSequence[] = {
     {0x0077U, 1U, {0x33U}},
     {0x0078U, 1U, {0x43U}},
     {0x00E0U, 1U, {0x00U}},
-    {0x0011U, 1U, {0x00U}},
+    {0x003AU, 1U, {0x77U}}, // Set Pixel Format: 0x77 = 24bpp (RGB888). Sent
+                            // BEFORE Sleep Out so the controller latches it
+                            // when initializing the display engine.
+    {0x0011U, 0U, {0x00U}}, // Sleep Out
     {LCD_CMD_DELAY, 120U, {0x00U}},
-    {0x0029U, 1U, {0x00U}},
+    {0x0029U, 0U, {0x00U}}, // Display On
     {LCD_CMD_DELAY, 5U, {0x00U}},
-    {0x0035U, 1U, {0x00U}},
+    {0x0035U, 1U, {0x00U}}, // Tearing Effect ON, V-blanking only (TEM=0)
+    // -------- Backlight control (used by panels with internal LED driver, e.g.
+    // STM32H747I-DISCO MB1166 / OTM8009A). Ignored by panels whose backlight
+    // is driven by an external GPIO. --------
+    {0x0051U, 1U, {0xFFU}}, // Write Display Brightness = max
+    {0x0053U, 1U, {0x2CU}}, // Write CTRL Display: BCTRL=1, DD=1, BL=1
+    {0x0055U, 1U, {0x02U}}, // Write CABC: still image
     {LCD_CMD_END, 0U, {0x00U}},
 };
 
@@ -266,65 +275,62 @@ static void FillCheckerboardRGB888(void);
 // *                             GLOBAL FUNCTIONS                             *
 // * ************************************************************************ *
 void DisplayInit(void) {
+  // 1) Enable LP-command capability on the DSI host.
   g_display_stage = 1U;
   if (EnableDsiLpCommands() != HAL_OK) {
     DisplayFail(1U, HAL_ERROR);
   }
 
+  // DIAG: backlight on early so visible glow proves panel power even
+  // if DSI init still fails.
+  HAL_GPIO_WritePin(BL_CTRL_GPIO_Port, BL_CTRL_Pin, GPIO_PIN_SET);
+
+  // 2) Start the DSI wrapper. This is what actually drives the data
+  //    lanes into LP-11 stop state via the host wrapper. WITHOUT this,
+  //    PHY status bits PSS0/PSS1 stay 0 and every LP escape goes into
+  //    a void. Video timing has been configured (HAL_DSI_ConfigVideoMode
+  //    in MX_DSIHOST_DSI_Init), but no actual scan-out happens until
+  //    LTDC starts feeding pixels (LTDC layer enable below).
   g_display_stage = 2U;
   if (HAL_DSI_Start(&hdsi) != HAL_OK) {
     DisplayFail(2U, HAL_ERROR);
   }
+
+  // Allow LP commands during V-blank windows even though VidCfg set
+  // LPCommandEnable = DISABLE.
+  hdsi.Instance->VMCR |= DSI_VMCR_LPCE;
+
+  // Give the PHY a moment to settle in LP-11 after the wrapper enable.
+  HAL_Delay(2);
+
+  // 3) Hardware reset the panel.
+  g_display_stage = 3U;
+  DisplayResetSequence();
+
+  // 4) Push the full panel init sequence. LP commands flow during
+  //    V-blank (LTDC isn't pushing video yet because the layer is
+  //    still disabled), so timing is relaxed.
+  g_display_stage = 4U;
+  if (DisplaySendInitSequence() != HAL_OK) {
+    DisplayFail(4U, HAL_ERROR);
+  }
+
+  // 5) Diagnostic readback of the panel ID (RDDIDIF, 0x04).
+  g_display_stage = 5U;
+  g_read_result_09 = HAL_DSI_Read(&hdsi, 0U, (uint8_t *)g_display_status,
+                                  3U, DSI_DCS_SHORT_PKT_READ, 0x04U,
+                                  (uint8_t *)g_display_status);
 
 #if DSI_LINK_TEST_MODE
   g_display_stage = 12U;
   if (HAL_DSI_PatternGeneratorStart(&hdsi, 0U, 0U) != HAL_OK) {
     DisplayFail(12U, HAL_ERROR);
   }
-
-  g_display_stage = 13U;
-  HAL_GPIO_WritePin(BL_CTRL_GPIO_Port, BL_CTRL_Pin, GPIO_PIN_SET);
-
-  for (;;) {
-    g_display_stage = 14U;
-    HAL_Delay(1000);
-  }
 #endif
 
-  g_display_stage = 3U;
-  DisplayResetSequence();
-
-  g_display_stage = 4U;
-  if (DisplaySendInitSequence() != HAL_OK) {
-    DisplayFail(4U, HAL_ERROR);
-  }
-
-  /* Some panels only latch these reliably once the host stream is active. */
-  g_display_stage = 5U;
-  if (DsiWriteCommand(0x11U, NULL, 0U) != HAL_OK) {
-    DisplayFail(5U, HAL_ERROR);
-  }
-  HAL_Delay(120);
-
-  g_display_stage = 6U;
-  if (DsiWriteCommand(0x29U, NULL, 0U) != HAL_OK) {
-    DisplayFail(6U, HAL_ERROR);
-  }
-
-  g_display_stage = 7U;
-  if (DsiWriteCommand(0x35U, NULL, 0U) != HAL_OK) {
-    DisplayFail(7U, HAL_ERROR);
-  }
-
-  /* Try reading without tripping SetMaxReturnPacketSize by only requesting 1 or 2 bytes */
-  // Read Power Mode (0x0A) - usually returns 1 byte
-  g_read_result_0A = HAL_DSI_Read(&hdsi, 0U, (uint8_t*)g_display_power, 1U, DSI_DCS_SHORT_PKT_READ, 0x0AU, NULL);
-
-  // Read Display MADCTRL (0x0B) - usually returns 1 byte
-  g_read_result_0B = HAL_DSI_Read(&hdsi, 0U, (uint8_t*)g_display_madctrl, 1U, DSI_DCS_SHORT_PKT_READ, 0x0BU, NULL);
-
-  // Read Display Pixel Format (0x0C) - 1 byte
-  g_read_result_09 = HAL_DSI_Read(&hdsi, 0U, (uint8_t*)g_display_status, 1U, DSI_DCS_SHORT_PKT_READ, 0x0CU, NULL);
+  // 6) Fill the framebuffer before enabling the LTDC layer.
+  g_display_stage = 9U;
+  FillCheckerboardRGB888();
 
   g_display_stage = 8U;
   if (HAL_LTDC_SetAlpha(&hltdc, 255U, 0U) != HAL_OK) {
@@ -333,20 +339,33 @@ void DisplayInit(void) {
   __HAL_LTDC_LAYER_ENABLE(&hltdc, 0U);
   __HAL_LTDC_RELOAD_IMMEDIATE_CONFIG(&hltdc);
 
-  g_display_stage = 9U;
-  FillCheckerboardRGB888();
-
   g_display_stage = 10U;
-  HAL_GPIO_WritePin(BL_CTRL_GPIO_Port, BL_CTRL_Pin, GPIO_PIN_SET);
 }
+
+// Live counters for diagnosing flicker / image corruption.
+// Increment from the LTDC ISR (or polled here) so the cause of
+// flicker (FIFO underrun vs DSI errors) is visible in the debugger.
+volatile uint32_t g_ltdc_underrun_count = 0U;
+volatile uint32_t g_ltdc_transfer_error_count = 0U;
 
 void DisplayTask(void) {
   g_display_stage = 11U;
 
-  // Only asking for 1 or 2 bytes prevents HAL_DSI_Read from sending SMRPS!
-  g_read_result_0A = HAL_DSI_Read(&hdsi, 0U, (uint8_t*)g_display_power, 1U, DSI_DCS_SHORT_PKT_READ, 0x0AU, NULL);
-  g_read_result_0B = HAL_DSI_Read(&hdsi, 0U, (uint8_t*)g_display_madctrl, 1U, DSI_DCS_SHORT_PKT_READ, 0x0BU, NULL);
-  g_read_result_09 = HAL_DSI_Read(&hdsi, 0U, (uint8_t*)g_display_status, 1U, DSI_DCS_SHORT_PKT_READ, 0x0CU, NULL);
+  // Poll LTDC error flags. Underrun = SDRAM/FB bandwidth too low.
+  // Transfer error = AHB master access fault.
+  uint32_t isr = hltdc.Instance->ISR;
+  if ((isr & LTDC_ISR_FUIF) != 0U) {
+    g_ltdc_underrun_count++;
+    hltdc.Instance->ICR = LTDC_ICR_CFUIF;
+  }
+  if ((isr & LTDC_ISR_TERRIF) != 0U) {
+    g_ltdc_transfer_error_count++;
+    hltdc.Instance->ICR = LTDC_ICR_CTERRIF;
+  }
+
+  // Reading from the display while video is streaming can cause
+  // BTA/LP mode conflicts resulting in display flickering/pulsating.
+  // Disabled the polling for now.
 }
 
 // * ************************************************************************ *
