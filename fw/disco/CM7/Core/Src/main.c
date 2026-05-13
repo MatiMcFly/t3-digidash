@@ -424,9 +424,13 @@ static void MX_DSIHOST_DSI_Init(void)
   VidCfg.HSPolarity = DSI_HSYNC_ACTIVE_LOW;
   VidCfg.VSPolarity = DSI_VSYNC_ACTIVE_LOW;
   VidCfg.DEPolarity = DSI_DATA_ENABLE_ACTIVE_HIGH;
-  VidCfg.HorizontalSyncActive = 20;
-  VidCfg.HorizontalBackPorch = 20;
-  VidCfg.HorizontalLine = 1250;
+  /* DSI horizontal timings are in DSI byte-clock units, scaled to the
+   * LTDC pixel clock. We dropped PLL3R from 5 to 20 (pixel clock 40 MHz
+   * -> 10 MHz) so all H values must be 4x the originally generated
+   * values to keep the DSI line duration matching the LTDC line. */
+  VidCfg.HorizontalSyncActive = 80;   /* was 20 */
+  VidCfg.HorizontalBackPorch = 80;    /* was 20 */
+  VidCfg.HorizontalLine = 5000;       /* was 1250 */
   VidCfg.VerticalSyncActive = 4;
   VidCfg.VerticalBackPorch = 12;
   VidCfg.VerticalFrontPorch = 24;

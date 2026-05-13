@@ -244,9 +244,7 @@ static const LcdInitCmd kLcdInitSequence[] = {
     {0x0077U, 1U, {0x33U}},
     {0x0078U, 1U, {0x43U}},
     {0x00E0U, 1U, {0x00U}},
-    {0x003AU, 1U, {0x77U}}, // Set Pixel Format: 0x77 = 24bpp (RGB888). Sent
-                            // BEFORE Sleep Out so the controller latches it
-                            // when initializing the display engine.
+    {0x003AU, 1U, {0x77U}}, // Set Pixel Format: 0x77 = 24bpp (RGB888)
     {0x0011U, 0U, {0x00U}}, // Sleep Out
     {LCD_CMD_DELAY, 120U, {0x00U}},
     {0x0029U, 0U, {0x00U}}, // Display On
