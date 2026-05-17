@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <limits.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/uart.h"
@@ -28,32 +30,47 @@
 #define UART_BUF_SIZE (1024)
 
 #define BLE_DEVICE_NAME "ESP32C3-NimBLE"
-#define BLE_GATT_MAX_PAYLOAD 128
+#define BATT_V_MIN_MV 10500
+#define BATT_V_MAX_MV 14500
+#define WATER_TEMP_MAX_ASCII 16
 
 static const char *TAG = "ESP32C3_UART_TO_NUCLEO";
 static const char *TAG_BLE = "BLE_GATT";
 
 static uint8_t g_own_addr_type;
 static uint16_t g_conn_handle = BLE_HS_CONN_HANDLE_NONE;
-static uint16_t gatt_chr_val_handle;
-static bool g_notify_enabled;
-static char gatt_value[BLE_GATT_MAX_PAYLOAD] = "ready";
+static uint16_t gatt_chr_val_handle_water_temp;
+static uint16_t gatt_chr_val_handle_batt_level;
+static bool g_notify_water_temp;
+static bool g_notify_batt_level;
+static char g_water_temp_ascii[WATER_TEMP_MAX_ASCII] = "0.0";
+static uint16_t g_batt_mv = 0;
+static uint8_t g_batt_level_percent = 0;
 
 // Service UUID: c4e7b1a2-0f3d-4f2a-8d89-0d92b48e7d21
 static const ble_uuid128_t gatt_svc_uuid = BLE_UUID128_INIT(
     0x21, 0x7d, 0x8e, 0xb4, 0x92, 0x0d, 0x89, 0x8d,
     0x2a, 0x4f, 0x3d, 0x0f, 0xa2, 0xb1, 0xe7, 0xc4);
-// Characteristic UUID: c4e7b1a3-0f3d-4f2a-8d89-0d92b48e7d21
-static const ble_uuid128_t gatt_chr_uuid = BLE_UUID128_INIT(
+// Water temperature characteristic UUID: c4e7b1a4-0f3d-4f2a-8d89-0d92b48e7d21
+static const ble_uuid128_t gatt_chr_uuid_water_temp = BLE_UUID128_INIT(
     0x21, 0x7d, 0x8e, 0xb4, 0x92, 0x0d, 0x89, 0x8d,
-    0x2a, 0x4f, 0x3d, 0x0f, 0xa3, 0xb1, 0xe7, 0xc4);
+    0x2a, 0x4f, 0x3d, 0x0f, 0xa4, 0xb1, 0xe7, 0xc4);
+
+// Standard Battery Service (0x180F) and Battery Level (0x2A19)
+static const ble_uuid16_t gatt_svc_uuid_batt = BLE_UUID16_INIT(0x180F);
+static const ble_uuid16_t gatt_chr_uuid_batt_level = BLE_UUID16_INIT(0x2A19);
 
 static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle,
                                struct ble_gatt_access_ctxt *ctxt, void *arg)
 {
     if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR) {
-        size_t len = strnlen(gatt_value, sizeof(gatt_value));
-        return os_mbuf_append(ctxt->om, gatt_value, len);
+        if (attr_handle == gatt_chr_val_handle_water_temp) {
+            size_t len = strnlen(g_water_temp_ascii, sizeof(g_water_temp_ascii));
+            return os_mbuf_append(ctxt->om, g_water_temp_ascii, len);
+        }
+        if (attr_handle == gatt_chr_val_handle_batt_level) {
+            return os_mbuf_append(ctxt->om, &g_batt_level_percent, sizeof(g_batt_level_percent));
+        }
     }
 
     return BLE_ATT_ERR_UNLIKELY;
@@ -65,16 +82,81 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
         .uuid = &gatt_svc_uuid.u,
         .characteristics = (struct ble_gatt_chr_def[]) {
             {
-                .uuid = &gatt_chr_uuid.u,
+                .uuid = &gatt_chr_uuid_water_temp.u,
                 .access_cb = gatt_svr_chr_access,
                 .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
-                .val_handle = &gatt_chr_val_handle,
+                .val_handle = &gatt_chr_val_handle_water_temp,
+            },
+            { 0 }
+        },
+    },
+    {
+        .type = BLE_GATT_SVC_TYPE_PRIMARY,
+        .uuid = &gatt_svc_uuid_batt.u,
+        .characteristics = (struct ble_gatt_chr_def[]) {
+            {
+                .uuid = &gatt_chr_uuid_batt_level.u,
+                .access_cb = gatt_svr_chr_access,
+                .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
+                .val_handle = &gatt_chr_val_handle_batt_level,
             },
             { 0 }
         },
     },
     { 0 }
 };
+
+static bool parse_uart_values(const char *text, float *water_c, float *batt_v)
+{
+    if (text == NULL || water_c == NULL || batt_v == NULL) {
+        return false;
+    }
+
+    if (sscanf(text, "WT=%f,BV=%f", water_c, batt_v) == 2) {
+        return true;
+    }
+    if (sscanf(text, "%f,%f", water_c, batt_v) == 2) {
+        return true;
+    }
+    if (sscanf(text, "%f %f", water_c, batt_v) == 2) {
+        return true;
+    }
+
+    return false;
+}
+
+static int16_t clamp_int16(int32_t value)
+{
+    if (value > INT16_MAX) {
+        return INT16_MAX;
+    }
+    if (value < INT16_MIN) {
+        return INT16_MIN;
+    }
+    return (int16_t)value;
+}
+
+static uint16_t clamp_uint16(int32_t value)
+{
+    if (value > UINT16_MAX) {
+        return UINT16_MAX;
+    }
+    if (value < 0) {
+        return 0;
+    }
+    return (uint16_t)value;
+}
+
+static uint8_t clamp_uint8(int32_t value)
+{
+    if (value > UINT8_MAX) {
+        return UINT8_MAX;
+    }
+    if (value < 0) {
+        return 0;
+    }
+    return (uint8_t)value;
+}
 
 static void ble_app_advertise(void);
 
@@ -93,13 +175,18 @@ static int ble_gap_event(struct ble_gap_event *event, void *arg)
     case BLE_GAP_EVENT_DISCONNECT:
         ESP_LOGI(TAG_BLE, "Disconnected; reason=%d", event->disconnect.reason);
         g_conn_handle = BLE_HS_CONN_HANDLE_NONE;
-        g_notify_enabled = false;
+        g_notify_water_temp = false;
+        g_notify_batt_level = false;
         ble_app_advertise();
         return 0;
     case BLE_GAP_EVENT_SUBSCRIBE:
-        if (event->subscribe.attr_handle == gatt_chr_val_handle) {
-            g_notify_enabled = event->subscribe.cur_notify;
-            ESP_LOGI(TAG_BLE, "Notify %s", g_notify_enabled ? "enabled" : "disabled");
+        if (event->subscribe.attr_handle == gatt_chr_val_handle_water_temp) {
+            g_notify_water_temp = event->subscribe.cur_notify;
+            ESP_LOGI(TAG_BLE, "Water temp notify %s", g_notify_water_temp ? "enabled" : "disabled");
+        }
+        if (event->subscribe.attr_handle == gatt_chr_val_handle_batt_level) {
+            g_notify_batt_level = event->subscribe.cur_notify;
+            ESP_LOGI(TAG_BLE, "Battery notify %s", g_notify_batt_level ? "enabled" : "disabled");
         }
         return 0;
     case BLE_GAP_EVENT_ADV_COMPLETE:
@@ -136,6 +223,9 @@ static void ble_app_advertise(void)
     fields.uuids128 = (ble_uuid128_t *)&gatt_svc_uuid;
     fields.num_uuids128 = 1;
     fields.uuids128_is_complete = 1;
+    fields.uuids16 = (ble_uuid16_t *)&gatt_svc_uuid_batt;
+    fields.num_uuids16 = 1;
+    fields.uuids16_is_complete = 1;
 
     int rc = ble_gap_adv_set_fields(&fields);
     if (rc != 0) {
@@ -167,33 +257,61 @@ static void ble_app_advertise(void)
     }
 }
 
-void ble_notify_text(const char *text)
+static void ble_notify_value(uint16_t attr_handle, const void *data, size_t len)
 {
-    if (text == NULL) {
+    if (data == NULL || len == 0) {
         return;
     }
 
-    size_t len = strnlen(text, BLE_GATT_MAX_PAYLOAD - 1);
-    memcpy(gatt_value, text, len);
-    gatt_value[len] = '\0';
-
-    if (!g_notify_enabled ||
-        g_conn_handle == BLE_HS_CONN_HANDLE_NONE ||
-        gatt_chr_val_handle == 0) {
+    if (g_conn_handle == BLE_HS_CONN_HANDLE_NONE || attr_handle == 0) {
         return;
     }
 
-    struct os_mbuf *om = ble_hs_mbuf_from_flat(gatt_value, len);
+    struct os_mbuf *om = ble_hs_mbuf_from_flat(data, len);
     if (om == NULL) {
         ESP_LOGW(TAG_BLE, "Notify: no mbuf");
         return;
     }
 
-    int rc = ble_gatts_notify_custom(g_conn_handle, gatt_chr_val_handle, om);
+    int rc = ble_gatts_notify_custom(g_conn_handle, attr_handle, om);
     if (rc != 0) {
         os_mbuf_free_chain(om);
         ESP_LOGW(TAG_BLE, "Notify failed: %d", rc);
     }
+}
+
+static void ble_notify_water_temp_c(float temp_c)
+{
+    snprintf(g_water_temp_ascii, sizeof(g_water_temp_ascii), "%.1f", temp_c);
+
+    if (!g_notify_water_temp) {
+        return;
+    }
+
+    ble_notify_value(gatt_chr_val_handle_water_temp,
+                     g_water_temp_ascii,
+                     strnlen(g_water_temp_ascii, sizeof(g_water_temp_ascii)));
+}
+
+static void ble_notify_batt_v(float volts)
+{
+    int32_t mv = (int32_t)(volts * 1000.0f);
+    g_batt_mv = clamp_uint16(mv);
+    if (BATT_V_MAX_MV > BATT_V_MIN_MV) {
+        int32_t scaled = (int32_t)(g_batt_mv - BATT_V_MIN_MV) * 100;
+        int32_t range = (int32_t)(BATT_V_MAX_MV - BATT_V_MIN_MV);
+        g_batt_level_percent = clamp_uint8(scaled / range);
+    } else {
+        g_batt_level_percent = 0;
+    }
+
+    if (!g_notify_batt_level) {
+        return;
+    }
+
+    ble_notify_value(gatt_chr_val_handle_batt_level,
+                     &g_batt_level_percent,
+                     sizeof(g_batt_level_percent));
 }
 
 static void ble_host_task(void *param)
@@ -261,7 +379,14 @@ static void uart_task_esp_to_nucleo(void *arg)
         if (len > 0) {
             data[len] = '\0'; // Null-terminate the string
             ESP_LOGI(TAG, "Received: %s", (char *)data);
-            ble_notify_text((char *)data);
+            float water_c = 0.0f;
+            float batt_v = 0.0f;
+            if (parse_uart_values((char *)data, &water_c, &batt_v)) {
+                ble_notify_water_temp_c(water_c);
+                ble_notify_batt_v(batt_v);
+            } else {
+                ESP_LOGW(TAG, "UART parse failed; expected 'WT=23.5,BV=12.6' or '23.5,12.6'");
+            }
         }
     }
 }
