@@ -1,0 +1,29 @@
+name: CI ESP
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'fw/esp/**'
+      - '.github/workflows/ci-esp.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: espressif/idf:release-v6.0
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build ESP-IDF project
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          . /opt/esp/idf/export.sh
+
+          cd fw/esp
+          idf.py build
