@@ -73,15 +73,13 @@ static void uart_task_esp_to_nucleo(void *arg)
             int32_t preheat = car_signals_get_preheat();
             int32_t tank_level = car_signals_get_tank_level();
 
-            if (parse_uart_values((char *)data, &water_c, &outside_c, &batt_v,
-                                  &rpm, &turn_signal, &high_beam, &preheat, &tank_level)) {
+            if (parse_uart_values((char *)data, &water_c, &batt_v,
+                                  &rpm, &turn_signal, &high_beam, &tank_level)) {
                 car_signals_set_water_temp_c(water_c);
-                car_signals_set_outside_temp_c(outside_c);
                 car_signals_set_batt_v(batt_v);
                 car_signals_set_rpm(clamp_uint16_range(rpm, 0, UINT16_MAX));
                 car_signals_set_turn_signal(clamp_uint8(turn_signal));
                 car_signals_set_high_beam(clamp_uint8(high_beam));
-                car_signals_set_preheat(clamp_uint8(preheat));
                 car_signals_set_tank_level(clamp_uint8(tank_level));
             } else {
                 ESP_LOGW(TAG, "UART parse failed; expected 'WT=23.5,OT=12.1,BV=12.6,RPM=1500,TS=1,HB=0,DP=0,TL=45'");
