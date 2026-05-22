@@ -18,7 +18,8 @@ This project consists of three firmware projects:
 
 ## HW
 
-This project consists of two hardware projects:
+This project consists of three hardware projects:
 
 - [disco-tft-adapter](hw/disco-tft-adapter/) -- Discovery Board TFT Adapter
 - [t3-harness-adapter](hw/t3-harness-adapter/) -- T3 Wiring harness adapter
+- [measurement-circuits](hw/measurement-circuits/) -- Collects all of the measurement circuits used
