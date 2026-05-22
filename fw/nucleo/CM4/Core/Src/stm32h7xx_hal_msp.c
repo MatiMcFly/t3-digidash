@@ -96,13 +96,13 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
   */
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC;
     PeriphClkInitStruct.PLL2.PLL2M = 4;
-    PeriphClkInitStruct.PLL2.PLL2N = 9;
+    PeriphClkInitStruct.PLL2.PLL2N = 10;
     PeriphClkInitStruct.PLL2.PLL2P = 2;
     PeriphClkInitStruct.PLL2.PLL2Q = 2;
     PeriphClkInitStruct.PLL2.PLL2R = 2;
     PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_3;
     PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOMEDIUM;
-    PeriphClkInitStruct.PLL2.PLL2FRACN = 3072;
+    PeriphClkInitStruct.PLL2.PLL2FRACN = 0.0;
     PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL2;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
     {
@@ -196,6 +196,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
   */
 void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
   if(huart->Instance==USART3)
   {
@@ -214,6 +215,19 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 
     /* Peripheral clock enable */
     __HAL_RCC_USART3_CLK_ENABLE();
+
+    __HAL_RCC_GPIOD_CLK_ENABLE();
+    /**USART3 GPIO Configuration
+    PD8     ------> USART3_TX
+    PD9     ------> USART3_RX
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART3;
+    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
     /* USER CODE BEGIN USART3_MspInit 1 */
 
     /* USER CODE END USART3_MspInit 1 */
@@ -237,6 +251,13 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
     /* USER CODE END USART3_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_USART3_CLK_DISABLE();
+
+    /**USART3 GPIO Configuration
+    PD8     ------> USART3_TX
+    PD9     ------> USART3_RX
+    */
+    HAL_GPIO_DeInit(GPIOD, GPIO_PIN_8|GPIO_PIN_9);
+
     /* USER CODE BEGIN USART3_MspDeInit 1 */
 
     /* USER CODE END USART3_MspDeInit 1 */
