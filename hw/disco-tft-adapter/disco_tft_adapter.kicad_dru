@@ -1,0 +1,4 @@
+(version 1)
+(rule "FFC_Connector_Clearance"
+    (condition "A.Parent == 'J1' && B.Parent == 'J1'")
+    (constraint clearance (min 0.15mm)))
