@@ -99,8 +99,8 @@ static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle,
             return os_mbuf_append(ctxt->om, &value, sizeof(value));
         }
         if (attr_handle == gatt_chr_val_handle_tank_level) {
-            uint8_t value = car_signals_get_tank_level();
-            return os_mbuf_append(ctxt->om, &value, sizeof(value));
+            const char *value = car_signals_get_tank_level_str();
+            return os_mbuf_append(ctxt->om, value, strlen(value));
         }
         if (attr_handle == gatt_chr_val_handle_batt_mv) {
             uint16_t value = car_signals_get_batt_mv();

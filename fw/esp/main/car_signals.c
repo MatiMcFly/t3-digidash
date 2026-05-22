@@ -1,6 +1,8 @@
 #include "car_signals.h"
 
 #include <limits.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "esp_log.h"
 
@@ -31,6 +33,7 @@ static uint8_t g_turn_signal = 0;
 static uint8_t g_high_beam = 0;
 static uint8_t g_preheat = 0;
 static uint8_t g_tank_level = 0;
+static char g_tank_level_str[16] = "0.0";
 
 static int16_t clamp_int16(int32_t value)
 {
@@ -206,10 +209,14 @@ void car_signals_set_preheat(uint8_t value)
 void car_signals_set_tank_level(uint8_t percent)
 {
     g_tank_level = clamp_uint8(percent);
+    float liters = (g_tank_level * 80.0f) / 100.0f;
+    snprintf(g_tank_level_str, sizeof(g_tank_level_str), "%.1f", liters);
     if (!g_notify_tank_level) {
         return;
     }
-    ble_app_notify(gatt_chr_val_handle_tank_level, &g_tank_level, sizeof(g_tank_level));
+    ble_app_notify(gatt_chr_val_handle_tank_level,
+                   g_tank_level_str,
+                   strlen(g_tank_level_str));
 }
 
 int16_t car_signals_get_water_temp_cC(void)
@@ -255,4 +262,9 @@ uint8_t car_signals_get_preheat(void)
 uint8_t car_signals_get_tank_level(void)
 {
     return g_tank_level;
+}
+
+const char *car_signals_get_tank_level_str(void)
+{
+    return g_tank_level_str;
 }
