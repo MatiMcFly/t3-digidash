@@ -10,3 +10,5 @@ fp-info-cache
 /plots/
 /gerbers/
 *-backups/
+*/fab/
+fab*
