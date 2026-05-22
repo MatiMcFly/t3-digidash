@@ -1,0 +1,258 @@
+#include "car_signals.h"
+
+#include <limits.h>
+
+#include "esp_log.h"
+
+#include "ble_app.h"
+#include "gatt_db.h"
+
+#define BATT_V_MIN_MV 10500
+#define BATT_V_MAX_MV 14500
+
+static const char *TAG = "CAR_SIGNALS";
+
+static bool g_notify_water_temp;
+static bool g_notify_outside_temp;
+static bool g_notify_batt_level;
+static bool g_notify_rpm;
+static bool g_notify_turn_signal;
+static bool g_notify_high_beam;
+static bool g_notify_preheat;
+static bool g_notify_tank_level;
+static bool g_notify_batt_mv;
+
+static int16_t g_water_temp_cC = 0;
+static int16_t g_outside_temp_cC = 0;
+static uint16_t g_batt_mv = 0;
+static uint8_t g_batt_level_percent = 0;
+static uint16_t g_rpm = 0;
+static uint8_t g_turn_signal = 0;
+static uint8_t g_high_beam = 0;
+static uint8_t g_preheat = 0;
+static uint8_t g_tank_level = 0;
+
+static int16_t clamp_int16(int32_t value)
+{
+    if (value > INT16_MAX) {
+        return INT16_MAX;
+    }
+    if (value < INT16_MIN) {
+        return INT16_MIN;
+    }
+    return (int16_t)value;
+}
+
+static uint16_t clamp_uint16(int32_t value)
+{
+    if (value > UINT16_MAX) {
+        return UINT16_MAX;
+    }
+    if (value < 0) {
+        return 0;
+    }
+    return (uint16_t)value;
+}
+
+static uint8_t clamp_uint8(int32_t value)
+{
+    if (value > UINT8_MAX) {
+        return UINT8_MAX;
+    }
+    if (value < 0) {
+        return 0;
+    }
+    return (uint8_t)value;
+}
+
+void car_signals_on_disconnect(void)
+{
+    g_notify_water_temp = false;
+    g_notify_outside_temp = false;
+    g_notify_batt_level = false;
+    g_notify_rpm = false;
+    g_notify_turn_signal = false;
+    g_notify_high_beam = false;
+    g_notify_preheat = false;
+    g_notify_tank_level = false;
+    g_notify_batt_mv = false;
+}
+
+void car_signals_on_subscribe(uint16_t attr_handle, bool notify_enabled)
+{
+    if (attr_handle == gatt_chr_val_handle_water_temp) {
+        g_notify_water_temp = notify_enabled;
+        ESP_LOGI(TAG, "Water temp notify %s", g_notify_water_temp ? "enabled" : "disabled");
+    }
+    if (attr_handle == gatt_chr_val_handle_outside_temp) {
+        g_notify_outside_temp = notify_enabled;
+        ESP_LOGI(TAG, "Outside temp notify %s", g_notify_outside_temp ? "enabled" : "disabled");
+    }
+    if (attr_handle == gatt_chr_val_handle_batt_level) {
+        g_notify_batt_level = notify_enabled;
+        ESP_LOGI(TAG, "Battery notify %s", g_notify_batt_level ? "enabled" : "disabled");
+    }
+    if (attr_handle == gatt_chr_val_handle_rpm) {
+        g_notify_rpm = notify_enabled;
+        ESP_LOGI(TAG, "RPM notify %s", g_notify_rpm ? "enabled" : "disabled");
+    }
+    if (attr_handle == gatt_chr_val_handle_turn_signal) {
+        g_notify_turn_signal = notify_enabled;
+        ESP_LOGI(TAG, "Turn signal notify %s", g_notify_turn_signal ? "enabled" : "disabled");
+    }
+    if (attr_handle == gatt_chr_val_handle_high_beam) {
+        g_notify_high_beam = notify_enabled;
+        ESP_LOGI(TAG, "High beam notify %s", g_notify_high_beam ? "enabled" : "disabled");
+    }
+    if (attr_handle == gatt_chr_val_handle_preheat) {
+        g_notify_preheat = notify_enabled;
+        ESP_LOGI(TAG, "Preheat notify %s", g_notify_preheat ? "enabled" : "disabled");
+    }
+    if (attr_handle == gatt_chr_val_handle_tank_level) {
+        g_notify_tank_level = notify_enabled;
+        ESP_LOGI(TAG, "Tank level notify %s", g_notify_tank_level ? "enabled" : "disabled");
+    }
+    if (attr_handle == gatt_chr_val_handle_batt_mv) {
+        g_notify_batt_mv = notify_enabled;
+        ESP_LOGI(TAG, "Battery mV notify %s", g_notify_batt_mv ? "enabled" : "disabled");
+    }
+}
+
+void car_signals_set_water_temp_c(float temp_c)
+{
+    int32_t cC = (int32_t)(temp_c * 100.0f);
+    g_water_temp_cC = clamp_int16(cC);
+
+    if (!g_notify_water_temp) {
+        return;
+    }
+
+    ble_app_notify(gatt_chr_val_handle_water_temp, &g_water_temp_cC, sizeof(g_water_temp_cC));
+}
+
+void car_signals_set_outside_temp_c(float temp_c)
+{
+    int32_t cC = (int32_t)(temp_c * 100.0f);
+    g_outside_temp_cC = clamp_int16(cC);
+
+    if (!g_notify_outside_temp) {
+        return;
+    }
+
+    ble_app_notify(gatt_chr_val_handle_outside_temp, &g_outside_temp_cC, sizeof(g_outside_temp_cC));
+}
+
+void car_signals_set_batt_v(float volts)
+{
+    int32_t mv = (int32_t)(volts * 1000.0f);
+    g_batt_mv = clamp_uint16(mv);
+    if (BATT_V_MAX_MV > BATT_V_MIN_MV) {
+        int32_t scaled = (int32_t)(g_batt_mv - BATT_V_MIN_MV) * 100;
+        int32_t range = (int32_t)(BATT_V_MAX_MV - BATT_V_MIN_MV);
+        g_batt_level_percent = clamp_uint8(scaled / range);
+    } else {
+        g_batt_level_percent = 0;
+    }
+
+    if (!g_notify_batt_level) {
+        return;
+    }
+
+    ble_app_notify(gatt_chr_val_handle_batt_level,
+                   &g_batt_level_percent,
+                   sizeof(g_batt_level_percent));
+
+    if (g_notify_batt_mv) {
+        ble_app_notify(gatt_chr_val_handle_batt_mv, &g_batt_mv, sizeof(g_batt_mv));
+    }
+}
+
+void car_signals_set_rpm(uint16_t rpm)
+{
+    g_rpm = rpm;
+    if (!g_notify_rpm) {
+        return;
+    }
+    ble_app_notify(gatt_chr_val_handle_rpm, &g_rpm, sizeof(g_rpm));
+}
+
+void car_signals_set_turn_signal(uint8_t value)
+{
+    g_turn_signal = value ? 1 : 0;
+    if (!g_notify_turn_signal) {
+        return;
+    }
+    ble_app_notify(gatt_chr_val_handle_turn_signal, &g_turn_signal, sizeof(g_turn_signal));
+}
+
+void car_signals_set_high_beam(uint8_t value)
+{
+    g_high_beam = value ? 1 : 0;
+    if (!g_notify_high_beam) {
+        return;
+    }
+    ble_app_notify(gatt_chr_val_handle_high_beam, &g_high_beam, sizeof(g_high_beam));
+}
+
+void car_signals_set_preheat(uint8_t value)
+{
+    g_preheat = value ? 1 : 0;
+    if (!g_notify_preheat) {
+        return;
+    }
+    ble_app_notify(gatt_chr_val_handle_preheat, &g_preheat, sizeof(g_preheat));
+}
+
+void car_signals_set_tank_level(uint8_t percent)
+{
+    g_tank_level = clamp_uint8(percent);
+    if (!g_notify_tank_level) {
+        return;
+    }
+    ble_app_notify(gatt_chr_val_handle_tank_level, &g_tank_level, sizeof(g_tank_level));
+}
+
+int16_t car_signals_get_water_temp_cC(void)
+{
+    return g_water_temp_cC;
+}
+
+int16_t car_signals_get_outside_temp_cC(void)
+{
+    return g_outside_temp_cC;
+}
+
+uint16_t car_signals_get_batt_mv(void)
+{
+    return g_batt_mv;
+}
+
+uint8_t car_signals_get_batt_level_percent(void)
+{
+    return g_batt_level_percent;
+}
+
+uint16_t car_signals_get_rpm(void)
+{
+    return g_rpm;
+}
+
+uint8_t car_signals_get_turn_signal(void)
+{
+    return g_turn_signal;
+}
+
+uint8_t car_signals_get_high_beam(void)
+{
+    return g_high_beam;
+}
+
+uint8_t car_signals_get_preheat(void)
+{
+    return g_preheat;
+}
+
+uint8_t car_signals_get_tank_level(void)
+{
+    return g_tank_level;
+}
