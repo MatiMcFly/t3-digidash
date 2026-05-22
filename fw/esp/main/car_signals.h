@@ -24,3 +24,4 @@ uint8_t car_signals_get_turn_signal(void);
 uint8_t car_signals_get_high_beam(void);
 uint8_t car_signals_get_preheat(void);
 uint8_t car_signals_get_tank_level(void);
+const char *car_signals_get_tank_level_str(void);
