@@ -19,20 +19,20 @@
 
 ## 1. Projektbeschreibung
 
-Zum Abschluss des CAS Embedded Systems soll ein verteiltes System entwickelt werden. Dieses wird in einem VW Transporter Typ 2.5 eingesetzt, um verschiedene analoge Instrumente im Armaturenbrett zu ersetzen. Einfache analoge Anzeigeelemente beschränken sich typischerweise auf den Tankfüllstand und die Kühlwassertemperatur. Der Kabelbaumabgriff, welcher zum Tacho führt,, beinhaltet jedoch noch diverse andere nützliche Signale, wie zum Beispiel die Drehzahlanzeige. Mit Hilfe eines passenden TFT-LCD kann somit eine konfigurierbare und dynamische digitale Anzeige gestaltet werden. Diese bietet weiter die Möglichkeit, zusätzliche, nicht originale Anzeigeelemente anzuschliessen, wie zum Beispiel einen Sensor zur Messug der Öltemperatur.
+Zum Abschluss des CAS Embedded Systems soll ein verteiltes System entwickelt werden. Dieses wird in einem VW Transporter Typ 2.5 eingesetzt, um verschiedene analoge Instrumente im Armaturenbrett zu ersetzen. Einfache analoge Anzeigeelemente beschränken sich typischerweise auf den Tankfüllstand und die Kühlwassertemperatur. Der Kabelbaumabgriff, welcher zum Tacho führt,, beinhaltet jedoch noch diverse andere nützliche Signale, wie zum Beispiel die Drehzahlanzeige. Mit Hilfe eines passenden TFT-LCD kann somit eine konfigurierbare und dynamische digitale Anzeige gestaltet werden. Diese bietet weiter die Möglichkeit, zusätzliche, nicht originale Anzeigeelemente anzuschliessen, wie zum Beispiel einen Sensor zur Messung der Öltemperatur.
 
-Nachfolgend eine Auflistung aller Grössen, die im Rahmen dieses Projektes sind:
+Nachfolgend eine Auflistung aller Grössen, die im Rahmen dieses Projektes verwendet werden:
 
-| Signal                  | Sensor-Typ                   | Messgrösse     | Wertebereich     | Bemerkungen |
-|-------------------------|------------------------------|----------------|------------------|-------------|
-| Wassertemperatur        | NTC gegen Chassis-GND        | 1100 - 100 Ohm | -10 ... 150 °C   | |
+| Signal                  | Sensor-Typ                   | Messgrösse     | Wertebereich     | Bemerkungen                                                              |
+| ----------------------- | ---------------------------- | -------------- | ---------------- | ------------------------------------------------------------------------ |
+| Wassertemperatur        | NTC gegen Chassis-GND        | 1100 - 100 Ohm | -10 ... 150 °C   |                                                                          |
 | Drehzahl                | Pulse von Zündspule          | 12V            | 0 ... 7000 U/min | Achtung, Spannungsspitzen. Via Optokoppler messen. Skaliert mit Faktor 4 |
-| Batteriespannung        | Spannungsteiler              | -              | 0 ... 20 V       | |
-| Tankfüllstand           | Hebelgeber gegen Chassis-GND | 40 ... 300 Ohm | 0 ... 80 l       | |
-| Blinker                 | Schalter                     | 12V / 0V       | on / off         | |
-| Fernlicht               | Schalter                     | 12V / 0V       | on / off         | |
-| Öldruckschalter 0.3 bar | Schalter                     | 12V / 0V       | on / off         | |
-| Öldruckschalter 1.8 bar | Schalter                     | 12V / 0V       | on / off         | |
+| Batteriespannung        | Spannungsteiler              | -              | 0 ... 20 V       |                                                                          |
+| Tankfüllstand           | Hebelgeber gegen Chassis-GND | 40 ... 300 Ohm | 0 ... 80 l       |                                                                          |
+| Blinker                 | Schalter                     | 12V / 0V       | on / off         |                                                                          |
+| Fernlicht               | Schalter                     | 12V / 0V       | on / off         |                                                                          |
+| Öldruckschalter 0.3 bar | Schalter                     | 12V / 0V       | on / off         |                                                                          |
+| Öldruckschalter 1.8 bar | Schalter                     | 12V / 0V       | on / off         |                                                                          |
 
 ## 2. Verwendete Hardware
 
@@ -114,13 +114,13 @@ Kit und ESP32-C3 sind reine Konsumenten dieser Daten und tauschen mit der Nucleo
 strukturierte Telemetrie-Frames aus.
 
 Der gesamte Code soll portabel gestaltet werden. In einem finalen Produkt wird das verteilte System
-zusammengeführt auf einer einzelnen Hauptplatine. Dies ist jedoch nicht im Rahmen des Projektes.
+zusammengeführt auf einer einzelnen Hauptplatine. Dies wird jedoch nicht im Rahmen dieses Projektes umgesetzt.
 
 ### 4.1 Nucleo -- Sensor-Frontend
 
 ![Nucleo](img/Nucleo.drawio.svg)
 
-Auf der Nucleo läuft die komplette Signalverarbeitungspipeline. Diese ist als FreeRTOS-Anwendung
+Auf der Nucleo läuft die komplette Signalverarbeitungs-Pipeline. Diese ist als FreeRTOS-Anwendung
 auf dem Cortex-M7 (CM7) und Cortex-M4 (CM4) realisiert und in vier klar getrennte Stufen
 aufgeteilt:
 
@@ -136,8 +136,13 @@ aufgeteilt:
 - **Publication** -- Serialisierung der gefilterten Werte zu einem Telemetrie-Frame und
   zyklische Ausgabe über die UART-Schnittstellen an Disco und ESP.
 
-Die beiden Cores teilen sich die Arbeit: Der CM4 übernimmt die zeitkritische Acquisition, die Conversion und das Filtering.
-Der CM7 übernimmt lediglich die Publication via UART. Die Inter-Core-Kommunikation erfolgt über den Shared-SRAM.
+Die beiden Cores teilen sich die Arbeit:
+- Der CM4 übernimmt die zeitkritische Acquisition, die Conversion und das Filtering.
+- Der CM7 übernimmt lediglich die Publication via UART.
+  - In Zukunft können die beiden STM32-Projekt dann einfach auf einer Platform kombiniert werden: CM4 von Nucleo wird auf CM4 von Disco migriert
+  - Im Rahmen dieses Projektes wird das nicht gemacht. Es werden bewusst zwei STM32-Platformen verwendet, da alle Projekt-Mitglieder ein Nucleo-Board haben, aber nur ein Disco-Board zur Verfügung steht.
+
+Die Inter-Core-Kommunikation erfolgt über den Shared-SRAM via FreeRTOS message buffer und Benachrichtigung via HSEM.
 
 ### 4.2 Discovery Kit -- Anzeige
 
@@ -147,7 +152,7 @@ Das Discovery Kit STM32H747I-DISCO ist über den `disco-tft-adapter` mit dem TFT
 verbunden und stellt das digitale Armaturenbrett dar. Es empfängt zyklisch Telemetrie-Frames
 von der Nucleo via UART, dekodiert diese und aktualisiert die Anzeige.
 
-Die Renderpipeline basiert auf TouchGFX / LTDC und nutzt den integrierten Framebuffer im SDRAM.
+Die Render-Pipeline basiert auf TouchGFX / LTDC und nutzt den integrierten Framebuffer im SDRAM.
 Sofern es die Rechenleistung zulässt ist der CM7 für die gesamte Funktionalität verantwortlich: Vom UART-Empfang, frame parsing hin zum Rendering des UIs
 
 Folgende Anzeigen sind vorgesehen:
@@ -202,5 +207,3 @@ Siehe Anhang.
 - Espressif Systems, *ESP32-C3 Technical Reference Manual*,
   https://www.espressif.com/sites/default/files/documentation/esp32-c3_technical_reference_manual_en.pdf
 - FreeRTOS, *FreeRTOS Kernel V11.3.0 Documentation*, https://www.freertos.org/
-
-
