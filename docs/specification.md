@@ -172,6 +172,8 @@ Folgende Flows müssen realisiert werden:
 
 ### 4.3 ESP32-C3 -- Wireless-Bridge
 
+![ESP32-C3](img/ESP_Diagramm.drawio.svg)
+
 Der ESP32-C3 empfängt die gleichen Telemetrie-Frames wie das Discovery Kit über UART
 und stellt sie via BLE GATT als Notify-Characteristic zur Verfügung. Ein Smartphone oder
 ein Laptop kann sich verbinden und die Daten z.B. in einer Telemetrie-App live mitlesen
