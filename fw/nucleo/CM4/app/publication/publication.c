@@ -9,6 +9,7 @@
 #include "app.h"
 #include "main.h"
 #include "queue.h"
+#include "shared.h"
 
 void publication_task(void* params)
 {

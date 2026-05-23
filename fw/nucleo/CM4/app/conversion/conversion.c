@@ -7,6 +7,7 @@
 #include "FreeRTOS.h"
 #include "app.h"
 #include "queue.h"
+#include "shared.h"
 
 static int16_t convert_water_temperature(int16_t raw_value);
 static int16_t convert_battery_voltage(int16_t raw_value);

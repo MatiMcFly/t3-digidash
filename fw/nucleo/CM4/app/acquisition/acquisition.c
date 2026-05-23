@@ -7,6 +7,7 @@
 #include "app.h"
 #include "main.h"
 #include "queue.h"
+#include "shared.h"
 #include "task.h"
 
 extern ADC_HandleTypeDef hadc1;

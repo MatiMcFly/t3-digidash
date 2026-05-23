@@ -4,6 +4,7 @@
 
 #include "FreeRTOS.h"
 #include "main.h"
+#include "shared.h"
 #include "task.h"
 
 static void heartbeat_task(void* params);

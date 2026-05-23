@@ -7,6 +7,7 @@
 #include "FreeRTOS.h"
 #include "app.h"
 #include "queue.h"
+#include "shared.h"
 
 #define FILTERING_SIZE 5
 

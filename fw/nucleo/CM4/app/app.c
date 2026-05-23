@@ -9,6 +9,7 @@
 #include "filtering.h"
 #include "main.h"
 #include "publication.h"
+#include "shared.h"
 #include "task.h"
 
 QueueHandle_t queue_data_raw;
