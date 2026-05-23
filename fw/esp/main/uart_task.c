@@ -87,23 +87,51 @@ static void uart_task_esp_to_nucleo(void *arg)
                 car_signals_set_preheat(clamp_uint8(preheat));
                 car_signals_set_tank_level(clamp_uint8(tank_level));
 
-                char notify_buf[160];
-                int notify_len = snprintf(notify_buf, sizeof(notify_buf),
-                                          "WT=%.1f,OT=%.1f,BV=%.2f,RPM=%u,TS=%u,HB=%u,DP=%u,TL=%u\n",
-                                          water_c,
-                                          outside_c,
-                                          batt_v,
-                                          (unsigned)clamp_uint16_range(rpm, 0, UINT16_MAX),
-                                          (unsigned)clamp_uint8(turn_signal),
-                                          (unsigned)clamp_uint8(high_beam),
-                                          (unsigned)clamp_uint8(preheat),
-                                          (unsigned)clamp_uint8(tank_level));
+                const uint16_t rpm_u16 = clamp_uint16_range(rpm, 0, UINT16_MAX);
+                const uint8_t turn_u8 = clamp_uint8(turn_signal);
+                const uint8_t high_u8 = clamp_uint8(high_beam);
+                const uint8_t preheat_u8 = clamp_uint8(preheat);
+                const uint8_t tank_u8 = clamp_uint8(tank_level);
+
+                char notify_buf[64];
+                int notify_len = snprintf(notify_buf, sizeof(notify_buf), "WT=%.1f\n", water_c);
                 if (notify_len > 0) {
-                    size_t send_len = (size_t)notify_len;
-                    if (send_len >= sizeof(notify_buf)) {
-                        send_len = sizeof(notify_buf) - 1;
-                    }
-                    ble_app_notify(gatt_chr_val_handle_uart_tx, notify_buf, send_len);
+                    ble_app_notify(gatt_chr_val_handle_uart_tx, notify_buf, (size_t)notify_len);
+                }
+
+                notify_len = snprintf(notify_buf, sizeof(notify_buf), "OT=%.1f\n", outside_c);
+                if (notify_len > 0) {
+                    ble_app_notify(gatt_chr_val_handle_uart_tx, notify_buf, (size_t)notify_len);
+                }
+
+                notify_len = snprintf(notify_buf, sizeof(notify_buf), "BV=%.2f\n", batt_v);
+                if (notify_len > 0) {
+                    ble_app_notify(gatt_chr_val_handle_uart_tx, notify_buf, (size_t)notify_len);
+                }
+
+                notify_len = snprintf(notify_buf, sizeof(notify_buf), "RPM=%u\n", (unsigned)rpm_u16);
+                if (notify_len > 0) {
+                    ble_app_notify(gatt_chr_val_handle_uart_tx, notify_buf, (size_t)notify_len);
+                }
+
+                notify_len = snprintf(notify_buf, sizeof(notify_buf), "TS=%u\n", (unsigned)turn_u8);
+                if (notify_len > 0) {
+                    ble_app_notify(gatt_chr_val_handle_uart_tx, notify_buf, (size_t)notify_len);
+                }
+
+                notify_len = snprintf(notify_buf, sizeof(notify_buf), "HB=%u\n", (unsigned)high_u8);
+                if (notify_len > 0) {
+                    ble_app_notify(gatt_chr_val_handle_uart_tx, notify_buf, (size_t)notify_len);
+                }
+
+                notify_len = snprintf(notify_buf, sizeof(notify_buf), "DP=%u\n", (unsigned)preheat_u8);
+                if (notify_len > 0) {
+                    ble_app_notify(gatt_chr_val_handle_uart_tx, notify_buf, (size_t)notify_len);
+                }
+
+                notify_len = snprintf(notify_buf, sizeof(notify_buf), "TL=%u\n", (unsigned)tank_u8);
+                if (notify_len > 0) {
+                    ble_app_notify(gatt_chr_val_handle_uart_tx, notify_buf, (size_t)notify_len);
                 }
             } else {
                 ESP_LOGW(TAG, "UART parse failed; expected 'WT=23.5,OT=12.1,BV=12.6,RPM=1500,TS=1,HB=0,DP=0,TL=45'");
