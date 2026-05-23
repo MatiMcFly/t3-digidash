@@ -81,11 +81,10 @@ static void ble_app_advertise(void)
     fields.uuids128_is_complete = 1;
 
     static const ble_uuid16_t adv_uuids16[] = {
-        BLE_UUID16_INIT(0x180F),
-        BLE_UUID16_INIT(0x181A)
+        BLE_UUID16_INIT(0xFFE0)
     };
     fields.uuids16 = (ble_uuid16_t *)adv_uuids16;
-    fields.num_uuids16 = 2;
+    fields.num_uuids16 = 1;
     fields.uuids16_is_complete = 1;
 
     int rc = ble_gap_adv_set_fields(&fields);

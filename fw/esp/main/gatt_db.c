@@ -28,6 +28,10 @@ static const ble_uuid16_t gatt_chr_uuid_temp = BLE_UUID16_INIT(0x2A6E);
 static const ble_uuid16_t gatt_svc_uuid_batt = BLE_UUID16_INIT(0x180F);
 static const ble_uuid16_t gatt_chr_uuid_batt_level = BLE_UUID16_INIT(0x2A19);
 
+// BLE UART (HM-10 compatible): Service 0xFFE0, Characteristic 0xFFE1
+static const ble_uuid16_t gatt_svc_uuid_uart = BLE_UUID16_INIT(0xFFE0);
+static const ble_uuid16_t gatt_chr_uuid_uart_tx = BLE_UUID16_INIT(0xFFE1);
+
 // Custom Car Signals characteristics
 static const ble_uuid128_t gatt_chr_uuid_rpm = BLE_UUID128_INIT(
     0x21, 0x7d, 0x8e, 0xb4, 0x92, 0x0d, 0x89, 0x8d,
@@ -57,6 +61,7 @@ uint16_t gatt_chr_val_handle_high_beam;
 uint16_t gatt_chr_val_handle_preheat;
 uint16_t gatt_chr_val_handle_tank_level;
 uint16_t gatt_chr_val_handle_batt_mv;
+uint16_t gatt_chr_val_handle_uart_tx;
 
 static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle,
                                struct ble_gatt_access_ctxt *ctxt, void *arg)
@@ -105,6 +110,12 @@ static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle,
         if (attr_handle == gatt_chr_val_handle_batt_mv) {
             uint16_t value = car_signals_get_batt_mv();
             return os_mbuf_append(ctxt->om, &value, sizeof(value));
+        }
+    }
+
+    if (ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR) {
+        if (attr_handle == gatt_chr_val_handle_uart_tx) {
+            return 0;
         }
     }
 
@@ -158,6 +169,19 @@ const struct ble_gatt_svc_def gatt_db_svcs[] = {
                 .access_cb = gatt_svr_chr_access,
                 .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
                 .val_handle = &gatt_chr_val_handle_batt_level,
+            },
+            { 0 }
+        },
+    },
+    {
+        .type = BLE_GATT_SVC_TYPE_PRIMARY,
+        .uuid = &gatt_svc_uuid_uart.u,
+        .characteristics = (struct ble_gatt_chr_def[]) {
+            {
+                .uuid = &gatt_chr_uuid_uart_tx.u,
+                .access_cb = gatt_svr_chr_access,
+                .flags = BLE_GATT_CHR_F_WRITE | BLE_GATT_CHR_F_NOTIFY,
+                .val_handle = &gatt_chr_val_handle_uart_tx,
             },
             { 0 }
         },

@@ -15,5 +15,6 @@ extern uint16_t gatt_chr_val_handle_high_beam;
 extern uint16_t gatt_chr_val_handle_preheat;
 extern uint16_t gatt_chr_val_handle_tank_level;
 extern uint16_t gatt_chr_val_handle_batt_mv;
+extern uint16_t gatt_chr_val_handle_uart_tx;
 
 extern const ble_uuid128_t gatt_svc_uuid_car;
