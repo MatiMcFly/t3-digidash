@@ -19,7 +19,7 @@
 
 ## 1. Projektbeschreibung
 
-Zum Abschluss des CAS Embedded Systems soll ein verteiltes System entwickelt werden. Dieses wird in einem VW Transporter Typ 2.5 eingesetzt, um verschiedene analoge Instrumente im Armaturenbrett zu ersetzen. Einfache analoge Anzeigeelemente beschränken sich typischerweise auf den Tankfüllstand und die Kühlwassertemperatur. Der Kabelbaumabgriff, welcher zum Tacho führt,, beinhaltet jedoch noch diverse andere nützliche Signale, wie zum Beispiel die Drehzahlanzeige. Mit Hilfe eines passenden TFT-LCD kann somit eine konfigurierbare und dynamische digitale Anzeige gestaltet werden. Diese bietet weiter die Möglichkeit, zusätzliche, nicht originale Anzeigeelemente anzuschliessen, wie zum Beispiel einen Sensor zur Messung der Öltemperatur.
+Zum Abschluss des CAS Embedded Systems soll ein verteiltes System entwickelt werden. Dieses wird in einem VW Transporter Typ 2.5 eingesetzt, um verschiedene analoge Instrumente im Armaturenbrett zu ersetzen. Einfache analoge Anzeigeelemente beschränken sich typischerweise auf den Tankfüllstand und die Kühlwassertemperatur. Der Kabelbaumabgriff, welcher zum Tacho führt, beinhaltet jedoch noch diverse andere nützliche Signale, wie zum Beispiel die Drehzahlanzeige. Mit Hilfe eines passenden TFT-LCD kann somit eine konfigurierbare und dynamische digitale Anzeige gestaltet werden. Diese bietet weiter die Möglichkeit, zusätzliche, nicht originale Anzeigeelemente anzuschliessen, wie zum Beispiel einen Sensor zur Messung der Öltemperatur.
 
 Nachfolgend eine Auflistung aller Grössen, die im Rahmen dieses Projektes verwendet werden:
 
