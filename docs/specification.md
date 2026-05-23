@@ -12,11 +12,10 @@
 
 1. Projektbeschreibung
 2. Verwendete Hardware
-3. T3 Sensorik
-4. Anforderungen
-5. Systemübersicht
-6. Planung
-7. Quellen
+3. Anforderungen
+4. Systemübersicht
+5. Planung
+6. Quellen
 
 ## 1. Projektbeschreibung
 
@@ -68,24 +67,7 @@ miteinander kommunizieren, sowie aus mehreren projektspezifischen Adapterplatine
 - **ESP &harr; Host (Handy/PC):** BLE GATT
 - **Disco &harr; TFT:** RGB / MIPI-DSI (boardseitig vorhanden)
 
-## 3. T3 Sensorik
-
-Die folgende Tabelle fasst die im VW T3 vorhandenen Sensoren bzw. Signalquellen mit ihrer
-physikalischen Grösse und ihrem Wertebereich kurz zusammen. Die ausführliche Herleitung der
-Kennlinien und Auswerteformeln findet sich in [sensor-measurements.md](sensor-measurements.md).
-
-| Sensor                       | Physikalische Grösse | Wertebereich     |
-|------------------------------|----------------------|------------------|
-| NTC Kühlwassertemperaturgeber | Temperatur           | -10 ... 150 °C   |
-| Hebelgeber Tankfüllstand     | Füllstand            | 0 ... 80 l       |
-| Bordnetz (Klemme 15/30)      | Spannung             | 0 ... 20 V       |
-| Zündspule (Klemme 1)         | Drehzahl             | 0 ... 7000 U/min |
-| Blinkerschalter              | Schaltzustand        | on / off         |
-| Fernlichtschalter            | Schaltzustand        | on / off         |
-| Öldruckschalter 0.3 bar      | Schaltzustand        | on / off         |
-| Öldruckschalter 1.8 bar      | Schaltzustand        | on / off         |
-
-## 4. Anforderungen
+## 3. Anforderungen
 
 ### 3.1 Muss-Anforderungen
 
@@ -118,7 +100,7 @@ Kennlinien und Auswerteformeln findet sich in [sensor-measurements.md](sensor-me
 - Konfiguration und Kalibration können persistent gespeichert werden
 - eine Android App stellt die über BLE empfangenen Werte auf einem Dashboard dar
 
-## 5. Systemübersicht
+## 4. Systemübersicht
 
 Das System ist als verteiltes Embedded-System aufgebaut. Die Sensorerfassung, die
 Visualisierung und die drahtlose Anbindung sind bewusst auf drei separate Plattformen verteilt,
@@ -134,7 +116,7 @@ strukturierte Telemetrie-Frames aus.
 Der gesamte Code soll portabel gestaltet werden. In einem finalen Produkt wird das verteilte System
 zusammengeführt auf einer einzelnen Hauptplatine. Dies ist jedoch nicht im Rahmen des Projektes.
 
-### 5.1 Nucleo -- Sensor-Frontend
+### 4.1 Nucleo -- Sensor-Frontend
 
 ![Nucleo](img/Nucleo.drawio.png)
 
@@ -158,23 +140,33 @@ Die beiden Cores teilen sich die Arbeit: Der CM4 übernimmt die zeitkritische Ac
 der CM7 übernimmt Conversion, Filtering und Publication. Die Inter-Core-Kommunikation
 erfolgt über den Shared-SRAM.
 
-### 5.2 Discovery Kit -- Anzeige
+### 4.2 Discovery Kit -- Anzeige
+
+![Discovery Kit](img/Discovery-Kit.drawio.png)
 
 Das Discovery Kit STM32H747I-DISCO ist über den `disco-tft-adapter` mit dem TFT-LCD
 verbunden und stellt das digitale Armaturenbrett dar. Es empfängt zyklisch Telemetrie-Frames
 von der Nucleo via UART, dekodiert diese und aktualisiert die Anzeige.
 
 Die Renderpipeline basiert auf TouchGFX / LTDC und nutzt den integrierten Framebuffer im SDRAM.
-Der CM7 ist für das Rendering zuständig, der CM4 für UART-Empfang und Frame-Parsing.
+Sofern es die Rechenleistung zulässt ist der CM7 für die gesamte Funktionalität verantwortlich: Vom UART-Empfang, frame parsing hin zum Rendering des UIs
 
 Folgende Anzeigen sind vorgesehen:
 
 - Drehzahlmesser (analog dargestellt)
-- Tachoähnliche Anzeige für Wassertemperatur und Tankfüllstand
+- Wassertemperatur (analog dargestellt)
+- Tankfüllstand (analog dargestellt)
 - Batteriespannung (digital)
 - Statusicons für Blinker, Fernlicht, Öldruckwarnung
 
-### 5.3 ESP32-C3 -- Wireless-Bridge
+Folgende Flows müssen realisiert werden:
+
+- UART receiver
+- Frame parser
+- UI Manager
+- DSI TFT Driver
+
+### 4.3 ESP32-C3 -- Wireless-Bridge
 
 Der ESP32-C3 empfängt die gleichen Telemetrie-Frames wie das Discovery Kit über UART
 und stellt sie via BLE GATT als Notify-Characteristic zur Verfügung. Ein Smartphone oder
@@ -190,11 +182,11 @@ Auf dem ESP läuft FreeRTOS (ESP-IDF) mit zwei Tasks:
 Optional kann der ESP zusätzlich einen WiFi-Stack starten, um die Daten via MQTT oder
 HTTP an einen Telemetrie-Server zu pushen.
 
-## 6. Planung
+## 5. Planung
 
 Siehe Anhang.
 
-## 7. Quellen
+## 6. Quellen
 
 - Volkswagen AG, *VW T3 Stromlaufplan*, Werkstatthandbuch
 - Volkswagen AG, *Reparaturleitfaden VW Transporter -- Elektrische Anlage*, Werkstatthandbuch
