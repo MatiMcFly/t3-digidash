@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "FreeRTOS.h"
 #include "app.h"
@@ -29,12 +30,12 @@ void filtering_task(void* params)
                     break;
 
                 default:
-                    while (true) {} // TODO: Error handling
-                    break;
+                    HAL_UART_Transmit(&huart3, (uint8_t*)"filtering: Unknown sensor id\n", strlen("filtering: Unknown sensor id\n"), HAL_MAX_DELAY);
+                    continue;
             }
 
-            if (xQueueSend(queue_data_filtered, &data, portMAX_DELAY) != pdTRUE) {
-                while (true) {} // TODO: Error handling
+            if (xQueueSend(queue_data_filtered, &data, pdMS_TO_TICKS(20)) != pdTRUE) {
+                HAL_UART_Transmit(&huart3, (uint8_t*)"filtering: xQueueSend error\n", strlen("filtering: xQueueSend error\n"), HAL_MAX_DELAY);
             }
         }
     }

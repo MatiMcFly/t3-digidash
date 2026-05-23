@@ -2,9 +2,10 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
-#include "../app.h"
 #include "FreeRTOS.h"
+#include "app.h"
 #include "queue.h"
 
 static int16_t convert_water_temperature(int16_t raw_value);
@@ -26,12 +27,12 @@ void conversion_task(void* params)
                     break;
 
                 default:
-                    while (true) {} // TODO: Error handling
-                    break;
+                    HAL_UART_Transmit(&huart3, (uint8_t*)"conversion: Unknown sensor id\n", strlen("conversion: Unknown sensor id\n"), HAL_MAX_DELAY);
+                    continue;
             }
 
-            if (xQueueSend(queue_data_converted, &data, portMAX_DELAY) != pdTRUE) {
-                while (true) {} // TODO: Error handling
+            if (xQueueSend(queue_data_converted, &data, pdMS_TO_TICKS(20)) != pdTRUE) {
+                HAL_UART_Transmit(&huart3, (uint8_t*)"conversion: xQueueSend error\n", strlen("conversion: xQueueSend error\n"), HAL_MAX_DELAY);
             }
         }
     }

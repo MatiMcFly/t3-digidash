@@ -1,6 +1,7 @@
 #include "acquisition.h"
 
 #include <stdbool.h>
+#include <string.h>
 
 #include "FreeRTOS.h"
 #include "app.h"
@@ -19,7 +20,9 @@ void acquisition_task(void* params)
     while (true) {
 
         // Start all sensor acquisitions
-        HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc1_buffer, 2);
+        if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc1_buffer, 2) != HAL_OK) {
+            HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: HAL_ADC_Start_DMA error\n", strlen("acquisition: HAL_ADC_Start_DMA error\n"), HAL_MAX_DELAY);
+        }
 
         vTaskDelayUntil(&last_wakeup, pdMS_TO_TICKS(1000));
     }
@@ -37,14 +40,14 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
         battery_voltage.value   = adc1_buffer[1];
 
         if (xQueueSendFromISR(queue_data_raw, &water_temperature, &higher_priority_task_woken) != pdPASS) {
-            while (true) {} // TODO: Error handling
+            HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSendFromISR error\n", strlen("acquisition: xQueueSendFromISR error\n"), HAL_MAX_DELAY);
         }
 
         if (xQueueSendFromISR(queue_data_raw, &battery_voltage, &higher_priority_task_woken) != pdPASS) {
-            while (true) {} // TODO: Error handling
+            HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSendFromISR error\n", strlen("acquisition: xQueueSendFromISR error\n"), HAL_MAX_DELAY);
         }
     } else {
-        while (true) {} // TODO: Error handling
+        HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: Unknown ADC instance\n", strlen("acquisition: Unknown ADC instance\n"), HAL_MAX_DELAY);
     }
 
     portYIELD_FROM_ISR(higher_priority_task_woken);

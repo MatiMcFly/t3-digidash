@@ -1,6 +1,7 @@
 #include "app.h"
 
 #include <stdbool.h>
+#include <string.h>
 
 #include "FreeRTOS.h"
 #include "acquisition.h"
@@ -18,6 +19,8 @@ static void heartbeat_task(void* params);
 
 void app(void)
 {
+    HAL_UART_Transmit(&huart3, (uint8_t*)"Hello from M4\n", strlen("Hello from M4\n"), HAL_MAX_DELAY);
+
     if ((queue_data_raw = xQueueCreate(20, sizeof(sensor_data_t))) == NULL) {
         while (true) {} // TODO: Error handling
     }

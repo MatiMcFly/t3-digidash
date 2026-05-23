@@ -2,6 +2,7 @@
 #define APP_H
 
 #include "FreeRTOS.h"
+#include "main.h"
 #include "queue.h"
 
 typedef enum {
@@ -13,6 +14,7 @@ typedef struct {
     sensor_id_t id;
     int16_t     value;
 } sensor_data_t;
+extern UART_HandleTypeDef huart3;
 
 extern QueueHandle_t queue_data_raw;
 extern QueueHandle_t queue_data_converted;
