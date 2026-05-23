@@ -106,7 +106,7 @@ Das System ist als verteiltes Embedded-System aufgebaut. Die Sensorerfassung, di
 Visualisierung und die drahtlose Anbindung sind bewusst auf drei separate Plattformen verteilt,
 um Verantwortlichkeiten klar zu trennen und unabhängige Entwicklung im Team zu ermöglichen.
 
-![System Overview](img/System%20Overview.drawio.png)
+![System Overview](img/System%20Overview.drawio.svg)
 
 Die Nucleo-Plattform ist die zentrale Datenquelle. Sie liest alle Fahrzeugsignale ein,
 normalisiert sie zu physikalischen Grössen und stellt sie zyklisch zur Verfügung. Discovery
@@ -118,7 +118,7 @@ zusammengeführt auf einer einzelnen Hauptplatine. Dies ist jedoch nicht im Rahm
 
 ### 4.1 Nucleo -- Sensor-Frontend
 
-![Nucleo](img/Nucleo.drawio.png)
+![Nucleo](img/Nucleo.drawio.svg)
 
 Auf der Nucleo läuft die komplette Signalverarbeitungspipeline. Diese ist als FreeRTOS-Anwendung
 auf dem Cortex-M7 (CM7) und Cortex-M4 (CM4) realisiert und in vier klar getrennte Stufen
@@ -136,13 +136,12 @@ aufgeteilt:
 - **Publication** -- Serialisierung der gefilterten Werte zu einem Telemetrie-Frame und
   zyklische Ausgabe über die UART-Schnittstellen an Disco und ESP.
 
-Die beiden Cores teilen sich die Arbeit: Der CM4 übernimmt die zeitkritische Acquisition,
-der CM7 übernimmt Conversion, Filtering und Publication. Die Inter-Core-Kommunikation
-erfolgt über den Shared-SRAM.
+Die beiden Cores teilen sich die Arbeit: Der CM4 übernimmt die zeitkritische Acquisition, die Conversion und das Filtering.
+Der CM7 übernimmt lediglich die Publication via UART. Die Inter-Core-Kommunikation erfolgt über den Shared-SRAM.
 
 ### 4.2 Discovery Kit -- Anzeige
 
-![Discovery Kit](img/Discovery-Kit.drawio.png)
+![Discovery Kit](img/Discovery-Kit.drawio.svg)
 
 Das Discovery Kit STM32H747I-DISCO ist über den `disco-tft-adapter` mit dem TFT-LCD
 verbunden und stellt das digitale Armaturenbrett dar. Es empfängt zyklisch Telemetrie-Frames
