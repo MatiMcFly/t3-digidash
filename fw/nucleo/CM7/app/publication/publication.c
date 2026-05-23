@@ -27,24 +27,11 @@ void HAL_HSEM_FreeCallback(uint32_t SemMask)
 void publication_task(void* params)
 {
     sensor_data_t data;
-    char          string[50] = "";
+    char          string[20] = "";
 
     while (true) {
         if (xMessageBufferReceive(ipc_message_buffer, &data, sizeof(data), portMAX_DELAY) == sizeof(data)) {
-            switch (data.id) {
-                case SENSOR_ID_WATER_TEMPERATURE:
-                    snprintf(string, sizeof(string), "Water Temperature: %d\n", data.value);
-                    break;
-
-                case SENSOR_ID_BATTERY_VOLTAGE:
-                    snprintf(string, sizeof(string), "Battery Voltage:   %d\n", data.value);
-                    break;
-
-                default:
-                    snprintf(string, sizeof(string), "Unknown sensor id: %d\n", (int)data.id);
-                    break;
-            }
-
+            snprintf(string, sizeof(string), "%u:%d;", data.id, data.value);
             HAL_UART_Transmit(&huart1, (uint8_t*)string, strlen(string), HAL_MAX_DELAY);
         }
     }

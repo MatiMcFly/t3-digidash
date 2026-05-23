@@ -18,8 +18,6 @@ MessageBufferHandle_t ipc_message_buffer;
 
 void app(void)
 {
-    HAL_UART_Transmit(&huart1, (uint8_t*)"Hello from M7\n", strlen("Hello from M7\n"), HAL_MAX_DELAY);
-
     ipc_message_buffer = (MessageBufferHandle_t)IPC_MB_STRUCT_ADDR; // Initialized by M4
 
     HAL_HSEM_ActivateNotification(__HAL_HSEM_SEMID_TO_MASK(IPC_HSEM_ID));
