@@ -3,6 +3,7 @@
 
 #include "FreeRTOS.h"
 #include "main.h"
+#include "message_buffer.h"
 #include "queue.h"
 
 extern UART_HandleTypeDef huart3;
@@ -10,6 +11,8 @@ extern UART_HandleTypeDef huart3;
 extern QueueHandle_t queue_data_raw;
 extern QueueHandle_t queue_data_converted;
 extern QueueHandle_t queue_data_filtered;
+
+extern MessageBufferHandle_t ipc_message_buffer;
 
 /**
  * @brief User application entry point. Never returns.

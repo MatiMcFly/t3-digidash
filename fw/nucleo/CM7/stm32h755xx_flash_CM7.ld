@@ -40,6 +40,7 @@ MEMORY
 FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 1024K
 RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 128K
 ITCMRAM (xrw)      : ORIGIN = 0x00000000, LENGTH = 64K
+SRAM4 (xrw)    : ORIGIN = 0x38000000, LENGTH = 64K
 }
 /* Highest address of the user mode stack */
 _estack = 0x20020000;    /* end of RAM */
@@ -125,6 +126,18 @@ SECTIONS
     PROVIDE_HIDDEN (__fini_array_end = .);
     . = ALIGN(4);
   } >FLASH
+
+  .ipc_shared (NOLOAD) : ALIGN(8)
+  {
+    __ipc_mb_struct_start__ = .;
+    . = . + 128;
+    __ipc_mb_struct_end__ = .;
+    __ipc_mb_storage_start__ = .;
+    . = . + 1024;
+    __ipc_mb_storage_end__ = .;
+    __ipc_mb_end__ = .;
+    . = ALIGN(8);
+  } >SRAM4
 
   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);

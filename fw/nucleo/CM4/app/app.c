@@ -8,6 +8,7 @@
 #include "conversion.h"
 #include "filtering.h"
 #include "main.h"
+#include "message_buffer.h"
 #include "publication.h"
 #include "shared.h"
 #include "task.h"
@@ -15,6 +16,8 @@
 QueueHandle_t queue_data_raw;
 QueueHandle_t queue_data_converted;
 QueueHandle_t queue_data_filtered;
+
+MessageBufferHandle_t ipc_message_buffer;
 
 static void heartbeat_task(void* params);
 
@@ -31,6 +34,10 @@ void app(void)
     }
 
     if ((queue_data_filtered = xQueueCreate(20, sizeof(sensor_data_t))) == NULL) {
+        while (true) {} // TODO: Error handling
+    }
+
+    if ((ipc_message_buffer = xMessageBufferCreateStaticWithCallback(IPC_MB_STORAGE_SIZE, (uint8_t*)IPC_MB_STORAGE_ADDR, (StaticMessageBuffer_t*)IPC_MB_STRUCT_ADDR, publication_mb_tx_callback, publication_mb_rx_callback)) == NULL) {
         while (true) {} // TODO: Error handling
     }
 
