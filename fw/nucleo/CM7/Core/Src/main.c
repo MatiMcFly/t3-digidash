@@ -141,6 +141,7 @@ Error_Handler();
   MX_DMA_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+  HAL_Delay(1000); // Wait for M4 to initialize the message buffer before starting the application
   app(); // never returns
 
   /* USER CODE END 2 */
