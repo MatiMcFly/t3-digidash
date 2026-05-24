@@ -348,7 +348,7 @@
  * xStreamBufferCreateStaticWithCallback() (and likewise APIs for message
  * buffer) can be used to create a stream buffer or message buffer instance
  * with application provided callbacks. Defaults to 0 if left undefined. */
-#define configUSE_SB_COMPLETED_CALLBACK 0
+#define configUSE_SB_COMPLETED_CALLBACK 1
 
 /* Set configCHECK_FOR_STACK_OVERFLOW to 1 or 2 for FreeRTOS to check for a
  * stack overflow at the time of a context switch.  Set to 0 to not look for a

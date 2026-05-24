@@ -53,7 +53,9 @@ enable_language(C ASM)
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
+    ../Common/Inc
     app/
+    app/publication
 )
 
 # FreeRTOS configuration
@@ -68,6 +70,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../FreeRTOS ${CMAKE_BINARY_DIR}/Fre
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
     app/app.c
+    app/publication/publication.c
 )
 
 # Link directories setup
