@@ -22,6 +22,7 @@ static const char *TAG_BLE = "BLE_GATT";
 
 static uint8_t g_own_addr_type;
 static uint16_t g_conn_handle = BLE_HS_CONN_HANDLE_NONE;
+static bool g_uart_notify_enabled;
 
 static void ble_app_advertise(void);
 
@@ -41,11 +42,17 @@ static int ble_gap_event(struct ble_gap_event *event, void *arg)
     case BLE_GAP_EVENT_DISCONNECT:
         ESP_LOGI(TAG_BLE, "Disconnected; reason=%d", event->disconnect.reason);
         g_conn_handle = BLE_HS_CONN_HANDLE_NONE;
+        g_uart_notify_enabled = false;
         remotexy_set_connected(false);
+        remotexy_set_notify_enabled(false);
         car_signals_on_disconnect();
         ble_app_advertise();
         return 0;
     case BLE_GAP_EVENT_SUBSCRIBE:
+        if (event->subscribe.attr_handle == gatt_chr_val_handle_uart_tx) {
+            g_uart_notify_enabled = event->subscribe.cur_notify;
+            remotexy_set_notify_enabled(g_uart_notify_enabled);
+        }
         car_signals_on_subscribe(event->subscribe.attr_handle, event->subscribe.cur_notify);
         return 0;
     case BLE_GAP_EVENT_ADV_COMPLETE:
@@ -140,6 +147,8 @@ void ble_app_notify(uint16_t attr_handle, const void *data, size_t len)
     if (rc != 0) {
         os_mbuf_free_chain(om);
         ESP_LOGW(TAG_BLE, "Notify failed: %d", rc);
+    } else if (attr_handle == gatt_chr_val_handle_uart_tx) {
+        ESP_LOGI(TAG_BLE, "UART notify sent (%u bytes)", (unsigned)len);
     }
 }
 
@@ -156,6 +165,7 @@ static void ble_host_task(void *param)
 
 void ble_app_init(void)
 {
+    g_uart_notify_enabled = false;
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK(nvs_flash_erase());
@@ -188,4 +198,9 @@ void ble_app_init(void)
     }
 
     nimble_port_freertos_init(ble_host_task);
+}
+
+bool ble_app_uart_notify_enabled(void)
+{
+    return g_uart_notify_enabled;
 }

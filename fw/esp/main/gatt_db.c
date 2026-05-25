@@ -3,10 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "esp_log.h"
 #include "os/os_mbuf.h"
 
 #include "car_signals.h"
 #include "remotexy_protocol.h"
+
+static const char *TAG_GATT = "GATT_DB";
 
 static const char g_desc_water_temp[] = "Water Temperature";
 static const char g_desc_outside_temp[] = "Outside Temperature";
@@ -77,6 +80,9 @@ static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle,
     }
 
     if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR) {
+        if (attr_handle == gatt_chr_val_handle_uart_tx) {
+            return 0;
+        }
         if (attr_handle == gatt_chr_val_handle_water_temp) {
             int16_t value = car_signals_get_water_temp_cC();
             return os_mbuf_append(ctxt->om, &value, sizeof(value));
@@ -126,6 +132,16 @@ static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle,
                 }
                 if (buf != NULL) {
                     os_mbuf_copydata(ctxt->om, 0, len, buf);
+                    if (len <= 8) {
+                        ESP_LOGI(TAG_GATT, "UART write len=%u bytes=%02x %02x %02x %02x %02x %02x %02x %02x",
+                                 (unsigned)len,
+                                 buf[0], len > 1 ? buf[1] : 0, len > 2 ? buf[2] : 0,
+                                 len > 3 ? buf[3] : 0, len > 4 ? buf[4] : 0, len > 5 ? buf[5] : 0,
+                                 len > 6 ? buf[6] : 0, len > 7 ? buf[7] : 0);
+                    } else {
+                        ESP_LOGI(TAG_GATT, "UART write len=%u first=%02x %02x %02x", (unsigned)len,
+                                 buf[0], buf[1], buf[2]);
+                    }
                     remotexy_handle_rx(buf, len);
                     if (buf != stack_buf) {
                         free(buf);
@@ -197,7 +213,7 @@ const struct ble_gatt_svc_def gatt_db_svcs[] = {
             {
                 .uuid = &gatt_chr_uuid_uart_tx.u,
                 .access_cb = gatt_svr_chr_access,
-                .flags = BLE_GATT_CHR_F_WRITE | BLE_GATT_CHR_F_NOTIFY,
+                .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_WRITE | BLE_GATT_CHR_F_WRITE_NO_RSP | BLE_GATT_CHR_F_NOTIFY,
                 .val_handle = &gatt_chr_val_handle_uart_tx,
             },
             { 0 }
