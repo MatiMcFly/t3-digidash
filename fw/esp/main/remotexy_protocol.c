@@ -359,12 +359,12 @@ void remotexy_handle_rx(const uint8_t *data, size_t len)
             }
 
             if (packet_len <= 8) {
-                ESP_LOGI(TAG_RXY, "RX raw len=%u crc=0x%04x bytes=%02x %02x %02x %02x %02x %02x %02x %02x",
-                         packet_len, crc,
-                         g_rx_buffer[0], g_rx_buffer[1], g_rx_buffer[2], g_rx_buffer[3],
-                         g_rx_buffer[4], g_rx_buffer[5],
-                         packet_len > 6 ? g_rx_buffer[6] : 0,
-                         packet_len > 7 ? g_rx_buffer[7] : 0);
+                // ESP_LOGI(TAG_RXY, "RX raw len=%u crc=0x%04x bytes=%02x %02x %02x %02x %02x %02x %02x %02x",
+                //          packet_len, crc,
+                //          g_rx_buffer[0], g_rx_buffer[1], g_rx_buffer[2], g_rx_buffer[3],
+                //          g_rx_buffer[4], g_rx_buffer[5],
+                //          packet_len > 6 ? g_rx_buffer[6] : 0,
+                //          packet_len > 7 ? g_rx_buffer[7] : 0);
             }
 
             if (crc == 0) {
@@ -380,12 +380,12 @@ void remotexy_handle_rx(const uint8_t *data, size_t len)
                 }
             } else {
                 if (packet_len <= 16) {
-                    ESP_LOGW(TAG_RXY, "CRC fail len=%u crc=0x%04x bytes=%02x %02x %02x %02x %02x %02x",
-                             packet_len, crc,
-                             g_rx_buffer[0], g_rx_buffer[1], g_rx_buffer[2],
-                             g_rx_buffer[3], g_rx_buffer[4], g_rx_buffer[5]);
+                    // ESP_LOGW(TAG_RXY, "CRC fail len=%u crc=0x%04x bytes=%02x %02x %02x %02x %02x %02x",
+                    //          packet_len, crc,
+                    //          g_rx_buffer[0], g_rx_buffer[1], g_rx_buffer[2],
+                    //          g_rx_buffer[3], g_rx_buffer[4], g_rx_buffer[5]);
                 } else {
-                    ESP_LOGW(TAG_RXY, "CRC fail len=%u crc=0x%04x", packet_len, crc);
+                    // ESP_LOGW(TAG_RXY, "CRC fail len=%u crc=0x%04x", packet_len, crc);
                 }
             }
 

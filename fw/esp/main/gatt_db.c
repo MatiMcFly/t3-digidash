@@ -133,14 +133,14 @@ static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle,
                 if (buf != NULL) {
                     os_mbuf_copydata(ctxt->om, 0, len, buf);
                     if (len <= 8) {
-                        ESP_LOGI(TAG_GATT, "UART write len=%u bytes=%02x %02x %02x %02x %02x %02x %02x %02x",
-                                 (unsigned)len,
-                                 buf[0], len > 1 ? buf[1] : 0, len > 2 ? buf[2] : 0,
-                                 len > 3 ? buf[3] : 0, len > 4 ? buf[4] : 0, len > 5 ? buf[5] : 0,
-                                 len > 6 ? buf[6] : 0, len > 7 ? buf[7] : 0);
+                        // ESP_LOGI(TAG_GATT, "UART write len=%u bytes=%02x %02x %02x %02x %02x %02x %02x %02x",
+                        //          (unsigned)len,
+                        //          buf[0], len > 1 ? buf[1] : 0, len > 2 ? buf[2] : 0,
+                        //          len > 3 ? buf[3] : 0, len > 4 ? buf[4] : 0, len > 5 ? buf[5] : 0,
+                        //          len > 6 ? buf[6] : 0, len > 7 ? buf[7] : 0);
                     } else {
-                        ESP_LOGI(TAG_GATT, "UART write len=%u first=%02x %02x %02x", (unsigned)len,
-                                 buf[0], buf[1], buf[2]);
+                        // ESP_LOGI(TAG_GATT, "UART write len=%u first=%02x %02x %02x", (unsigned)len,
+                        //          buf[0], buf[1], buf[2]);
                     }
                     remotexy_handle_rx(buf, len);
                     if (buf != stack_buf) {
