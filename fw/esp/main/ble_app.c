@@ -148,7 +148,7 @@ void ble_app_notify(uint16_t attr_handle, const void *data, size_t len)
         os_mbuf_free_chain(om);
         ESP_LOGW(TAG_BLE, "Notify failed: %d", rc);
     } else if (attr_handle == gatt_chr_val_handle_uart_tx) {
-        ESP_LOGI(TAG_BLE, "UART notify sent (%u bytes)", (unsigned)len);
+        // ESP_LOGI(TAG_BLE, "UART notify sent (%u bytes)", (unsigned)len);
     }
 }
 
