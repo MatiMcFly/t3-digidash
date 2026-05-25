@@ -1,10 +1,12 @@
 #include "gatt_db.h"
 
+#include <stdlib.h>
 #include <string.h>
 
 #include "os/os_mbuf.h"
 
 #include "car_signals.h"
+#include "remotexy_protocol.h"
 
 static const char g_desc_water_temp[] = "Water Temperature";
 static const char g_desc_outside_temp[] = "Outside Temperature";
@@ -115,6 +117,21 @@ static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle,
 
     if (ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR) {
         if (attr_handle == gatt_chr_val_handle_uart_tx) {
+            uint16_t len = OS_MBUF_PKTLEN(ctxt->om);
+            if (len > 0) {
+                uint8_t stack_buf[128];
+                uint8_t *buf = stack_buf;
+                if (len > sizeof(stack_buf)) {
+                    buf = (uint8_t *)malloc(len);
+                }
+                if (buf != NULL) {
+                    os_mbuf_copydata(ctxt->om, 0, len, buf);
+                    remotexy_handle_rx(buf, len);
+                    if (buf != stack_buf) {
+                        free(buf);
+                    }
+                }
+            }
             return 0;
         }
     }
