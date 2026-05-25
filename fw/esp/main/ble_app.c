@@ -14,6 +14,7 @@
 
 #include "car_signals.h"
 #include "gatt_db.h"
+#include "remotexy_protocol.h"
 
 #define BLE_DEVICE_NAME "ESP32C3-NimBLE"
 
@@ -31,6 +32,7 @@ static int ble_gap_event(struct ble_gap_event *event, void *arg)
         if (event->connect.status == 0) {
             g_conn_handle = event->connect.conn_handle;
             ESP_LOGI(TAG_BLE, "Connected; handle=%d", g_conn_handle);
+            remotexy_set_connected(true);
         } else {
             ESP_LOGW(TAG_BLE, "Connect failed; status=%d", event->connect.status);
             ble_app_advertise();
@@ -39,6 +41,7 @@ static int ble_gap_event(struct ble_gap_event *event, void *arg)
     case BLE_GAP_EVENT_DISCONNECT:
         ESP_LOGI(TAG_BLE, "Disconnected; reason=%d", event->disconnect.reason);
         g_conn_handle = BLE_HS_CONN_HANDLE_NONE;
+        remotexy_set_connected(false);
         car_signals_on_disconnect();
         ble_app_advertise();
         return 0;
