@@ -23,3 +23,4 @@ This project consists of three hardware projects:
 - [disco-tft-adapter](hw/disco-tft-adapter/) -- Discovery Board TFT Adapter
 - [t3-harness-adapter](hw/t3-harness-adapter/) -- T3 Wiring harness adapter
 - [measurement-circuits](hw/measurement-circuits/) -- Collects all of the measurement circuits used
+- [signal-emulator](hw/signal-emulator/) -- Sensor signal emulator (used for testing and demonstration)
