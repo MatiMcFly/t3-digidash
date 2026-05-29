@@ -55,6 +55,7 @@ enable_language(C ASM)
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
     Core/Application
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Middlewares/ST/touchgfx/framework/include
 )
 
 # Add sources to executable
@@ -68,11 +69,13 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 # Link directories setup
 target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined library search paths
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Middlewares/ST/touchgfx/lib/core/cortex_m7/gcc
 )
 
 # Add linked libraries
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined libraries
+    touchgfx-float-abi-hard
 )
 
 # Remove wrong libob.a library dependency when using cpp files
