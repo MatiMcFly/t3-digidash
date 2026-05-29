@@ -15,9 +15,16 @@ static int16_t filter_coolant_temperature(int16_t value);
 static int16_t filter_battery_voltage(int16_t value);
 static int16_t mean(int16_t values[], uint8_t size);
 
+/**
+ * @brief Filtering task for sensor data
+ *
+ * @param params -- Unused
+ */
 void filtering_task(void* params)
 {
     sensor_data_t data;
+
+    (void)params; // Unused
 
     while (true) {
         if (xQueueReceive(queue_data_converted, &data, portMAX_DELAY) == pdTRUE) {

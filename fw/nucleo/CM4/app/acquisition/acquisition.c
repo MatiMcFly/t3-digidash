@@ -14,9 +14,16 @@ extern ADC_HandleTypeDef hadc1;
 
 static volatile uint16_t adc1_buffer[2] = {0};
 
+/**
+ * @brief Acquisition task for sensor data
+ *
+ * @param params -- Unused
+ */
 void acquisition_task(void* params)
 {
     TickType_t last_wakeup = xTaskGetTickCount();
+
+    (void)params; // Unused
 
     while (true) {
 

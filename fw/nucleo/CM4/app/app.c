@@ -68,6 +68,8 @@ void app(void)
 
 static void heartbeat_task(void* params)
 {
+    (void)params; // Unused
+
     while (true) {
         HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_SET);
         vTaskDelay(pdMS_TO_TICKS(50));

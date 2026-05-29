@@ -12,9 +12,16 @@
 static int16_t convert_coolant_temperature(int16_t raw_value);
 static int16_t convert_battery_voltage(int16_t raw_value);
 
+/**
+ * @brief Conversion task for sensor data
+ *
+ * @param params -- Unused
+ */
 void conversion_task(void* params)
 {
     sensor_data_t data;
+
+    (void)params; // Unused
 
     while (true) {
         if (xQueueReceive(queue_data_raw, &data, portMAX_DELAY) == pdTRUE) {

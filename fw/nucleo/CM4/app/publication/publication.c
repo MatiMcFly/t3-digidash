@@ -11,10 +11,17 @@
 #include "queue.h"
 #include "shared.h"
 
+/**
+ * @brief Publication task
+ *
+ * @param params -- Unused
+ */
 void publication_task(void* params)
 {
     sensor_data_t data;
     char          string[50] = "";
+
+    (void)params; // Unused
 
     while (true) {
         if (xQueueReceive(queue_data_filtered, &data, portMAX_DELAY) == pdTRUE) {
