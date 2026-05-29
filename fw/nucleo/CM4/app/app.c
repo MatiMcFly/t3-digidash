@@ -1,7 +1,6 @@
 #include "app.h"
 
 #include <stdbool.h>
-#include <string.h>
 
 #include "FreeRTOS.h"
 #include "acquisition.h"
