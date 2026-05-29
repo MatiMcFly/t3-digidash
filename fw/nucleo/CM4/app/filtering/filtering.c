@@ -13,11 +13,21 @@
 #define FILTER_SIZE_BATTERY_VOLTAGE     20
 #define FILTER_SIZE_FUEL_LEVEL          300
 
+#define DEBOUNCE_SIZE_TURN_SIGNAL          2
+#define DEBOUNCE_SIZE_HIGH_BEAM            2
+#define DEBOUNCE_SIZE_OIL_PRESSURE_0_3_BAR 2
+#define DEBOUNCE_SIZE_OIL_PRESSURE_1_8_BAR 2
+
 static int16_t filter_coolant_temperature(int16_t value);
 static int16_t filter_battery_voltage(int16_t value);
 static int16_t filter_fuel_level(int16_t value);
+static int16_t debounce_turn_signal(int16_t value);
+static int16_t debounce_high_beam(int16_t value);
+static int16_t debounce_oil_pressure_0_3_bar(int16_t value);
+static int16_t debounce_oil_pressure_1_8_bar(int16_t value);
 static void    ringbuf_update(int16_t ringbuf[], uint16_t size, uint16_t* index, int16_t value);
 static int16_t ringbuf_mean(int16_t ringbuf[], uint16_t size);
+static bool    ringbuf_is_consistent(int16_t ringbuf[], uint16_t size);
 
 /**
  * @brief Filtering task for sensor data
@@ -43,6 +53,22 @@ void filtering_task(void* params)
 
                 case SENSOR_ID_FUEL_LEVEL:
                     data.value = filter_fuel_level(data.value);
+                    break;
+
+                case SENSOR_ID_TURN_SIGNAL:
+                    data.value = debounce_turn_signal(data.value);
+                    break;
+
+                case SENSOR_ID_HIGH_BEAM:
+                    data.value = debounce_high_beam(data.value);
+                    break;
+
+                case SENSOR_ID_OIL_PRESSURE_0_3_BAR:
+                    data.value = debounce_oil_pressure_0_3_bar(data.value);
+                    break;
+
+                case SENSOR_ID_OIL_PRESSURE_1_8_BAR:
+                    data.value = debounce_oil_pressure_1_8_bar(data.value);
                     break;
 
                 default:
@@ -85,6 +111,66 @@ static int16_t filter_fuel_level(int16_t value)
     ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
 
     return ringbuf_mean(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]));
+}
+
+static int16_t debounce_turn_signal(int16_t value)
+{
+    static int16_t  ringbuf[DEBOUNCE_SIZE_TURN_SIGNAL] = {0};
+    static uint16_t index                              = 0;
+    static int16_t  previous_value                     = 0;
+
+    ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
+
+    if (ringbuf_is_consistent(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]))) {
+        previous_value = value;
+    }
+
+    return previous_value;
+}
+
+static int16_t debounce_high_beam(int16_t value)
+{
+    static int16_t  ringbuf[DEBOUNCE_SIZE_HIGH_BEAM] = {0};
+    static uint16_t index                            = 0;
+    static int16_t  previous_value                   = 0;
+
+    ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
+
+    if (ringbuf_is_consistent(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]))) {
+        previous_value = value;
+    }
+
+    return previous_value;
+}
+
+static int16_t debounce_oil_pressure_0_3_bar(int16_t value)
+{
+    static int16_t  ringbuf[DEBOUNCE_SIZE_OIL_PRESSURE_0_3_BAR] = {0};
+    static uint16_t index                                       = 0;
+    static int16_t  previous_value                              = 0;
+
+    ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
+
+    if (ringbuf_is_consistent(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]))) {
+        previous_value = value;
+    }
+
+    return previous_value;
+}
+
+static int16_t debounce_oil_pressure_1_8_bar(int16_t value)
+{
+    static int16_t  ringbuf[DEBOUNCE_SIZE_OIL_PRESSURE_1_8_BAR] = {0};
+    static uint16_t index                                       = 0;
+    static int16_t  previous_value                              = 0;
+
+    ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
+
+    if (ringbuf_is_consistent(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]))) {
+        previous_value = value;
+    }
+
+    return previous_value;
 }
 
 /**
@@ -134,4 +220,31 @@ static int16_t ringbuf_mean(int16_t ringbuf[], uint16_t size)
     }
 
     return (int16_t)(sum / size);
+}
+
+/**
+ * @brief Check if all values in the ring buffer are the same
+ *
+ * @param ringbuf -- Ring buffer array
+ * @param size    -- Number of elements in the ring buffer
+ *
+ * @return true -- All elements in the ring buffer have the same value
+ * @return false -- Not all elements in the ring buffer have the same value
+ */
+static bool ringbuf_is_consistent(int16_t ringbuf[], uint16_t size)
+{
+    if (size == 0) {
+        HAL_UART_Transmit(&huart3, (uint8_t*)"ringbuf_is_consistent: Size cannot be zero\n", strlen("ringbuf_is_consistent: Size cannot be zero\n"), HAL_MAX_DELAY);
+        return false; // Invalid size
+    }
+
+    int16_t value = ringbuf[0];
+
+    for (uint16_t i = 1; i < size; i++) {
+        if (ringbuf[i] != value) {
+            return false;
+        }
+    }
+
+    return true;
 }

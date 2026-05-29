@@ -5,9 +5,14 @@
 #include <stdint.h>
 
 typedef enum {
-    SENSOR_ID_COOLANT_TEMPERATURE = 1,
-    SENSOR_ID_BATTERY_VOLTAGE     = 3,
-    SENSOR_ID_FUEL_LEVEL          = 4,
+    SENSOR_ID_COOLANT_TEMPERATURE  = 1, // analog signal
+    SENSOR_ID_ROTATION_SPEED       = 2, // pulsed signal (TODO)
+    SENSOR_ID_BATTERY_VOLTAGE      = 3, // analog signal
+    SENSOR_ID_FUEL_LEVEL           = 4, // analog signal
+    SENSOR_ID_TURN_SIGNAL          = 5, // binary signal
+    SENSOR_ID_HIGH_BEAM            = 6, // binary signal
+    SENSOR_ID_OIL_PRESSURE_0_3_BAR = 7, // binary signal
+    SENSOR_ID_OIL_PRESSURE_1_8_BAR = 8, // binary signal
 } sensor_id_t;
 
 typedef struct {
