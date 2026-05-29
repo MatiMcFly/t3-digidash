@@ -20,13 +20,9 @@ CM7/build/
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
-*.cmake
 compile_commands.json
 
 # IDE - VS Code
-.vscode/settings.json
-.vscode/launch.json
-.vscode/tasks.json
 *.code-workspace
 .history/
 
