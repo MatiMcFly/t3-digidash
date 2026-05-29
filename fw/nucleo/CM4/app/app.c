@@ -12,8 +12,6 @@
 #include "shared.h"
 #include "task.h"
 
-#define QUEUE_SIZE 20
-
 QueueHandle_t queue_data_raw;
 QueueHandle_t queue_data_converted;
 QueueHandle_t queue_data_filtered;

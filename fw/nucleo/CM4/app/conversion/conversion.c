@@ -43,12 +43,19 @@ void conversion_task(void* params)
                     data.value = convert_fuel_level(data.value);
                     break;
 
+                case SENSOR_ID_TURN_SIGNAL:
+                case SENSOR_ID_HIGH_BEAM:
+                case SENSOR_ID_OIL_PRESSURE_0_3_BAR:
+                case SENSOR_ID_OIL_PRESSURE_1_8_BAR:
+                    // No conversion needed for binary signals
+                    break;
+
                 default:
                     HAL_UART_Transmit(&huart3, (uint8_t*)"conversion: Unknown sensor id\n", strlen("conversion: Unknown sensor id\n"), HAL_MAX_DELAY);
                     continue;
             }
 
-            if (xQueueSend(queue_data_converted, &data, pdMS_TO_TICKS(20)) != pdPASS) {
+            if (xQueueSend(queue_data_converted, &data, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
                 HAL_UART_Transmit(&huart3, (uint8_t*)"conversion: xQueueSend error\n", strlen("conversion: xQueueSend error\n"), HAL_MAX_DELAY);
             }
         }

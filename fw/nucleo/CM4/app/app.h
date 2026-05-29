@@ -6,6 +6,9 @@
 #include "message_buffer.h"
 #include "queue.h"
 
+#define QUEUE_SIZE       50
+#define QUEUE_TIMEOUT_MS 0
+
 extern UART_HandleTypeDef huart3;
 
 extern QueueHandle_t queue_data_raw;
