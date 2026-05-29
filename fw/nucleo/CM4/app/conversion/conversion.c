@@ -1,5 +1,6 @@
 #include "conversion.h"
 
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -9,8 +10,11 @@
 #include "queue.h"
 #include "shared.h"
 
+static float   adc_to_voltage(int16_t raw_value);
 static int16_t convert_coolant_temperature(int16_t raw_value);
 static int16_t convert_battery_voltage(int16_t raw_value);
+
+static const float VREF_V = 3.3f;
 
 /**
  * @brief Conversion task for sensor data
@@ -46,10 +50,50 @@ void conversion_task(void* params)
     }
 }
 
+/**
+ * @brief Convert raw ADC value to voltage in V
+ *
+ * @param raw_value -- Raw ADC value (0 to 65535)
+ *
+ * @return float -- Voltage in V
+ */
+static float adc_to_voltage(int16_t raw_value)
+{
+    const float ADC_MAX = 65536.0f;
+
+    return ((float)raw_value / ADC_MAX) * VREF_V;
+}
+
+/**
+ * @brief Convert raw ADC value to coolant temperature in deci-°C
+ *
+ * @param raw_value -- Raw ADC value (0 to 65535)
+ *
+ * @return int16_t -- Temperature in deci-°C (e.g., 234 means 23.4°C)
+ */
 static int16_t convert_coolant_temperature(int16_t raw_value)
 {
-    // TODO: apply coolant temperature conversion
-    return raw_value;
+    const float R2_OHM = 470.0f;
+    const float R0_OHM = 1100.0f;
+    const float T0_K   = 293.15f;
+    const float B      = 3572.0f;
+    const float K_TO_C = 273.15f;
+
+    float vadc_v = adc_to_voltage(raw_value);
+
+    float rv2_ohm = INFINITY;
+    if ((VREF_V - vadc_v) != 0.0f) {
+        rv2_ohm = (vadc_v * R2_OHM) / (VREF_V - vadc_v);
+    }
+
+    float t_k = 0.0f;
+    if ((rv2_ohm / R0_OHM) > 0.0f) {
+        t_k = 1 / ((1 / T0_K) + (1 / B) * log(rv2_ohm / R0_OHM));
+    }
+
+    float t_c = t_k - K_TO_C;
+
+    return (int16_t)(t_c * 10.0f);
 }
 
 static int16_t convert_battery_voltage(int16_t raw_value)
