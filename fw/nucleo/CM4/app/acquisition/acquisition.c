@@ -58,19 +58,19 @@ static void acquire_binary_sensors(void)
     oil_pressure_0_3_bar.value = (int16_t)HAL_GPIO_ReadPin(SENSOR_07_OIL_PRESSURE_0_3_BAR_GPIO_Port, SENSOR_07_OIL_PRESSURE_0_3_BAR_Pin);
     oil_pressure_1_8_bar.value = (int16_t)HAL_GPIO_ReadPin(SENSOR_08_OIL_PRESSURE_1_8_BAR_GPIO_Port, SENSOR_08_OIL_PRESSURE_1_8_BAR_Pin);
 
-    if (xQueueSend(queue_data_raw, &turn_signal, pdMS_TO_TICKS(20)) != pdPASS) {
+    if (xQueueSend(queue_data_raw, &turn_signal, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
         HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSend error\n", strlen("acquisition: xQueueSend error\n"), HAL_MAX_DELAY);
     }
 
-    if (xQueueSend(queue_data_raw, &high_beam, pdMS_TO_TICKS(20)) != pdPASS) {
+    if (xQueueSend(queue_data_raw, &high_beam, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
         HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSend error\n", strlen("acquisition: xQueueSend error\n"), HAL_MAX_DELAY);
     }
 
-    if (xQueueSend(queue_data_raw, &oil_pressure_0_3_bar, pdMS_TO_TICKS(20)) != pdPASS) {
+    if (xQueueSend(queue_data_raw, &oil_pressure_0_3_bar, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
         HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSend error\n", strlen("acquisition: xQueueSend error\n"), HAL_MAX_DELAY);
     }
 
-    if (xQueueSend(queue_data_raw, &oil_pressure_1_8_bar, pdMS_TO_TICKS(20)) != pdPASS) {
+    if (xQueueSend(queue_data_raw, &oil_pressure_1_8_bar, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
         HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSend error\n", strlen("acquisition: xQueueSend error\n"), HAL_MAX_DELAY);
     }
 }

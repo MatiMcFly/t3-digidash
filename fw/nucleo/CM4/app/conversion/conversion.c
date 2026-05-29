@@ -55,7 +55,7 @@ void conversion_task(void* params)
                     continue;
             }
 
-            if (xQueueSend(queue_data_converted, &data, pdMS_TO_TICKS(20)) != pdPASS) {
+            if (xQueueSend(queue_data_converted, &data, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
                 HAL_UART_Transmit(&huart3, (uint8_t*)"conversion: xQueueSend error\n", strlen("conversion: xQueueSend error\n"), HAL_MAX_DELAY);
             }
         }
