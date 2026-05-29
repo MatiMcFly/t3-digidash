@@ -7,7 +7,7 @@
 #include "queue.h"
 
 #define QUEUE_SIZE       50
-#define QUEUE_TIMEOUT_MS 20
+#define QUEUE_TIMEOUT_MS 0
 
 extern UART_HandleTypeDef huart3;
 
