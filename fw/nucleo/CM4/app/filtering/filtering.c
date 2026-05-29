@@ -183,15 +183,15 @@ static int16_t debounce_oil_pressure_1_8_bar(int16_t value)
  */
 static void ringbuf_update(int16_t ringbuf[], uint16_t size, uint16_t* index, int16_t value)
 {
+    if (size == 0) {
+        HAL_UART_Transmit(&huart3, (uint8_t*)"ringbuf_update: Size cannot be zero\n", strlen("ringbuf_update: Size cannot be zero\n"), HAL_MAX_DELAY);
+        return; // Invalid size
+    }
+
     if (*index >= size) {
         HAL_UART_Transmit(&huart3, (uint8_t*)"ringbuf_update: Invalid index\n", strlen("ringbuf_update: Invalid index\n"), HAL_MAX_DELAY);
         *index = 0;
         return; // Invalid index
-    }
-
-    if (size == 0) {
-        HAL_UART_Transmit(&huart3, (uint8_t*)"ringbuf_update: Size cannot be zero\n", strlen("ringbuf_update: Size cannot be zero\n"), HAL_MAX_DELAY);
-        return; // Invalid size
     }
 
     ringbuf[*index] = value;
