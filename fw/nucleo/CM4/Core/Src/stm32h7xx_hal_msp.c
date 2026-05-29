@@ -102,7 +102,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     PeriphClkInitStruct.PLL2.PLL2R = 2;
     PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_3;
     PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOMEDIUM;
-    PeriphClkInitStruct.PLL2.PLL2FRACN = 0.0;
+    PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
     PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL2;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
     {
@@ -123,10 +123,10 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(SENSOR_03_BATTERY_VOLTAGE_GPIO_Port, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = SENSOR_01_WATER_TEMPERATURE_Pin;
+    GPIO_InitStruct.Pin = SENSOR_01_COOLANT_TEMPERATURE_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(SENSOR_01_WATER_TEMPERATURE_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(SENSOR_01_COOLANT_TEMPERATURE_GPIO_Port, &GPIO_InitStruct);
 
     /* ADC1 DMA Init */
     /* ADC1 Init */
@@ -177,7 +177,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     */
     HAL_GPIO_DeInit(SENSOR_03_BATTERY_VOLTAGE_GPIO_Port, SENSOR_03_BATTERY_VOLTAGE_Pin);
 
-    HAL_GPIO_DeInit(SENSOR_01_WATER_TEMPERATURE_GPIO_Port, SENSOR_01_WATER_TEMPERATURE_Pin);
+    HAL_GPIO_DeInit(SENSOR_01_COOLANT_TEMPERATURE_GPIO_Port, SENSOR_01_COOLANT_TEMPERATURE_Pin);
 
     /* ADC1 DMA DeInit */
     HAL_DMA_DeInit(hadc->DMA_Handle);

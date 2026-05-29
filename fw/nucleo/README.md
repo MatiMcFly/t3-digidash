@@ -20,14 +20,14 @@ M4 core handles all sensor data related operations and then sends processed sens
 
 ## Pinout
 
-| Function                    | Core | Peripheral | Pins                 |
-| --------------------------- | ---- | ---------- | -------------------- |
-| Sensor 1: Water temperature | M4   | ADC1_INP2  | PF11                 |
-| Sensor 3: Battery voltage   | M4   | ADC1_INP3  | PA6                  |
-| Debug UART                  | M4   | USART3     | PD8 (TX), PD9 (RX)   |
-| Output UART                 | M7   | USART1     | PB14 (TX), PB15 (RX) |
-| Heartbeat LED               | M4   | GPIO       | PB0 (LD1)            |
-| Heartbeat LED               | M7   | GPIO       | PE1 (LD2)            |
+| Function                      | Core | Peripheral | Pins                 |
+| ----------------------------- | ---- | ---------- | -------------------- |
+| Sensor 1: Coolant temperature | M4   | ADC1_INP2  | PF11                 |
+| Sensor 3: Battery voltage     | M4   | ADC1_INP3  | PA6                  |
+| Debug UART                    | M4   | USART3     | PD8 (TX), PD9 (RX)   |
+| Output UART                   | M7   | USART1     | PB14 (TX), PB15 (RX) |
+| Heartbeat LED                 | M4   | GPIO       | PB0 (LD1)            |
+| Heartbeat LED                 | M7   | GPIO       | PE1 (LD2)            |
 
 ## UART
 
@@ -74,7 +74,7 @@ flowchart TB
     ACQ -->|HAL_ADC_Start_DMA| ADC
     ADC -->|DMA transfer complete IRQ| ISR
 
-    ISR -->|xQueueSendFromISR\nSENSOR_ID_WATER_TEMPERATURE| QRAW
+    ISR -->|xQueueSendFromISR\nSENSOR_ID_COOLANT_TEMPERATURE| QRAW
     ISR -->|xQueueSendFromISR\nSENSOR_ID_BATTERY_VOLTAGE| QRAW
 
     QRAW -->|xQueueReceive| CONV

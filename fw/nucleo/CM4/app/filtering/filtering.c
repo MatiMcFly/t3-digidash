@@ -11,7 +11,7 @@
 
 #define FILTERING_SIZE 5
 
-static int16_t filter_water_temperature(int16_t value);
+static int16_t filter_coolant_temperature(int16_t value);
 static int16_t filter_battery_voltage(int16_t value);
 static int16_t mean(int16_t values[], uint8_t size);
 
@@ -22,8 +22,8 @@ void filtering_task(void* params)
     while (true) {
         if (xQueueReceive(queue_data_converted, &data, portMAX_DELAY) == pdTRUE) {
             switch (data.id) {
-                case SENSOR_ID_WATER_TEMPERATURE:
-                    data.value = filter_water_temperature(data.value);
+                case SENSOR_ID_COOLANT_TEMPERATURE:
+                    data.value = filter_coolant_temperature(data.value);
                     break;
 
                 case SENSOR_ID_BATTERY_VOLTAGE:
@@ -42,7 +42,7 @@ void filtering_task(void* params)
     }
 }
 
-static int16_t filter_water_temperature(int16_t value)
+static int16_t filter_coolant_temperature(int16_t value)
 {
     static int16_t ringbuf[FILTERING_SIZE] = {0};
     static uint8_t index                   = 0;

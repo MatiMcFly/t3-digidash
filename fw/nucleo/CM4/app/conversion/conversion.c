@@ -9,7 +9,7 @@
 #include "queue.h"
 #include "shared.h"
 
-static int16_t convert_water_temperature(int16_t raw_value);
+static int16_t convert_coolant_temperature(int16_t raw_value);
 static int16_t convert_battery_voltage(int16_t raw_value);
 
 void conversion_task(void* params)
@@ -19,8 +19,8 @@ void conversion_task(void* params)
     while (true) {
         if (xQueueReceive(queue_data_raw, &data, portMAX_DELAY) == pdTRUE) {
             switch (data.id) {
-                case SENSOR_ID_WATER_TEMPERATURE:
-                    data.value = convert_water_temperature(data.value);
+                case SENSOR_ID_COOLANT_TEMPERATURE:
+                    data.value = convert_coolant_temperature(data.value);
                     break;
 
                 case SENSOR_ID_BATTERY_VOLTAGE:
@@ -39,9 +39,9 @@ void conversion_task(void* params)
     }
 }
 
-static int16_t convert_water_temperature(int16_t raw_value)
+static int16_t convert_coolant_temperature(int16_t raw_value)
 {
-    // TODO: apply water temperature conversion
+    // TODO: apply coolant temperature conversion
     return raw_value;
 }
 

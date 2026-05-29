@@ -19,12 +19,12 @@ void publication_task(void* params)
     while (true) {
         if (xQueueReceive(queue_data_filtered, &data, portMAX_DELAY) == pdTRUE) {
             switch (data.id) {
-                case SENSOR_ID_WATER_TEMPERATURE:
-                    snprintf(string, sizeof(string), "Water Temperature: %d\n", data.value);
+                case SENSOR_ID_COOLANT_TEMPERATURE:
+                    snprintf(string, sizeof(string), "Coolant Temperature: %d\n", data.value);
                     break;
 
                 case SENSOR_ID_BATTERY_VOLTAGE:
-                    snprintf(string, sizeof(string), "Battery Voltage:   %d\n", data.value);
+                    snprintf(string, sizeof(string), "Battery Voltage:     %d\n", data.value);
                     break;
 
                 default:

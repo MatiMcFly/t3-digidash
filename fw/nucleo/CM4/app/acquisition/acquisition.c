@@ -34,13 +34,13 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
     BaseType_t higher_priority_task_woken = pdFALSE;
 
     if (hadc->Instance == ADC1) {
-        sensor_data_t water_temperature = {.id = SENSOR_ID_WATER_TEMPERATURE, .value = 0};
-        sensor_data_t battery_voltage   = {.id = SENSOR_ID_BATTERY_VOLTAGE, .value = 0};
+        sensor_data_t coolant_temperature = {.id = SENSOR_ID_COOLANT_TEMPERATURE, .value = 0};
+        sensor_data_t battery_voltage     = {.id = SENSOR_ID_BATTERY_VOLTAGE, .value = 0};
 
-        water_temperature.value = adc1_buffer[0];
-        battery_voltage.value   = adc1_buffer[1];
+        coolant_temperature.value = adc1_buffer[0];
+        battery_voltage.value     = adc1_buffer[1];
 
-        if (xQueueSendFromISR(queue_data_raw, &water_temperature, &higher_priority_task_woken) != pdPASS) {
+        if (xQueueSendFromISR(queue_data_raw, &coolant_temperature, &higher_priority_task_woken) != pdPASS) {
             HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSendFromISR error\n", strlen("acquisition: xQueueSendFromISR error\n"), HAL_MAX_DELAY);
         }
 
