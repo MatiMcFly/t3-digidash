@@ -26,15 +26,15 @@ void publication_task(void* params)
         if (xQueueReceive(queue_data_filtered, &data, portMAX_DELAY) == pdPASS) {
             switch (data.id) {
                 case SENSOR_ID_COOLANT_TEMPERATURE:
-                    snprintf(string, sizeof(string), "Coolant Temperature: %d\n", data.value);
+                    snprintf(string, sizeof(string), "Coolant Temperature: %d d°C\n", data.value);
                     break;
 
                 case SENSOR_ID_BATTERY_VOLTAGE:
-                    snprintf(string, sizeof(string), "Battery Voltage:     %d\n", data.value);
+                    snprintf(string, sizeof(string), "Battery Voltage:     %d cV\n", data.value);
                     break;
 
                 case SENSOR_ID_FUEL_LEVEL:
-                    snprintf(string, sizeof(string), "Fuel Level:          %d\n", data.value);
+                    snprintf(string, sizeof(string), "Fuel Level:          %d dl\n", data.value);
                     break;
 
                 default:
