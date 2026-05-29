@@ -184,9 +184,6 @@ void HAL_LTDC_MspInit(LTDC_HandleTypeDef* hltdc)
     PeriphClkInitStruct.PLL3.PLL3N = 8;
     PeriphClkInitStruct.PLL3.PLL3P = 2;
     PeriphClkInitStruct.PLL3.PLL3Q = 2;
-    /* PLL3R = 20 (was 10, originally 5) lowers LTDC pixel clock to 10 MHz.
-     * SDRAM @ 32 MHz x 32-bit can comfortably feed this. Frame rate drops
-     * to ~15 Hz which is fine for a static dashboard during bring-up. */
     PeriphClkInitStruct.PLL3.PLL3R = 20;
     PeriphClkInitStruct.PLL3.PLL3RGE = RCC_PLL3VCIRANGE_3;
     PeriphClkInitStruct.PLL3.PLL3VCOSEL = RCC_PLL3VCOWIDE;
