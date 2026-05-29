@@ -73,7 +73,8 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 )
 
 # Add linked libraries
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
+# NOTE: plain signature used to stay compatible with mx-generated.cmake
+target_link_libraries(${CMAKE_PROJECT_NAME}
     # Add user defined libraries
     touchgfx-float-abi-hard
 )

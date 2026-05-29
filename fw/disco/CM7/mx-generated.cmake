@@ -26,7 +26,6 @@ set(MX_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/stm32h7xx_hal_msp.c
     ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/sysmem.c
     ${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/syscalls.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/TouchGFX/App/app_touchgfx.c
     ${CMAKE_CURRENT_SOURCE_DIR}/TouchGFX/target/generated/TouchGFXConfiguration.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/TouchGFX/target/generated/TouchGFXGeneratedHAL.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/TouchGFX/target/generated/STM32DMA.cpp
@@ -34,6 +33,7 @@ set(MX_Application_Src
     ${CMAKE_CURRENT_SOURCE_DIR}/TouchGFX/target/TouchGFXHAL.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/TouchGFX/target/STM32TouchController.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/TouchGFX/target/TouchGFXGPIO.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/TouchGFX/App/app_touchgfx.c
     ${CMAKE_CURRENT_SOURCE_DIR}/Core/Startup/startup_stm32h747xx_CM7.s
 )
 
