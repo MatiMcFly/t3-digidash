@@ -74,8 +74,7 @@ flowchart TB
     ACQ -->|HAL_ADC_Start_DMA| ADC
     ADC -->|DMA transfer complete IRQ| ISR
 
-    ISR -->|xQueueSendFromISR\nSENSOR_ID_COOLANT_TEMPERATURE| QRAW
-    ISR -->|xQueueSendFromISR\nSENSOR_ID_BATTERY_VOLTAGE| QRAW
+    ISR -->|xQueueSendFromISR| QRAW
 
     QRAW -->|xQueueReceive| CONV
     CONV -->|xQueueSend| QCONV
