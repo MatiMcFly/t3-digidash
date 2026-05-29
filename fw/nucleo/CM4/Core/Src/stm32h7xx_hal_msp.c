@@ -113,15 +113,22 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     __HAL_RCC_ADC12_CLK_ENABLE();
 
     __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
     __HAL_RCC_GPIOF_CLK_ENABLE();
     /**ADC1 GPIO Configuration
     PA6     ------> ADC1_INP3
+    PB1     ------> ADC1_INP5
     PF11     ------> ADC1_INP2
     */
     GPIO_InitStruct.Pin = SENSOR_03_BATTERY_VOLTAGE_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(SENSOR_03_BATTERY_VOLTAGE_GPIO_Port, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = SENSOR_04_FUEL_LEVEL_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(SENSOR_04_FUEL_LEVEL_GPIO_Port, &GPIO_InitStruct);
 
     GPIO_InitStruct.Pin = SENSOR_01_COOLANT_TEMPERATURE_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
@@ -173,9 +180,12 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 
     /**ADC1 GPIO Configuration
     PA6     ------> ADC1_INP3
+    PB1     ------> ADC1_INP5
     PF11     ------> ADC1_INP2
     */
     HAL_GPIO_DeInit(SENSOR_03_BATTERY_VOLTAGE_GPIO_Port, SENSOR_03_BATTERY_VOLTAGE_Pin);
+
+    HAL_GPIO_DeInit(SENSOR_04_FUEL_LEVEL_GPIO_Port, SENSOR_04_FUEL_LEVEL_Pin);
 
     HAL_GPIO_DeInit(SENSOR_01_COOLANT_TEMPERATURE_GPIO_Port, SENSOR_01_COOLANT_TEMPERATURE_Pin);
 
