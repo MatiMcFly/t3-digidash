@@ -10,9 +10,9 @@
 #include "queue.h"
 #include "shared.h"
 
-static float   adc_to_voltage(int16_t raw_value);
-static int16_t convert_coolant_temperature(int16_t raw_value);
-static int16_t convert_battery_voltage(int16_t raw_value);
+static float   adc_to_voltage(uint16_t raw_value);
+static int16_t convert_coolant_temperature(uint16_t raw_value);
+static int16_t convert_battery_voltage(uint16_t raw_value);
 
 static const float VREF_V = 3.3f;
 
@@ -57,7 +57,7 @@ void conversion_task(void* params)
  *
  * @return float -- Voltage in V
  */
-static float adc_to_voltage(int16_t raw_value)
+static float adc_to_voltage(uint16_t raw_value)
 {
     const float ADC_MAX = 65536.0f;
 
@@ -71,7 +71,7 @@ static float adc_to_voltage(int16_t raw_value)
  *
  * @return int16_t -- Temperature in deci-°C (e.g., 234 means 23.4°C)
  */
-static int16_t convert_coolant_temperature(int16_t raw_value)
+static int16_t convert_coolant_temperature(uint16_t raw_value)
 {
     const float R2_OHM = 470.0f;
     const float R0_OHM = 1100.0f;
@@ -103,7 +103,7 @@ static int16_t convert_coolant_temperature(int16_t raw_value)
  *
  * @return int16_t -- Battery voltage in centi-V (e.g., 1234 means 12.34V)
  */
-static int16_t convert_battery_voltage(int16_t raw_value)
+static int16_t convert_battery_voltage(uint16_t raw_value)
 {
     const float R4_OHM = 10000.0f;
     const float R5_OHM = 2200.0f;
