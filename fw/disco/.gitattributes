@@ -1,0 +1,8 @@
+# Normalize line endings to LF for all text files
+* text=auto eol=lf
+
+# Explicitly binary files — no conversion
+*.ld binary
+*.s  binary
+*.a  binary
+*.o  binary
