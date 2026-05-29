@@ -34,6 +34,10 @@ void publication_task(void* params)
                     snprintf(string, sizeof(string), "Battery Voltage:     %d\n", data.value);
                     break;
 
+                case SENSOR_ID_FUEL_LEVEL:
+                    snprintf(string, sizeof(string), "Fuel Level:          %d\n", data.value);
+                    break;
+
                 default:
                     HAL_UART_Transmit(&huart3, (uint8_t*)"publication: Unknown sensor id\n", strlen("publication: Unknown sensor id\n"), HAL_MAX_DELAY);
                     continue;

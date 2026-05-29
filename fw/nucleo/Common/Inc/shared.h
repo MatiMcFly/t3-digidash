@@ -7,6 +7,7 @@
 typedef enum {
     SENSOR_ID_COOLANT_TEMPERATURE = 1,
     SENSOR_ID_BATTERY_VOLTAGE     = 3,
+    SENSOR_ID_FUEL_LEVEL          = 4,
 } sensor_id_t;
 
 typedef struct {

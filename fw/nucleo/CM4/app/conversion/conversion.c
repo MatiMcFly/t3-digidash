@@ -13,6 +13,7 @@
 static float   adc_to_voltage(uint16_t raw_value);
 static int16_t convert_coolant_temperature(uint16_t raw_value);
 static int16_t convert_battery_voltage(uint16_t raw_value);
+static int16_t convert_fuel_level(uint16_t raw_value);
 
 static const float VREF_V = 3.3f;
 
@@ -36,6 +37,10 @@ void conversion_task(void* params)
 
                 case SENSOR_ID_BATTERY_VOLTAGE:
                     data.value = convert_battery_voltage(data.value);
+                    break;
+
+                case SENSOR_ID_FUEL_LEVEL:
+                    data.value = convert_fuel_level(data.value);
                     break;
 
                 default:
@@ -113,4 +118,29 @@ static int16_t convert_battery_voltage(uint16_t raw_value)
     float vbat_v = vadc_v * (R4_OHM + R5_OHM) / R5_OHM;
 
     return (int16_t)(vbat_v * 100.0f);
+}
+
+/**
+ * @brief Convert raw ADC value to fuel level in deci-l
+ *
+ * @param raw_value -- Raw ADC value (0 to 65535)
+ *
+ * @return int16_t -- Fuel level in deci-l (e.g., 123 means 12.3 l)
+ */
+static int16_t convert_fuel_level(uint16_t raw_value)
+{
+    const float R1_OHM   = 330.0f;
+    const float VOL0_L   = 80.8f;
+    const float OHM_TO_L = -0.269f;
+
+    float vadc_v = adc_to_voltage(raw_value);
+
+    float rv1_ohm = 0.0f;
+    if ((VREF_V - vadc_v) != 0.0f) {
+        rv1_ohm = R1_OHM * vadc_v / (VREF_V - vadc_v);
+    }
+
+    float vol_l = OHM_TO_L * rv1_ohm + VOL0_L;
+
+    return (int16_t)(vol_l * 10.0f);
 }

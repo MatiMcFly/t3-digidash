@@ -13,6 +13,7 @@
 
 static int16_t filter_coolant_temperature(int16_t value);
 static int16_t filter_battery_voltage(int16_t value);
+static int16_t filter_fuel_level(int16_t value);
 static int16_t mean(int16_t values[], uint8_t size);
 
 /**
@@ -35,6 +36,10 @@ void filtering_task(void* params)
 
                 case SENSOR_ID_BATTERY_VOLTAGE:
                     data.value = filter_battery_voltage(data.value);
+                    break;
+
+                case SENSOR_ID_FUEL_LEVEL:
+                    data.value = filter_fuel_level(data.value);
                     break;
 
                 default:
@@ -61,6 +66,17 @@ static int16_t filter_coolant_temperature(int16_t value)
 }
 
 static int16_t filter_battery_voltage(int16_t value)
+{
+    static int16_t ringbuf[FILTERING_SIZE] = {0};
+    static uint8_t index                   = 0;
+
+    ringbuf[index] = value;
+    index          = (index + 1) % FILTERING_SIZE;
+
+    return mean(ringbuf, FILTERING_SIZE);
+}
+
+static int16_t filter_fuel_level(int16_t value)
 {
     static int16_t ringbuf[FILTERING_SIZE] = {0};
     static uint8_t index                   = 0;
