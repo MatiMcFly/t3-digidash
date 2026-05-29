@@ -29,7 +29,7 @@ void conversion_task(void* params)
     (void)params; // Unused
 
     while (true) {
-        if (xQueueReceive(queue_data_raw, &data, portMAX_DELAY) == pdTRUE) {
+        if (xQueueReceive(queue_data_raw, &data, portMAX_DELAY) == pdPASS) {
             switch (data.id) {
                 case SENSOR_ID_COOLANT_TEMPERATURE:
                     data.value = convert_coolant_temperature(data.value);
@@ -48,7 +48,7 @@ void conversion_task(void* params)
                     continue;
             }
 
-            if (xQueueSend(queue_data_converted, &data, pdMS_TO_TICKS(20)) != pdTRUE) {
+            if (xQueueSend(queue_data_converted, &data, pdMS_TO_TICKS(20)) != pdPASS) {
                 HAL_UART_Transmit(&huart3, (uint8_t*)"conversion: xQueueSend error\n", strlen("conversion: xQueueSend error\n"), HAL_MAX_DELAY);
             }
         }
