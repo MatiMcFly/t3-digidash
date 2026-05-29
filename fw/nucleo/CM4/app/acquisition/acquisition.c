@@ -12,6 +12,8 @@
 
 extern ADC_HandleTypeDef hadc1;
 
+#define MEASUREMENT_PERIOD_MS 100
+
 #define ADC1_BUFFER_SIZE 3
 static volatile uint16_t adc1_buffer[ADC1_BUFFER_SIZE] = {0};
 
@@ -33,7 +35,7 @@ void acquisition_task(void* params)
             HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: HAL_ADC_Start_DMA error\n", strlen("acquisition: HAL_ADC_Start_DMA error\n"), HAL_MAX_DELAY);
         }
 
-        vTaskDelayUntil(&last_wakeup, pdMS_TO_TICKS(1000));
+        vTaskDelayUntil(&last_wakeup, pdMS_TO_TICKS(MEASUREMENT_PERIOD_MS));
     }
 }
 
