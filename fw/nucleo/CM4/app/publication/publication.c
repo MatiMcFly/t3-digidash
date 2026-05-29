@@ -1,7 +1,6 @@
 #include "publication.h"
 
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -11,20 +10,31 @@
 #include "queue.h"
 #include "shared.h"
 
+/**
+ * @brief Publication task
+ *
+ * @param params -- Unused
+ */
 void publication_task(void* params)
 {
     sensor_data_t data;
     char          string[50] = "";
 
+    (void)params; // Unused
+
     while (true) {
-        if (xQueueReceive(queue_data_filtered, &data, portMAX_DELAY) == pdTRUE) {
+        if (xQueueReceive(queue_data_filtered, &data, portMAX_DELAY) == pdPASS) {
             switch (data.id) {
-                case SENSOR_ID_WATER_TEMPERATURE:
-                    snprintf(string, sizeof(string), "Water Temperature: %d\n", data.value);
+                case SENSOR_ID_COOLANT_TEMPERATURE:
+                    snprintf(string, sizeof(string), "Coolant Temperature: %d d°C\n", data.value);
                     break;
 
                 case SENSOR_ID_BATTERY_VOLTAGE:
-                    snprintf(string, sizeof(string), "Battery Voltage:   %d\n", data.value);
+                    snprintf(string, sizeof(string), "Battery Voltage:     %d cV\n", data.value);
+                    break;
+
+                case SENSOR_ID_FUEL_LEVEL:
+                    snprintf(string, sizeof(string), "Fuel Level:          %d dl\n", data.value);
                     break;
 
                 default:
