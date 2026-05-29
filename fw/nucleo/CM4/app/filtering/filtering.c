@@ -9,12 +9,11 @@
 #include "queue.h"
 #include "shared.h"
 
-#define FILTERING_SIZE 5
-
 static int16_t filter_coolant_temperature(int16_t value);
 static int16_t filter_battery_voltage(int16_t value);
 static int16_t filter_fuel_level(int16_t value);
-static int16_t mean(int16_t values[], uint8_t size);
+static int16_t ringbuf_update(int16_t ringbuf[], uint16_t size, uint16_t* index, int16_t value);
+static int16_t mean(int16_t values[], uint16_t size);
 
 /**
  * @brief Filtering task for sensor data
@@ -56,42 +55,65 @@ void filtering_task(void* params)
 
 static int16_t filter_coolant_temperature(int16_t value)
 {
-    static int16_t ringbuf[FILTERING_SIZE] = {0};
-    static uint8_t index                   = 0;
+    static int16_t  ringbuf[20] = {0};
+    static uint16_t index       = 0;
 
-    ringbuf[index] = value;
-    index          = (index + 1) % FILTERING_SIZE;
-
-    return mean(ringbuf, FILTERING_SIZE);
+    return ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
 }
 
 static int16_t filter_battery_voltage(int16_t value)
 {
-    static int16_t ringbuf[FILTERING_SIZE] = {0};
-    static uint8_t index                   = 0;
+    static int16_t  ringbuf[20] = {0};
+    static uint16_t index       = 0;
 
-    ringbuf[index] = value;
-    index          = (index + 1) % FILTERING_SIZE;
-
-    return mean(ringbuf, FILTERING_SIZE);
+    return ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
 }
 
 static int16_t filter_fuel_level(int16_t value)
 {
-    static int16_t ringbuf[FILTERING_SIZE] = {0};
-    static uint8_t index                   = 0;
+    static int16_t  ringbuf[300] = {0};
+    static uint16_t index        = 0;
 
-    ringbuf[index] = value;
-    index          = (index + 1) % FILTERING_SIZE;
-
-    return mean(ringbuf, FILTERING_SIZE);
+    return ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
 }
 
-static int16_t mean(int16_t values[], uint8_t size)
+/**
+ * @brief Update ring buffer with a new value and recalculate the mean
+ *
+ * @param ringbuf -- Ring buffer array
+ * @param size    -- Number of elements in the ring buffer
+ * @param index   -- Pointer to the current index in the ring buffer
+ * @param value   -- New value to add to the ring buffer
+
+ * @return int16_t -- New mean after adding the new value
+ */
+static int16_t ringbuf_update(int16_t ringbuf[], uint16_t size, uint16_t* index, int16_t value)
+{
+    if (*index >= size) {
+        HAL_UART_Transmit(&huart3, (uint8_t*)"ringbuf_update: Invalid index\n", strlen("ringbuf_update: Invalid index\n"), HAL_MAX_DELAY);
+        *index = 0;
+        return 0; // Invalid index
+    }
+
+    ringbuf[*index] = value;
+    *index          = (*index + 1) % size;
+
+    return mean(ringbuf, size);
+}
+
+/**
+ * @brief Calculate the mean of an array
+ *
+ * @param values -- Array of values
+ * @param size   -- Number of elements in the array
+ *
+ * @return int16_t -- Mean value
+ */
+static int16_t mean(int16_t values[], uint16_t size)
 {
     int32_t sum = 0;
 
-    for (uint8_t i = 0; i < size; i++) {
+    for (uint16_t i = 0; i < size; i++) {
         sum += values[i];
     }
 
