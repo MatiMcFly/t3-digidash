@@ -99,6 +99,11 @@ static int16_t ringbuf_update(int16_t ringbuf[], uint16_t size, uint16_t* index,
         return 0; // Invalid index
     }
 
+    if (size == 0) {
+        HAL_UART_Transmit(&huart3, (uint8_t*)"ringbuf_update: Size cannot be zero\n", strlen("ringbuf_update: Size cannot be zero\n"), HAL_MAX_DELAY);
+        return 0; // Invalid size
+    }
+
     ringbuf[*index] = value;
     *index          = (*index + 1) % size;
 
@@ -116,6 +121,11 @@ static int16_t ringbuf_update(int16_t ringbuf[], uint16_t size, uint16_t* index,
 static int16_t mean(int16_t values[], uint16_t size)
 {
     int32_t sum = 0;
+
+    if (size == 0) {
+        HAL_UART_Transmit(&huart3, (uint8_t*)"mean: Size cannot be zero\n", strlen("mean: Size cannot be zero\n"), HAL_MAX_DELAY);
+        return 0; // Invalid size
+    }
 
     for (uint16_t i = 0; i < size; i++) {
         sum += values[i];
