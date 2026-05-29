@@ -2196,9 +2196,9 @@
 		)
 		(uuid "58b4f221-adff-4740-b0e9-e6f66018e8bc")
 	)
-	(text "T = 1 / (1 / T0) + (1 / b) * log (RV2 / R0)"
+	(text "T = 1 / ((1 / T0) + (1 / b) * log (RV2 / R0))"
 		(exclude_from_sim no)
-		(at 105.918 117.348 0)
+		(at 106.68 117.348 0)
 		(effects
 			(font
 				(size 1.27 1.27)
