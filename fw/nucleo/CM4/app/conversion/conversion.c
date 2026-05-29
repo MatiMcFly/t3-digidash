@@ -96,8 +96,21 @@ static int16_t convert_coolant_temperature(int16_t raw_value)
     return (int16_t)(t_c * 10.0f);
 }
 
+/**
+ * @brief Convert raw ADC value to battery voltage in centi-V
+ *
+ * @param raw_value -- Raw ADC value (0 to 65535)
+ *
+ * @return int16_t -- Battery voltage in centi-V (e.g., 1234 means 12.34V)
+ */
 static int16_t convert_battery_voltage(int16_t raw_value)
 {
-    // TODO: apply battery voltage conversion
-    return raw_value;
+    const float R4_OHM = 10000.0f;
+    const float R5_OHM = 2200.0f;
+
+    float vadc_v = adc_to_voltage(raw_value);
+
+    float vbat_v = vadc_v * (R4_OHM + R5_OHM) / R5_OHM;
+
+    return (int16_t)(vbat_v * 100.0f);
 }
