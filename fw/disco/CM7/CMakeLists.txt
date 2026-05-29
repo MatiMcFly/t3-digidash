@@ -39,6 +39,9 @@ add_executable(${CMAKE_PROJECT_NAME})
 # Include mx-generated
 include("mx-generated.cmake")
 
+# Add touchgfx generated sources and libraries
+add_subdirectory(cmake/touchgfx)
+
 
 # In order to use CMake for cross-compiling
 set(CMAKE_CXX_COMPILER_FORCED "true")
@@ -55,7 +58,6 @@ enable_language(C ASM)
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
     Core/Application
-    ${CMAKE_CURRENT_SOURCE_DIR}/../Middlewares/ST/touchgfx/framework/include
 )
 
 # Add sources to executable
@@ -69,14 +71,12 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 # Link directories setup
 target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined library search paths
-    ${CMAKE_CURRENT_SOURCE_DIR}/../Middlewares/ST/touchgfx/lib/core/cortex_m7/gcc
 )
 
 # Add linked libraries
 # NOTE: plain signature used to stay compatible with mx-generated.cmake
 target_link_libraries(${CMAKE_PROJECT_NAME}
     # Add user defined libraries
-    touchgfx-float-abi-hard
 )
 
 # Remove wrong libob.a library dependency when using cpp files
