@@ -9,6 +9,10 @@
 #include "queue.h"
 #include "shared.h"
 
+#define FILTER_SIZE_COOLANT_TEMPERATURE 20
+#define FILTER_SIZE_BATTERY_VOLTAGE     20
+#define FILTER_SIZE_FUEL_LEVEL          300
+
 static int16_t filter_coolant_temperature(int16_t value);
 static int16_t filter_battery_voltage(int16_t value);
 static int16_t filter_fuel_level(int16_t value);
@@ -55,24 +59,24 @@ void filtering_task(void* params)
 
 static int16_t filter_coolant_temperature(int16_t value)
 {
-    static int16_t  ringbuf[20] = {0};
-    static uint16_t index       = 0;
+    static int16_t  ringbuf[FILTER_SIZE_COOLANT_TEMPERATURE] = {0};
+    static uint16_t index                                    = 0;
 
     return ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
 }
 
 static int16_t filter_battery_voltage(int16_t value)
 {
-    static int16_t  ringbuf[20] = {0};
-    static uint16_t index       = 0;
+    static int16_t  ringbuf[FILTER_SIZE_BATTERY_VOLTAGE] = {0};
+    static uint16_t index                                = 0;
 
     return ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
 }
 
 static int16_t filter_fuel_level(int16_t value)
 {
-    static int16_t  ringbuf[300] = {0};
-    static uint16_t index        = 0;
+    static int16_t  ringbuf[FILTER_SIZE_FUEL_LEVEL] = {0};
+    static uint16_t index                           = 0;
 
     return ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
 }

@@ -12,6 +12,8 @@
 #include "shared.h"
 #include "task.h"
 
+#define QUEUE_SIZE 20
+
 QueueHandle_t queue_data_raw;
 QueueHandle_t queue_data_converted;
 QueueHandle_t queue_data_filtered;
@@ -22,15 +24,15 @@ static void heartbeat_task(void* params);
 
 void app(void)
 {
-    if ((queue_data_raw = xQueueCreate(20, sizeof(sensor_data_t))) == NULL) {
+    if ((queue_data_raw = xQueueCreate(QUEUE_SIZE, sizeof(sensor_data_t))) == NULL) {
         while (true) {} // TODO: Error handling
     }
 
-    if ((queue_data_converted = xQueueCreate(20, sizeof(sensor_data_t))) == NULL) {
+    if ((queue_data_converted = xQueueCreate(QUEUE_SIZE, sizeof(sensor_data_t))) == NULL) {
         while (true) {} // TODO: Error handling
     }
 
-    if ((queue_data_filtered = xQueueCreate(20, sizeof(sensor_data_t))) == NULL) {
+    if ((queue_data_filtered = xQueueCreate(QUEUE_SIZE, sizeof(sensor_data_t))) == NULL) {
         while (true) {} // TODO: Error handling
     }
 
