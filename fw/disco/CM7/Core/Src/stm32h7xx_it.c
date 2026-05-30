@@ -22,6 +22,10 @@
 #include "stm32h7xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "FreeRTOS.h"
+#include "task.h"
+
+extern void xPortSysTickHandler(void);
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -138,18 +142,8 @@ void UsageFault_Handler(void)
   }
 }
 
-/**
-  * @brief This function handles System service call via SWI instruction.
-  */
-void SVC_Handler(void)
-{
-  /* USER CODE BEGIN SVCall_IRQn 0 */
-
-  /* USER CODE END SVCall_IRQn 0 */
-  /* USER CODE BEGIN SVCall_IRQn 1 */
-
-  /* USER CODE END SVCall_IRQn 1 */
-}
+/* SVC_Handler and PendSV_Handler are provided by the FreeRTOS port
+ * (mapped to vPortSVCHandler / xPortPendSVHandler in FreeRTOSConfig.h). */
 
 /**
   * @brief This function handles Debug monitor.
@@ -165,20 +159,11 @@ void DebugMon_Handler(void)
 }
 
 /**
-  * @brief This function handles Pendable request for system service.
-  */
-void PendSV_Handler(void)
-{
-  /* USER CODE BEGIN PendSV_IRQn 0 */
-
-  /* USER CODE END PendSV_IRQn 0 */
-  /* USER CODE BEGIN PendSV_IRQn 1 */
-
-  /* USER CODE END PendSV_IRQn 1 */
-}
-
-/**
   * @brief This function handles System tick timer.
+  *
+  * Always increment the HAL tick (so HAL_GetTick / HAL_Delay keep working both
+  * before and after the scheduler is started) and, once FreeRTOS is running,
+  * forward the tick to the kernel.
   */
 void SysTick_Handler(void)
 {
@@ -187,7 +172,10 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
-
+  if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+  {
+    xPortSysTickHandler();
+  }
   /* USER CODE END SysTick_IRQn 1 */
 }
 
@@ -213,5 +201,14 @@ void TIM17_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
+
+/* LTDC IRQ — provides the VSYNC tick to TouchGFX via the line-event callback
+ * registered in Display.c. Priority and NVIC enable are configured in
+ * DisplayInit(). */
+extern LTDC_HandleTypeDef hltdc;
+void LTDC_IRQHandler(void)
+{
+  HAL_LTDC_IRQHandler(&hltdc);
+}
 
 /* USER CODE END 1 */

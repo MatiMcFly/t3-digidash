@@ -24,6 +24,13 @@
 
 /* USER CODE BEGIN TouchGFXHAL.cpp */
 
+#include <touchgfx/hal/OSWrappers.hpp>
+#include "stm32h7xx_hal.h"
+
+extern "C" {
+    extern LTDC_HandleTypeDef hltdc;
+}
+
 using namespace touchgfx;
 
 void TouchGFXHAL::initialize()
@@ -140,12 +147,22 @@ void TouchGFXHAL::disableInterrupts()
  */
 void TouchGFXHAL::enableLCDControllerInterrupt()
 {
-    // Calling parent implementation of enableLCDControllerInterrupt().
-    //
-    // To overwrite the generated implementation, omit the call to the parent function
-    // and implement the needed functionality here.
+    /* Override the (empty) generated implementation: arm the LTDC line
+     * event so HAL_LTDC_LineEventCallback fires once per frame and we can
+     * deliver a VSYNC tick to the TouchGFX render task. Line 0 is the start
+     * of the active area and gives a stable, jitter-free frame boundary. */
+    HAL_LTDC_ProgramLineEvent(&hltdc, 0U);
+}
 
-    TouchGFXGeneratedHAL::enableLCDControllerInterrupt();
+/**
+ * C-callable shim used by HAL_LTDC_LineEventCallback in stm32h7xx_it /
+ * Display.c to wake the TouchGFX render task on every VSYNC.
+ */
+extern "C" void TouchGFX_SignalVsync(void)
+{
+    OSWrappers::signalVSync();
+    /* Re-arm the line event so it fires again on the next frame. */
+    HAL_LTDC_ProgramLineEvent(&hltdc, 0U);
 }
 
 bool TouchGFXHAL::beginFrame()

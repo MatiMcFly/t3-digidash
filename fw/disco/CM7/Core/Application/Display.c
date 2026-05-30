@@ -337,7 +337,25 @@ void DisplayInit(void) {
   __HAL_LTDC_LAYER_ENABLE(&hltdc, 0U);
   __HAL_LTDC_RELOAD_IMMEDIATE_CONFIG(&hltdc);
 
+  /* Enable the LTDC line interrupt so TouchGFX gets a VSYNC tick every
+   * frame. Priority must be numerically >= configMAX_SYSCALL_INTERRUPT_PRIORITY
+   * (5) so the ISR can call FreeRTOS *FromISR APIs via OSWrappers::signalVSync.
+   * The line event itself is armed by TouchGFXHAL::enableLCDControllerInterrupt
+   * once HAL::initialize() finishes, and re-armed every frame by the
+   * TouchGFX_SignalVsync() shim. */
+  HAL_NVIC_SetPriority(LTDC_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(LTDC_IRQn);
+
   g_display_stage = 10U;
+}
+
+/* Bridge from the C-domain HAL callback to the TouchGFX OS abstraction. */
+extern void TouchGFX_SignalVsync(void);
+
+void HAL_LTDC_LineEventCallback(LTDC_HandleTypeDef *hltdc_param)
+{
+  (void)hltdc_param;
+  TouchGFX_SignalVsync();
 }
 
 // Live counters for diagnosing flicker / image corruption.

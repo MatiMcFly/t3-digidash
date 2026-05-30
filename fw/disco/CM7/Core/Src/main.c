@@ -24,6 +24,9 @@
 /* USER CODE BEGIN Includes */
 #include "App.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -256,16 +259,17 @@ Error_Handler();
 
   ConfigureMpuForSdram();
 
+  AppInit();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  AppRun();
-  // this does not return! However to prevent nasal demons, we add an infinite loop here as well
-  for(;;) {}
+  vTaskStartScheduler();
+  /* Should never reach here. */
+  for (;;) {}
     /* USER CODE END WHILE */
 
-  MX_TouchGFX_Process();
     /* USER CODE BEGIN 3 */
   /* USER CODE END 3 */
 }

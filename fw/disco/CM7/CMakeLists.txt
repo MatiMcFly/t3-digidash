@@ -58,6 +58,10 @@ enable_language(C ASM)
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
     Core/Application
+    # FreeRTOS kernel + port + project config
+    ${CMAKE_SOURCE_DIR}/../Drivers/FreeRTOS-Kernel/include
+    ${CMAKE_SOURCE_DIR}/../Drivers/FreeRTOS-Kernel/portable/GCC/ARM_CM7/r0p1
+    Core/Inc
 )
 
 # Add sources to executable
@@ -66,6 +70,18 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/Application/App.c
     Core/Application/Backlight.c
     Core/Application/Display.c
+    Core/Src/freertos_hooks.c
+    # FreeRTOS kernel
+    ${CMAKE_SOURCE_DIR}/../Drivers/FreeRTOS-Kernel/tasks.c
+    ${CMAKE_SOURCE_DIR}/../Drivers/FreeRTOS-Kernel/queue.c
+    ${CMAKE_SOURCE_DIR}/../Drivers/FreeRTOS-Kernel/list.c
+    ${CMAKE_SOURCE_DIR}/../Drivers/FreeRTOS-Kernel/timers.c
+    ${CMAKE_SOURCE_DIR}/../Drivers/FreeRTOS-Kernel/event_groups.c
+    ${CMAKE_SOURCE_DIR}/../Drivers/FreeRTOS-Kernel/stream_buffer.c
+    # FreeRTOS port (Cortex-M7 r0p1 errata-safe)
+    ${CMAKE_SOURCE_DIR}/../Drivers/FreeRTOS-Kernel/portable/GCC/ARM_CM7/r0p1/port.c
+    # FreeRTOS heap implementation
+    ${CMAKE_SOURCE_DIR}/../Drivers/FreeRTOS-Kernel/portable/MemMang/heap_4.c
 )
 
 # Link directories setup
