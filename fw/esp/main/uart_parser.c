@@ -8,9 +8,8 @@
 
 #define UART_PARSER_BUF_SIZE 1024
 
-bool parse_uart_values(const char *text, float *water_c, float *outside_c,
-                       float *batt_v, int32_t *rpm, int32_t *turn_signal,
-                       int32_t *high_beam, int32_t *preheat, int32_t *tank_level)
+bool parse_uart_values(const char *text, int16_t *water_c, uint16_t *rpm, uint16_t *batt_v , uint16_t *tank_level, bool *turn_signal,
+                       bool *high_beam, bool *oil_pressure_switch_3b, bool *oil_pressure_switch_18b)
 {
     if (text == NULL) {
         return false;
@@ -21,6 +20,7 @@ bool parse_uart_values(const char *text, float *water_c, float *outside_c,
     buffer[sizeof(buffer) - 1] = '\0';
     
     // Expected format: "1:23.5;2:1500;3:12.6;4:18.2;5:1;6:0;7:1;8:75"
+    // 1:23;2:1500;3:100;4:50;5:1;6:0;7:1;8:0
     // Where each pair is "id:value" and pairs are separated by ';'
 
     int parsed_count = 0;
@@ -42,52 +42,53 @@ bool parse_uart_values(const char *text, float *water_c, float *outside_c,
             case UART_FIELD_WATER_TEMP:
                 if (water_c) {
                     // Note: strtof returns float
-                    *water_c = strtof(value, NULL);
+                    *water_c = (int16_t)strtof(value, NULL);
                     parsed_count++;
                 }
                 break;
             case UART_FIELD_RPM:
                 if (rpm) {
-                    *rpm = strtol(value, NULL, 10);
+                    *rpm = (uint16_t)strtol(value, NULL, 10);
                     parsed_count++;
                 }
                 break;
             case UART_FIELD_BATT_VOLT:
                 if (batt_v) {
-                    *batt_v = strtof(value, NULL);
+                    *batt_v = (uint16_t)strtof(value, NULL);
                     parsed_count++;
                 }
                 break;
-            case UART_FIELD_OUTSIDE_TEMP:
-                if (outside_c) {
-                    *outside_c = strtof(value, NULL);
-                    parsed_count++;
-                }
-                break;
+            case UART_FIELD_TANK_LEVEL:
+            if (tank_level) {
+                *tank_level = (int16_t)strtol(value, NULL, 10);
+                parsed_count++;
+            }
+            break;
             case UART_FIELD_TURN_SIGNAL:
                 if (turn_signal) {
-                    *turn_signal = strtol(value, NULL, 10);
+                    *turn_signal = (bool)strtol(value, NULL, 10);
                     parsed_count++;
                 }
                 break;
             case UART_FIELD_HIGH_BEAM:
                 if (high_beam) {
-                    *high_beam = strtol(value, NULL, 10);
+                    *high_beam = (bool)strtol(value, NULL, 10);
                     parsed_count++;
                 }
                 break;
-            case UART_FIELD_PREHEAT:
-                if (preheat) {
-                    *preheat = strtol(value, NULL, 10);
+            case UART_FIELD_OIL_PRESSURE_SWITCH_3B:
+                if (oil_pressure_switch_3b) {
+                    *oil_pressure_switch_3b = (bool)strtol(value, NULL, 10);
                     parsed_count++;
                 }
                 break;
-            case UART_FIELD_TANK_LEVEL:
-                if (tank_level) {
-                    *tank_level = strtol(value, NULL, 10);
+            case UART_FIELD_OIL_PRESSURE_SWITCH_18B:
+                if (oil_pressure_switch_18b) {
+                    *oil_pressure_switch_18b = (bool)strtol(value, NULL, 10);
                     parsed_count++;
                 }
                 break;
+            
             default:
                 break;
             }

@@ -58,14 +58,14 @@ static const ble_uuid128_t gatt_chr_uuid_batt_mv = BLE_UUID128_INIT(
     0x2a, 0x4f, 0x3d, 0x0f, 0xab, 0xb1, 0xe7, 0xc4);
 
 uint16_t gatt_chr_val_handle_water_temp;
-uint16_t gatt_chr_val_handle_outside_temp;
-uint16_t gatt_chr_val_handle_batt_level;
 uint16_t gatt_chr_val_handle_rpm;
+uint16_t gatt_chr_val_handle_batt_level;
+uint16_t gatt_chr_val_handle_batt_mv;
 uint16_t gatt_chr_val_handle_turn_signal;
 uint16_t gatt_chr_val_handle_high_beam;
-uint16_t gatt_chr_val_handle_preheat;
 uint16_t gatt_chr_val_handle_tank_level;
-uint16_t gatt_chr_val_handle_batt_mv;
+uint16_t gatt_chr_val_handle_oil_pressure_3b;
+uint16_t gatt_chr_val_handle_oil_pressure_18b;
 uint16_t gatt_chr_val_handle_uart_tx;
 
 static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle,
@@ -87,10 +87,7 @@ static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle,
             int16_t value = car_signals_get_water_temp_cC();
             return os_mbuf_append(ctxt->om, &value, sizeof(value));
         }
-        if (attr_handle == gatt_chr_val_handle_outside_temp) {
-            int16_t value = car_signals_get_outside_temp_cC();
-            return os_mbuf_append(ctxt->om, &value, sizeof(value));
-        }
+        
         if (attr_handle == gatt_chr_val_handle_batt_level) {
             uint8_t value = car_signals_get_batt_level_percent();
             return os_mbuf_append(ctxt->om, &value, sizeof(value));
@@ -107,8 +104,12 @@ static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle,
             uint8_t value = car_signals_get_high_beam();
             return os_mbuf_append(ctxt->om, &value, sizeof(value));
         }
-        if (attr_handle == gatt_chr_val_handle_preheat) {
-            uint8_t value = car_signals_get_preheat();
+        if (attr_handle == gatt_chr_val_handle_oil_pressure_3b) {
+            uint8_t value = car_signals_get_oil_pressure_3b();
+            return os_mbuf_append(ctxt->om, &value, sizeof(value));
+        }
+        if (attr_handle == gatt_chr_val_handle_oil_pressure_18b) {
+            uint8_t value = car_signals_get_oil_pressure_18b();
             return os_mbuf_append(ctxt->om, &value, sizeof(value));
         }
         if (attr_handle == gatt_chr_val_handle_tank_level) {
@@ -132,16 +133,6 @@ static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle,
                 }
                 if (buf != NULL) {
                     os_mbuf_copydata(ctxt->om, 0, len, buf);
-                    if (len <= 8) {
-                        // ESP_LOGI(TAG_GATT, "UART write len=%u bytes=%02x %02x %02x %02x %02x %02x %02x %02x",
-                        //          (unsigned)len,
-                        //          buf[0], len > 1 ? buf[1] : 0, len > 2 ? buf[2] : 0,
-                        //          len > 3 ? buf[3] : 0, len > 4 ? buf[4] : 0, len > 5 ? buf[5] : 0,
-                        //          len > 6 ? buf[6] : 0, len > 7 ? buf[7] : 0);
-                    } else {
-                        // ESP_LOGI(TAG_GATT, "UART write len=%u first=%02x %02x %02x", (unsigned)len,
-                        //          buf[0], buf[1], buf[2]);
-                    }
                     remotexy_handle_rx(buf, len);
                     if (buf != stack_buf) {
                         free(buf);
@@ -171,21 +162,6 @@ const struct ble_gatt_svc_def gatt_db_svcs[] = {
                         .att_flags = BLE_ATT_F_READ,
                         .access_cb = gatt_svr_chr_access,
                         .arg = (void *)g_desc_water_temp,
-                    },
-                    { 0 }
-                },
-            },
-            {
-                .uuid = &gatt_chr_uuid_temp.u,
-                .access_cb = gatt_svr_chr_access,
-                .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
-                .val_handle = &gatt_chr_val_handle_outside_temp,
-                .descriptors = (struct ble_gatt_dsc_def[]) {
-                    {
-                        .uuid = BLE_UUID16_DECLARE(0x2901),
-                        .att_flags = BLE_ATT_F_READ,
-                        .access_cb = gatt_svr_chr_access,
-                        .arg = (void *)g_desc_outside_temp,
                     },
                     { 0 }
                 },
@@ -264,21 +240,6 @@ const struct ble_gatt_svc_def gatt_db_svcs[] = {
                         .att_flags = BLE_ATT_F_READ,
                         .access_cb = gatt_svr_chr_access,
                         .arg = (void *)g_desc_high_beam,
-                    },
-                    { 0 }
-                },
-            },
-            {
-                .uuid = &gatt_chr_uuid_preheat.u,
-                .access_cb = gatt_svr_chr_access,
-                .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
-                .val_handle = &gatt_chr_val_handle_preheat,
-                .descriptors = (struct ble_gatt_dsc_def[]) {
-                    {
-                        .uuid = BLE_UUID16_DECLARE(0x2901),
-                        .att_flags = BLE_ATT_F_READ,
-                        .access_cb = gatt_svr_chr_access,
-                        .arg = (void *)g_desc_preheat,
                     },
                     { 0 }
                 },

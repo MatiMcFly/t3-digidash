@@ -91,7 +91,7 @@ static void remotexy_output_task(void *arg)
                 g_output_dirty = false;
             }
         }
-        vTaskDelay(pdMS_TO_TICKS(500));
+        vTaskDelay(pdMS_TO_TICKS(5000));//?
     }
 }
 
@@ -283,7 +283,8 @@ static void remotexy_handle_packet(uint8_t command, uint8_t client_id,
         }
         break;
     case REMOTEXY_PACKAGE_COMMAND_OUTPUTVAR:
-        remotexy_send_output(client_id);
+        //remotexy_send_output(client_id);
+        remotexy_send_empty(REMOTEXY_PACKAGE_COMMAND_PING, client_id);
         break;
     default:
         remotexy_send_empty(command, client_id);
@@ -468,14 +469,6 @@ void remotexy_handle_rx(const uint8_t *data, size_t len)
                 rxy_crc_update(&crc, g_rx_buffer[j]);
             }
 
-            if (packet_len <= 8) {
-                // ESP_LOGI(TAG_RXY, "RX raw len=%u crc=0x%04x bytes=%02x %02x %02x %02x %02x %02x %02x %02x",
-                //          packet_len, crc,
-                //          g_rx_buffer[0], g_rx_buffer[1], g_rx_buffer[2], g_rx_buffer[3],
-                //          g_rx_buffer[4], g_rx_buffer[5],
-                //          packet_len > 6 ? g_rx_buffer[6] : 0,
-                //          packet_len > 7 ? g_rx_buffer[7] : 0);
-            }
 
             if (crc == 0) {
                 uint8_t cm = g_rx_buffer[3];
@@ -489,14 +482,7 @@ void remotexy_handle_rx(const uint8_t *data, size_t len)
                     ESP_LOGW(TAG_RXY, "RX fragment flag set cm=0x%02x len=%u", cm, packet_len);
                 }
             } else {
-                if (packet_len <= 16) {
-                    // ESP_LOGW(TAG_RXY, "CRC fail len=%u crc=0x%04x bytes=%02x %02x %02x %02x %02x %02x",
-                    //          packet_len, crc,
-                    //          g_rx_buffer[0], g_rx_buffer[1], g_rx_buffer[2],
-                    //          g_rx_buffer[3], g_rx_buffer[4], g_rx_buffer[5]);
-                } else {
-                    // ESP_LOGW(TAG_RXY, "CRC fail len=%u crc=0x%04x", packet_len, crc);
-                }
+                ESP_LOGW(TAG_RXY, "RX packet with invalid CRC len=%u", packet_len);
             }
 
             memmove(g_rx_buffer, g_rx_buffer + packet_len, g_rx_len - packet_len);
