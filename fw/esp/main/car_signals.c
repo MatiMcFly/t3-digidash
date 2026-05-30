@@ -27,7 +27,7 @@ static bool g_notify_oil_pressure_18b;
 static int16_t g_water_temp_cC = 0;
 static uint16_t g_rpm = 0;
 static uint16_t g_batt_mv = 0;
-static uint8_t g_tank_level = 0;
+static uint16_t g_tank_level = 0;
 static bool g_turn_signal = false;
 static bool g_high_beam = false;
 static bool g_oil_pressure_switch_3b = false;
@@ -45,27 +45,6 @@ static int16_t clamp_int16(int32_t value)
     return (int16_t)value;
 }
 
-static uint16_t clamp_uint16(int32_t value)
-{
-    if (value > UINT16_MAX) {
-        return UINT16_MAX;
-    }
-    if (value < 0) {
-        return 0;
-    }
-    return (uint16_t)value;
-}
-
-static uint8_t clamp_uint8(int32_t value)
-{
-    if (value > UINT8_MAX) {
-        return UINT8_MAX;
-    }
-    if (value < 0) {
-        return 0;
-    }
-    return (uint8_t)value;
-}
 
 void car_signals_on_disconnect(void)
 {
@@ -120,11 +99,9 @@ void car_signals_on_subscribe(uint16_t attr_handle, bool notify_enabled)
     }
 }
 
-void car_signals_set_water_temp_c(float temp_c)
+void car_signals_set_water_temp_c(int16_t temp_c)
 {
-    int32_t cC = (int32_t)(temp_c * 100.0f);
-    g_water_temp_cC = clamp_int16(cC);
-
+    g_water_temp_cC = temp_c;
     if (!g_notify_water_temp) {
         return;
     }
@@ -132,6 +109,13 @@ void car_signals_set_water_temp_c(float temp_c)
     ble_app_notify(gatt_chr_val_handle_water_temp, &g_water_temp_cC, sizeof(g_water_temp_cC));
 }
 
+void car_signals_set_batt_v(uint16_t volts){
+    g_batt_mv = volts;
+    if (!g_notify_batt_mv) {
+        return;
+    }
+    ble_app_notify(gatt_chr_val_handle_batt_mv, &g_batt_mv, sizeof(g_batt_mv));
+}
 
 void car_signals_set_rpm(uint16_t rpm)
 {
@@ -142,36 +126,45 @@ void car_signals_set_rpm(uint16_t rpm)
     ble_app_notify(gatt_chr_val_handle_rpm, &g_rpm, sizeof(g_rpm));
 }
 
-void car_signals_set_turn_signal(uint8_t value)
+void car_signals_set_tank_level(uint16_t value)
 {
-    g_turn_signal = value ? true : false;
+    g_tank_level = value;
+    if (!g_notify_tank_level) {
+        return;
+    }
+    ble_app_notify(gatt_chr_val_handle_tank_level, g_tank_level_str, strlen(g_tank_level_str));
+}
+
+void car_signals_set_turn_signal(bool value)
+{
+    g_turn_signal = value;
     if (!g_notify_turn_signal) {
         return;
     }
     ble_app_notify(gatt_chr_val_handle_turn_signal, &g_turn_signal, sizeof(g_turn_signal));
 }
 
-void car_signals_set_high_beam(uint8_t value)
+void car_signals_set_high_beam(bool value)
 {
-    g_high_beam = value ? true : false;
+    g_high_beam = value;
     if (!g_notify_high_beam) {
         return;
     }
     ble_app_notify(gatt_chr_val_handle_high_beam, &g_high_beam, sizeof(g_high_beam));
 }
 
-void car_signals_oil_pressure_3b(uint8_t value)
+void car_signals_oil_pressure_3b(bool value)
 {
-    g_oil_pressure_switch_3b = value ? true : false;
+    g_oil_pressure_switch_3b = value;
     if (!g_notify_oil_pressure_3b) {
         return;
     }
     ble_app_notify(gatt_chr_val_handle_oil_pressure_3b, &g_oil_pressure_switch_3b, sizeof(g_oil_pressure_switch_3b));
 }
 
-void car_signals_oil_pressure_18b(uint8_t value)
+void car_signals_oil_pressure_18b(bool value)
 {
-    g_oil_pressure_switch_18b = value ? true : false;
+    g_oil_pressure_switch_18b = value;
     if (!g_notify_oil_pressure_18b) {
         return;
     }
@@ -216,7 +209,7 @@ bool car_signals_get_oil_pressure_18b(void)
     return g_oil_pressure_switch_18b;
 }
 
-uint8_t car_signals_get_tank_level(void)
+uint16_t car_signals_get_tank_level(void)
 {
     return g_tank_level;
 }

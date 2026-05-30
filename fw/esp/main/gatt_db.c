@@ -12,11 +12,9 @@
 static const char *TAG_GATT = "GATT_DB";
 
 static const char g_desc_water_temp[] = "Water Temperature";
-static const char g_desc_outside_temp[] = "Outside Temperature";
 static const char g_desc_rpm[] = "RPM";
 static const char g_desc_turn_signal[] = "Turn Signal";
 static const char g_desc_high_beam[] = "High Beam";
-static const char g_desc_preheat[] = "Diesel Preheat";
 static const char g_desc_tank_level[] = "Tank Level";
 static const char g_desc_batt_mv[] = "Battery Voltage (mV)";
 
@@ -47,9 +45,6 @@ static const ble_uuid128_t gatt_chr_uuid_turn_signal = BLE_UUID128_INIT(
 static const ble_uuid128_t gatt_chr_uuid_high_beam = BLE_UUID128_INIT(
     0x21, 0x7d, 0x8e, 0xb4, 0x92, 0x0d, 0x89, 0x8d,
     0x2a, 0x4f, 0x3d, 0x0f, 0xa8, 0xb1, 0xe7, 0xc4);
-static const ble_uuid128_t gatt_chr_uuid_preheat = BLE_UUID128_INIT(
-    0x21, 0x7d, 0x8e, 0xb4, 0x92, 0x0d, 0x89, 0x8d,
-    0x2a, 0x4f, 0x3d, 0x0f, 0xa9, 0xb1, 0xe7, 0xc4);
 static const ble_uuid128_t gatt_chr_uuid_tank_level = BLE_UUID128_INIT(
     0x21, 0x7d, 0x8e, 0xb4, 0x92, 0x0d, 0x89, 0x8d,
     0x2a, 0x4f, 0x3d, 0x0f, 0xaa, 0xb1, 0xe7, 0xc4);
@@ -87,29 +82,25 @@ static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle,
             int16_t value = car_signals_get_water_temp_cC();
             return os_mbuf_append(ctxt->om, &value, sizeof(value));
         }
-        
-        if (attr_handle == gatt_chr_val_handle_batt_level) {
-            uint8_t value = car_signals_get_batt_level_percent();
-            return os_mbuf_append(ctxt->om, &value, sizeof(value));
-        }
+      
         if (attr_handle == gatt_chr_val_handle_rpm) {
             uint16_t value = car_signals_get_rpm();
             return os_mbuf_append(ctxt->om, &value, sizeof(value));
         }
         if (attr_handle == gatt_chr_val_handle_turn_signal) {
-            uint8_t value = car_signals_get_turn_signal();
+            bool value = car_signals_get_turn_signal();
             return os_mbuf_append(ctxt->om, &value, sizeof(value));
         }
         if (attr_handle == gatt_chr_val_handle_high_beam) {
-            uint8_t value = car_signals_get_high_beam();
+            bool value = car_signals_get_high_beam();
             return os_mbuf_append(ctxt->om, &value, sizeof(value));
         }
         if (attr_handle == gatt_chr_val_handle_oil_pressure_3b) {
-            uint8_t value = car_signals_get_oil_pressure_3b();
+            bool value = car_signals_get_oil_pressure_3b();
             return os_mbuf_append(ctxt->om, &value, sizeof(value));
         }
         if (attr_handle == gatt_chr_val_handle_oil_pressure_18b) {
-            uint8_t value = car_signals_get_oil_pressure_18b();
+            bool value = car_signals_get_oil_pressure_18b();
             return os_mbuf_append(ctxt->om, &value, sizeof(value));
         }
         if (attr_handle == gatt_chr_val_handle_tank_level) {
