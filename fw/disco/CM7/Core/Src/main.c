@@ -270,6 +270,7 @@ Error_Handler();
   for (;;) {}
     /* USER CODE END WHILE */
 
+  MX_TouchGFX_Process();
     /* USER CODE BEGIN 3 */
   /* USER CODE END 3 */
 }

@@ -39,6 +39,19 @@ add_executable(${CMAKE_PROJECT_NAME})
 # Include mx-generated
 include("mx-generated.cmake")
 
+# The TouchGFX Generator emits target/generated/OSWrappers.cpp against
+# CMSIS-RTOSv2 on every regen. This project uses native FreeRTOS, so drop
+# the generated file from the project's source list and compile our own
+# (see TouchGFX/target/OSWrappers_FreeRTOS.cpp) in its place.
+get_target_property(_t3d_srcs ${CMAKE_PROJECT_NAME} SOURCES)
+if(_t3d_srcs)
+    list(FILTER _t3d_srcs EXCLUDE REGEX "TouchGFX/target/generated/OSWrappers\\.cpp$")
+    set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY SOURCES ${_t3d_srcs})
+endif()
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/TouchGFX/target/OSWrappers_FreeRTOS.cpp
+)
+
 # Add touchgfx generated sources and libraries
 add_subdirectory(cmake/touchgfx)
 

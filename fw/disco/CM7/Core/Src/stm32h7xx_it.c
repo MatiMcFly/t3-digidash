@@ -26,6 +26,14 @@
 #include "task.h"
 
 extern void xPortSysTickHandler(void);
+
+/* Mark the CubeMX-generated SVC_Handler / PendSV_Handler bodies below as
+ * weak so the strong definitions provided by the FreeRTOS port (mapped to
+ * those names via FreeRTOSConfig.h) win at link time. GCC propagates the
+ * weak attribute from the prototype to the definition further down this
+ * file, surviving CubeMX regeneration. */
+void SVC_Handler(void)    __attribute__((weak));
+void PendSV_Handler(void) __attribute__((weak));
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -142,8 +150,18 @@ void UsageFault_Handler(void)
   }
 }
 
-/* SVC_Handler and PendSV_Handler are provided by the FreeRTOS port
- * (mapped to vPortSVCHandler / xPortPendSVHandler in FreeRTOSConfig.h). */
+/**
+  * @brief This function handles System service call via SWI instruction.
+  */
+void SVC_Handler(void)
+{
+  /* USER CODE BEGIN SVCall_IRQn 0 */
+
+  /* USER CODE END SVCall_IRQn 0 */
+  /* USER CODE BEGIN SVCall_IRQn 1 */
+
+  /* USER CODE END SVCall_IRQn 1 */
+}
 
 /**
   * @brief This function handles Debug monitor.
@@ -159,11 +177,20 @@ void DebugMon_Handler(void)
 }
 
 /**
+  * @brief This function handles Pendable request for system service.
+  */
+void PendSV_Handler(void)
+{
+  /* USER CODE BEGIN PendSV_IRQn 0 */
+
+  /* USER CODE END PendSV_IRQn 0 */
+  /* USER CODE BEGIN PendSV_IRQn 1 */
+
+  /* USER CODE END PendSV_IRQn 1 */
+}
+
+/**
   * @brief This function handles System tick timer.
-  *
-  * Always increment the HAL tick (so HAL_GetTick / HAL_Delay keep working both
-  * before and after the scheduler is started) and, once FreeRTOS is running,
-  * forward the tick to the kernel.
   */
 void SysTick_Handler(void)
 {

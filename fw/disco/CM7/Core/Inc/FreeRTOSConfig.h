@@ -131,13 +131,21 @@
 /* Interrupt handler names                                                    */
 /* -------------------------------------------------------------------------- */
 
-/* SVC and PendSV are provided by the FreeRTOS port. Make sure CubeMX-generated
- * weak handlers in stm32h7xx_it.c are removed so these win at link time. */
+/* Direct routing: the FreeRTOS port's vPortSVCHandler / xPortPendSVHandler
+ * ARE the exception handlers. They are __attribute__((naked)) and must be
+ * entered by the hardware exception mechanism, NOT called via bl from a
+ * trampoline (doing so corrupts EXC_RETURN / PSP and crashes the first
+ * task). We therefore remap them to the Cortex-M vector-table names here.
+ *
+ * CubeMX still emits SVC_Handler / PendSV_Handler bodies in stm32h7xx_it.c
+ * on every regen. To prevent a duplicate-symbol link failure, those bodies
+ * are marked __attribute__((weak)) via a prior prototype placed inside the
+ * USER CODE block of stm32h7xx_it.c, so the strong port.c definitions win. */
 #define vPortSVCHandler         SVC_Handler
 #define xPortPendSVHandler      PendSV_Handler
 
-/* The SysTick_Handler is intentionally NOT remapped here: stm32h7xx_it.c keeps
- * its own SysTick_Handler that calls HAL_IncTick() and forwards to
+/* The SysTick_Handler is intentionally NOT remapped here: stm32h7xx_it.c
+ * keeps its own SysTick_Handler that calls HAL_IncTick() and forwards to
  * xPortSysTickHandler() once the scheduler is running. */
 
 /* -------------------------------------------------------------------------- */
