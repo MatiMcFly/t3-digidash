@@ -31,16 +31,35 @@ static const char *TAG_RXY = "RemoteXY";
 
 #pragma pack(push, 1)
 typedef struct {
-    int16_t instrument_01;
+    uint8_t led_01;
+    uint8_t led_02;
+    float instrument_01;
+    float onlineGraph_01_var1;
+    uint8_t led_03;
+    uint8_t led_04;
+    float linearbar_01;
+    int16_t linearbar_02;
     uint8_t connect_flag;
 } RemoteXYData;
 #pragma pack(pop)
 
-static const uint8_t k_remotexy_conf_full[] = {
-    255, 0, 0, 2, 0, 45, 0, 19, 0, 0, 0, 0, 31, 1, 106, 200, 1, 1, 1, 0,
-    71, 32, 71, 42, 42, 56, 16, 2, 24, 135, 0, 0, 0, 0, 0, 0, 200, 66, 0, 0,
-    160, 65, 0, 0, 32, 65, 0, 0, 0, 64, 24, 0
-};
+static const uint8_t k_remotexy_conf_full[] = { 255,0,0,18,0,69,1,19,0,0,0,0,31,1,106,200,3,1,0,0,
+  7,0,70,12,33,18,18,16,26,37,0,70,70,33,18,18,16,26,37,0,
+  129,5,13,40,12,64,17,66,108,105,110,107,101,114,0,129,53,13,51,12,
+  64,17,70,101,114,110,108,105,99,104,116,0,129,25,85,51,12,64,17,68,
+  114,101,104,122,97,104,108,0,131,32,179,40,14,2,17,2,31,80,97,103,
+  101,32,49,0,38,71,19,105,62,62,56,0,2,24,135,0,0,0,0,0,
+  0,122,67,0,0,112,66,0,0,240,65,0,0,112,65,24,114,112,109,0,
+  7,0,68,17,30,76,74,1,8,36,70,16,143,18,18,16,26,37,0,131,
+  34,182,40,14,2,17,2,31,80,97,103,101,32,50,0,26,70,71,144,18,
+  18,16,26,37,0,129,9,125,37,12,64,17,195,150,76,32,48,46,51,0,
+  129,62,125,37,12,64,17,195,150,76,32,49,46,56,0,129,33,10,46,12,
+  64,17,66,97,116,116,101,114,105,101,0,5,0,73,39,21,20,50,4,128,
+  0,2,26,0,0,0,0,0,0,200,66,0,0,0,0,73,37,96,25,80,
+  20,128,0,2,26,0,0,0,0,0,0,200,66,0,0,0,0,129,11,5,
+  88,12,64,17,75,195,188,104,108,109,105,116,116,101,108,116,101,109,112,0,
+  131,31,182,40,14,2,17,2,31,77,97,105,110,32,112,97,103,101,0,41,
+  129,37,80,28,12,64,17,84,97,110,107,0 };
 
 static RemoteXYData g_remotexy;
 static uint8_t g_rx_buffer[REMOTEXY_RX_BUFFER_SIZE];
@@ -60,6 +79,7 @@ static uint16_t g_conf_len;
 static const uint8_t *g_conf_data;
 
 static bool remotexy_send_output(uint8_t client_id);
+static void remotexy_pack_outputs(uint8_t *buf, size_t buf_len);
 
 static void remotexy_output_task(void *arg)
 {
@@ -189,21 +209,45 @@ static bool remotexy_send_output(uint8_t client_id)
         g_has_client_id = true;
         return false;
     }
-    uint8_t payload[1 + sizeof(int16_t)];
-    uint8_t flags = 0;
-    payload[0] = flags;
-    payload[1] = (uint8_t)(g_remotexy.instrument_01 & 0xff);
-    payload[2] = (uint8_t)((g_remotexy.instrument_01 >> 8) & 0xff);
-    remotexy_send_packet(REMOTEXY_PACKAGE_COMMAND_OUTPUTVAR, client_id, payload, (uint16_t)(1 + g_output_len));
+    size_t payload_len = (size_t)g_output_len + 1;
+    uint8_t stack_buf[64];
+    uint8_t *payload = stack_buf;
+
+    if (payload_len > sizeof(stack_buf)) {
+        payload = (uint8_t *)malloc(payload_len);
+        if (payload == NULL) {
+            return false;
+        }
+    }
+
+    payload[0] = 0;
+    remotexy_pack_outputs(&payload[1], g_output_len);
+    remotexy_send_packet(REMOTEXY_PACKAGE_COMMAND_OUTPUTVAR, client_id, payload, (uint16_t)payload_len);
+
+    if (payload != stack_buf) {
+        free(payload);
+    }
     return true;
 }
 
 static void remotexy_send_allvar(uint8_t client_id)
 {
-    uint8_t payload[sizeof(int16_t)];
-    payload[0] = (uint8_t)(g_remotexy.instrument_01 & 0xff);
-    payload[1] = (uint8_t)((g_remotexy.instrument_01 >> 8) & 0xff);
+    uint8_t stack_buf[64];
+    uint8_t *payload = stack_buf;
+
+    if (g_output_len > sizeof(stack_buf)) {
+        payload = (uint8_t *)malloc(g_output_len);
+        if (payload == NULL) {
+            return;
+        }
+    }
+
+    remotexy_pack_outputs(payload, g_output_len);
     remotexy_send_packet(REMOTEXY_PACKAGE_COMMAND_ALLVAR, client_id, payload, g_output_len);
+
+    if (payload != stack_buf) {
+        free(payload);
+    }
 }
 
 static void remotexy_handle_packet(uint8_t command, uint8_t client_id,
@@ -248,7 +292,14 @@ static void remotexy_handle_packet(uint8_t command, uint8_t client_id,
 
 void remotexy_init(void)
 {
+    g_remotexy.led_01 = 0;
+    g_remotexy.led_02 = 0;
     g_remotexy.instrument_01 = 0;
+    g_remotexy.onlineGraph_01_var1 = 0;
+    g_remotexy.led_03 = 0;
+    g_remotexy.led_04 = 0;
+    g_remotexy.linearbar_01 = 0;
+    g_remotexy.linearbar_02 = 0;
     g_remotexy.connect_flag = 0;
     g_connected = false;
     g_has_client_id = false;
@@ -307,18 +358,90 @@ void remotexy_set_notify_enabled(bool enabled)
     }
 }
 
-void remotexy_set_instrument(int16_t value)
+void remotexy_set_instrument(float value)
 {
     if (g_remotexy.instrument_01 != value) {
         g_remotexy.instrument_01 = value;
         g_output_dirty = true;
-        ESP_LOGI(TAG_RXY, "Instrument=%d", (int)value);
+        ESP_LOGI(TAG_RXY, "Instrument=%.2f", (double)value);
         if (g_connected && g_has_client_id && g_session_ready) {
             if (remotexy_send_output(g_last_client_id)) {
                 g_output_dirty = false;
             }
         }
     }
+}
+
+void remotexy_set_outputs(uint8_t led_01, uint8_t led_02, float instrument_01,
+                          float onlineGraph_01_var1, uint8_t led_03, uint8_t led_04,
+                          float linearbar_01, int16_t linearbar_02)
+{
+    bool changed = false;
+
+    if (g_remotexy.led_01 != led_01) {
+        g_remotexy.led_01 = led_01;
+        changed = true;
+    }
+    if (g_remotexy.led_02 != led_02) {
+        g_remotexy.led_02 = led_02;
+        changed = true;
+    }
+    if (g_remotexy.instrument_01 != instrument_01) {
+        g_remotexy.instrument_01 = instrument_01;
+        changed = true;
+    }
+    if (g_remotexy.onlineGraph_01_var1 != onlineGraph_01_var1) {
+        g_remotexy.onlineGraph_01_var1 = onlineGraph_01_var1;
+        changed = true;
+    }
+    if (g_remotexy.led_03 != led_03) {
+        g_remotexy.led_03 = led_03;
+        changed = true;
+    }
+    if (g_remotexy.led_04 != led_04) {
+        g_remotexy.led_04 = led_04;
+        changed = true;
+    }
+    if (g_remotexy.linearbar_01 != linearbar_01) {
+        g_remotexy.linearbar_01 = linearbar_01;
+        changed = true;
+    }
+    if (g_remotexy.linearbar_02 != linearbar_02) {
+        g_remotexy.linearbar_02 = linearbar_02;
+        changed = true;
+    }
+
+    if (!changed) {
+        return;
+    }
+
+    g_output_dirty = true;
+    if (g_connected && g_has_client_id && g_session_ready) {
+        if (remotexy_send_output(g_last_client_id)) {
+            g_output_dirty = false;
+        }
+    }
+}
+
+static void remotexy_pack_outputs(uint8_t *buf, size_t buf_len)
+{
+    size_t offset = 0;
+
+    if (buf == NULL || buf_len < g_output_len) {
+        return;
+    }
+
+    buf[offset++] = g_remotexy.led_01;
+    buf[offset++] = g_remotexy.led_02;
+    memcpy(&buf[offset], &g_remotexy.instrument_01, sizeof(g_remotexy.instrument_01));
+    offset += sizeof(g_remotexy.instrument_01);
+    memcpy(&buf[offset], &g_remotexy.onlineGraph_01_var1, sizeof(g_remotexy.onlineGraph_01_var1));
+    offset += sizeof(g_remotexy.onlineGraph_01_var1);
+    buf[offset++] = g_remotexy.led_03;
+    buf[offset++] = g_remotexy.led_04;
+    memcpy(&buf[offset], &g_remotexy.linearbar_01, sizeof(g_remotexy.linearbar_01));
+    offset += sizeof(g_remotexy.linearbar_01);
+    memcpy(&buf[offset], &g_remotexy.linearbar_02, sizeof(g_remotexy.linearbar_02));
 }
 
 void remotexy_handle_rx(const uint8_t *data, size_t len)
