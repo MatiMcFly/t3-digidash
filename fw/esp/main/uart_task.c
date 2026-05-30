@@ -50,8 +50,8 @@ static void uart_task_esp_to_nucleo(void *arg)
             uint16_t rpm = car_signals_get_rpm();
             bool turn_signal = car_signals_get_turn_signal();
             bool high_beam = car_signals_get_high_beam();
-            uint8_t tank_level = car_signals_get_tank_level();
-            uint16_t water_c = car_signals_get_water_temp_cC();
+            uint16_t tank_level = car_signals_get_tank_level();
+            int16_t water_c = car_signals_get_water_temp_cC();
             uint16_t batt_v = car_signals_get_batt_mv();
             bool oil_pressure_switch_3b = car_signals_get_oil_pressure_3b();
             bool oil_pressure_switch_18b = car_signals_get_oil_pressure_18b();
