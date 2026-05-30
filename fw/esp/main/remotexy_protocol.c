@@ -31,35 +31,36 @@ static const char *TAG_RXY = "RemoteXY";
 
 #pragma pack(push, 1)
 typedef struct {
-    uint8_t led_01;
-    uint8_t led_02;
-    float instrument_01;
-    float onlineGraph_01_var1;
-    uint8_t led_03;
-    uint8_t led_04;
-    float linearbar_01;
-    int16_t linearbar_02;
+    uint8_t turn_signal_w;
+    uint8_t high_beam_w;
+    int16_t rpm_w;
+    float batt_volt_w;
+    uint8_t oil_03_w;
+    uint8_t oil_18_w;
+    int8_t water_temp_w;
+    int8_t tank_level_w;
     uint8_t connect_flag;
 } RemoteXYData;
 #pragma pack(pop)
 
-static const uint8_t k_remotexy_conf_full[] = { 255,0,0,18,0,69,1,19,0,0,0,0,31,1,106,200,3,1,0,0,
-  7,0,70,12,33,18,18,16,26,37,0,70,70,33,18,18,16,26,37,0,
-  129,5,13,40,12,64,17,66,108,105,110,107,101,114,0,129,53,13,51,12,
-  64,17,70,101,114,110,108,105,99,104,116,0,129,25,85,51,12,64,17,68,
-  114,101,104,122,97,104,108,0,131,32,179,40,14,2,17,2,31,80,97,103,
-  101,32,49,0,38,71,19,105,62,62,56,0,2,24,135,0,0,0,0,0,
-  0,122,67,0,0,112,66,0,0,240,65,0,0,112,65,24,114,112,109,0,
-  7,0,68,17,30,76,74,1,8,36,70,16,143,18,18,16,26,37,0,131,
-  34,182,40,14,2,17,2,31,80,97,103,101,32,50,0,26,70,71,144,18,
-  18,16,26,37,0,129,9,125,37,12,64,17,195,150,76,32,48,46,51,0,
-  129,62,125,37,12,64,17,195,150,76,32,49,46,56,0,129,33,10,46,12,
-  64,17,66,97,116,116,101,114,105,101,0,5,0,73,39,21,20,50,4,128,
-  0,2,26,0,0,0,0,0,0,200,66,0,0,0,0,73,37,96,25,80,
-  20,128,0,2,26,0,0,0,0,0,0,200,66,0,0,0,0,129,11,5,
-  88,12,64,17,75,195,188,104,108,109,105,116,116,101,108,116,101,109,112,0,
-  131,31,182,40,14,2,17,2,31,77,97,105,110,32,112,97,103,101,0,41,
-  129,37,80,28,12,64,17,84,97,110,107,0 };
+static const uint8_t k_remotexy_conf_full[] = {
+        255, 0, 0, 12, 0, 41, 1, 19, 0, 0, 0, 0, 31, 1, 106, 200, 3, 1, 0, 0,
+        7, 0, 70, 12, 33, 18, 18, 16, 26, 37, 0, 70, 70, 33, 18, 18, 16, 26, 37, 0,
+        129, 5, 13, 40, 12, 64, 17, 66, 108, 105, 110, 107, 101, 114, 0, 129, 53, 13, 51, 12,
+        64, 17, 70, 101, 114, 110, 108, 105, 99, 104, 116, 0, 129, 25, 85, 51, 12, 64, 17, 68,
+        114, 101, 104, 122, 97, 104, 108, 0, 131, 32, 179, 40, 14, 2, 17, 2, 31, 80, 97, 103,
+        101, 32, 49, 0, 38, 71, 19, 105, 62, 62, 56, 16, 2, 24, 135, 0, 0, 0, 0, 0,
+        0, 122, 67, 0, 0, 112, 66, 0, 0, 240, 65, 0, 0, 112, 65, 24, 114, 112, 109, 0,
+        7, 0, 68, 17, 30, 76, 74, 1, 8, 36, 70, 16, 143, 18, 18, 16, 26, 37, 0, 131,
+        34, 182, 40, 14, 2, 17, 2, 31, 80, 97, 103, 101, 32, 50, 0, 26, 70, 72, 144, 18,
+        18, 16, 26, 37, 0, 129, 9, 125, 37, 12, 64, 17, 195, 150, 76, 32, 48, 46, 51, 0,
+        129, 62, 125, 37, 12, 64, 17, 195, 150, 76, 32, 49, 46, 56, 0, 129, 33, 10, 46, 12,
+        64, 17, 66, 97, 116, 116, 101, 114, 105, 101, 0, 5, 0, 129, 11, 5, 88, 12, 64, 17,
+        75, 195, 188, 104, 108, 109, 105, 116, 116, 101, 108, 116, 101, 109, 112, 0, 131, 31, 182, 40,
+        14, 2, 17, 2, 31, 77, 97, 105, 110, 32, 112, 97, 103, 101, 0, 41, 129, 39, 92, 28,
+        12, 64, 17, 84, 97, 110, 107, 0, 66, 17, 28, 70, 40, 131, 2, 24, 66, 16, 114, 70,
+        40, 131, 2, 24
+};
 
 static RemoteXYData g_remotexy;
 static uint8_t g_rx_buffer[REMOTEXY_RX_BUFFER_SIZE];
@@ -292,14 +293,14 @@ static void remotexy_handle_packet(uint8_t command, uint8_t client_id,
 
 void remotexy_init(void)
 {
-    g_remotexy.led_01 = 0;
-    g_remotexy.led_02 = 0;
-    g_remotexy.instrument_01 = 0;
-    g_remotexy.onlineGraph_01_var1 = 0;
-    g_remotexy.led_03 = 0;
-    g_remotexy.led_04 = 0;
-    g_remotexy.linearbar_01 = 0;
-    g_remotexy.linearbar_02 = 0;
+    g_remotexy.turn_signal_w = 0;
+    g_remotexy.high_beam_w = 0;
+    g_remotexy.rpm_w = 0;
+    g_remotexy.batt_volt_w = 0;
+    g_remotexy.oil_03_w = 0;
+    g_remotexy.oil_18_w = 0;
+    g_remotexy.water_temp_w = 0;
+    g_remotexy.tank_level_w = 0;
     g_remotexy.connect_flag = 0;
     g_connected = false;
     g_has_client_id = false;
@@ -358,56 +359,42 @@ void remotexy_set_notify_enabled(bool enabled)
     }
 }
 
-void remotexy_set_instrument(float value)
-{
-    if (g_remotexy.instrument_01 != value) {
-        g_remotexy.instrument_01 = value;
-        g_output_dirty = true;
-        ESP_LOGI(TAG_RXY, "Instrument=%.2f", (double)value);
-        if (g_connected && g_has_client_id && g_session_ready) {
-            if (remotexy_send_output(g_last_client_id)) {
-                g_output_dirty = false;
-            }
-        }
-    }
-}
-
-void remotexy_set_outputs(uint8_t led_01, uint8_t led_02, float instrument_01,
-                          float onlineGraph_01_var1, uint8_t led_03, uint8_t led_04,
-                          float linearbar_01, int16_t linearbar_02)
+void remotexy_set_outputs(uint8_t turn_signal_w, uint8_t high_beam_w, int16_t rpm_w,
+                          float batt_volt_w, uint8_t oil_03_w, uint8_t oil_18_w,
+                          int8_t water_temp_w, int8_t tank_level_w)
 {
     bool changed = false;
 
-    if (g_remotexy.led_01 != led_01) {
-        g_remotexy.led_01 = led_01;
+    if (g_remotexy.turn_signal_w != turn_signal_w) {
+        g_remotexy.turn_signal_w = turn_signal_w;
         changed = true;
     }
-    if (g_remotexy.led_02 != led_02) {
-        g_remotexy.led_02 = led_02;
+    if (g_remotexy.high_beam_w != high_beam_w) {
+        g_remotexy.high_beam_w = high_beam_w;
         changed = true;
     }
-    if (g_remotexy.instrument_01 != instrument_01) {
-        g_remotexy.instrument_01 = instrument_01;
+    if (g_remotexy.rpm_w != rpm_w) {
+        g_remotexy.rpm_w = rpm_w;
         changed = true;
     }
-    if (g_remotexy.onlineGraph_01_var1 != onlineGraph_01_var1) {
-        g_remotexy.onlineGraph_01_var1 = onlineGraph_01_var1;
+    if (g_remotexy.batt_volt_w != batt_volt_w) {
+        g_remotexy.batt_volt_w = batt_volt_w;
         changed = true;
     }
-    if (g_remotexy.led_03 != led_03) {
-        g_remotexy.led_03 = led_03;
+    if (g_remotexy.oil_03_w != oil_03_w) {
+        g_remotexy.oil_03_w = oil_03_w;
         changed = true;
     }
-    if (g_remotexy.led_04 != led_04) {
-        g_remotexy.led_04 = led_04;
+    if (g_remotexy.oil_18_w != oil_18_w) {
+        g_remotexy.oil_18_w = oil_18_w;
         changed = true;
     }
-    if (g_remotexy.linearbar_01 != linearbar_01) {
-        g_remotexy.linearbar_01 = linearbar_01;
+    if (g_remotexy.water_temp_w != water_temp_w) {
+        g_remotexy.water_temp_w = water_temp_w;
         changed = true;
     }
-    if (g_remotexy.linearbar_02 != linearbar_02) {
-        g_remotexy.linearbar_02 = linearbar_02;
+    if (g_remotexy.tank_level_w != tank_level_w) {
+        g_remotexy.tank_level_w = tank_level_w;
         changed = true;
     }
 
@@ -431,17 +418,17 @@ static void remotexy_pack_outputs(uint8_t *buf, size_t buf_len)
         return;
     }
 
-    buf[offset++] = g_remotexy.led_01;
-    buf[offset++] = g_remotexy.led_02;
-    memcpy(&buf[offset], &g_remotexy.instrument_01, sizeof(g_remotexy.instrument_01));
-    offset += sizeof(g_remotexy.instrument_01);
-    memcpy(&buf[offset], &g_remotexy.onlineGraph_01_var1, sizeof(g_remotexy.onlineGraph_01_var1));
-    offset += sizeof(g_remotexy.onlineGraph_01_var1);
-    buf[offset++] = g_remotexy.led_03;
-    buf[offset++] = g_remotexy.led_04;
-    memcpy(&buf[offset], &g_remotexy.linearbar_01, sizeof(g_remotexy.linearbar_01));
-    offset += sizeof(g_remotexy.linearbar_01);
-    memcpy(&buf[offset], &g_remotexy.linearbar_02, sizeof(g_remotexy.linearbar_02));
+    buf[offset++] = g_remotexy.turn_signal_w;
+    buf[offset++] = g_remotexy.high_beam_w;
+    memcpy(&buf[offset], &g_remotexy.rpm_w, sizeof(g_remotexy.rpm_w));
+    offset += sizeof(g_remotexy.rpm_w);
+    memcpy(&buf[offset], &g_remotexy.batt_volt_w, sizeof(g_remotexy.batt_volt_w));
+    offset += sizeof(g_remotexy.batt_volt_w);
+    buf[offset++] = g_remotexy.oil_03_w;
+    buf[offset++] = g_remotexy.oil_18_w;
+    memcpy(&buf[offset], &g_remotexy.water_temp_w, sizeof(g_remotexy.water_temp_w));
+    offset += sizeof(g_remotexy.water_temp_w);
+    memcpy(&buf[offset], &g_remotexy.tank_level_w, sizeof(g_remotexy.tank_level_w));
 }
 
 void remotexy_handle_rx(const uint8_t *data, size_t len)

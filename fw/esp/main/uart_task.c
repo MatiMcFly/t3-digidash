@@ -47,6 +47,17 @@ static uint8_t clamp_uint8(int32_t value)
     return (uint8_t)value;
 }
 
+static int8_t clamp_int8_range(int32_t value, int8_t min_value, int8_t max_value)
+{
+    if (value < min_value) {
+        return min_value;
+    }
+    if (value > max_value) {
+        return max_value;
+    }
+    return (int8_t)value;
+}
+
 static void uart_task_esp_to_nucleo(void *arg)
 {
     uart_config_t uart_config = {
@@ -88,17 +99,18 @@ static void uart_task_esp_to_nucleo(void *arg)
                 car_signals_set_preheat(clamp_uint8(preheat));
                 car_signals_set_tank_level(clamp_uint8(tank_level));
 
-                uint8_t batt_percent = car_signals_get_batt_level_percent();
-                uint8_t batt_low = batt_percent < 20 ? 1 : 0;
                 uint8_t turn = clamp_uint8(turn_signal);
                 uint8_t high = clamp_uint8(high_beam);
-                uint8_t preheat_on = clamp_uint8(preheat);
-                float rpm_value = (float)clamp_uint16_range(rpm, 0, UINT16_MAX);
-                int16_t tank_percent = (int16_t)clamp_uint8(tank_level);
+                int16_t rpm_value = (int16_t)clamp_uint16_range(rpm, 0, INT16_MAX);
+                float batt_v_out = batt_v;
+                uint8_t oil_03 = clamp_uint8(preheat);
+                uint8_t oil_18 = 0;
+                int8_t water_temp = clamp_int8_range((int32_t)water_c, 0, 100);
+                int8_t tank_percent = (int8_t)clamp_uint8(tank_level);
 
                 remotexy_set_outputs(turn, high, rpm_value,
-                                     rpm_value, preheat_on, batt_low,
-                                     (float)batt_percent, tank_percent);
+                                     batt_v_out, oil_03, oil_18,
+                                     water_temp, tank_percent);
             } else {
                 ESP_LOGW(TAG, "UART parse failed; expected 'WT=23.5,OT=12.1,BV=12.6,RPM=1500,TS=1,HB=0,DP=0,TL=45'");
             }
