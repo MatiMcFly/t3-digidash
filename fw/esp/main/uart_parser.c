@@ -6,7 +6,7 @@
 
 #include "esp_log.h"
 
-#define UART_PARSER_BUF_SIZE 1024
+#define UART_PARSER_BUF_SIZE 256
 
 bool parse_uart_values(const char *text, int16_t *water_c, uint16_t *rpm, uint16_t *batt_v , uint16_t *tank_level, bool *turn_signal,
                        bool *high_beam, bool *oil_pressure_switch_3b, bool *oil_pressure_switch_18b)
@@ -15,7 +15,7 @@ bool parse_uart_values(const char *text, int16_t *water_c, uint16_t *rpm, uint16
         return false;
     }
 
-    char buffer[UART_PARSER_BUF_SIZE];
+    static char buffer[UART_PARSER_BUF_SIZE];
     strncpy(buffer, text, sizeof(buffer) - 1);
     buffer[sizeof(buffer) - 1] = '\0';
     
@@ -24,6 +24,7 @@ bool parse_uart_values(const char *text, int16_t *water_c, uint16_t *rpm, uint16
     // Where each pair is "id:value" and pairs are separated by ';'
 
     int parsed_count = 0;
+    bool had_error = false;
     // context is used by strtok_r to maintain state between calls
     char *context = NULL;
     // Get the first pair of id and value
@@ -90,12 +91,19 @@ bool parse_uart_values(const char *text, int16_t *water_c, uint16_t *rpm, uint16
                 break;
             
             default:
+                had_error = true;
                 break;
             }
+        } else {
+            had_error = true;
         }
         // move to the next pair
         pairs = strtok_r(NULL, ";", &context);
     }
 
-    return parsed_count == 8;
+    if (parsed_count == 0) {
+        return false;
+    }
+
+    return !had_error;
 }
