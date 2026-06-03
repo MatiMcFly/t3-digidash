@@ -12,7 +12,7 @@ include(ExternalProject)
 set(CMAKE_CXX_COMPILER_FORCED "true")
 
 # Set the project name
-set(CMAKE_PROJECT_NAME t3-dash)
+set(CMAKE_PROJECT_NAME t3-digidash)
 
 # Core project settings
 project(${CMAKE_PROJECT_NAME} LANGUAGES C ASM)

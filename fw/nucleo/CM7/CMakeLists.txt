@@ -30,7 +30,7 @@ set(STM32_LINKER_SCRIPT stm32h755xx_flash_CM7.ld)
 set(STM32_LINKER_OPTION  )
 
 # Set the project name
-set(CMAKE_PROJECT_NAME t3-dash_CM7)
+set(CMAKE_PROJECT_NAME t3-digidash_CM7)
 project(${CMAKE_PROJECT_NAME} LANGUAGES C ASM)
 
 # Create an executable object type

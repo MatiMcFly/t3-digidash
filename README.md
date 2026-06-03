@@ -1,4 +1,4 @@
-# 🛻 T3 Dash -- Digital dashboard for the VW T3
+# 🛻 T3 DigiDash -- Digital dashboard for the VW T3
 
 (C) 2026 Matthias Schär, Rinaldo Leone, Timon Burkard
 
