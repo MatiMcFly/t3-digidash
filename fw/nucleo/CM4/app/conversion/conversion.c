@@ -29,35 +29,37 @@ void conversion_task(void* params)
     (void)params; // Unused
 
     while (true) {
-        if (xQueueReceive(queue_data_raw, &data, portMAX_DELAY) == pdPASS) {
-            switch (data.id) {
-                case SENSOR_ID_COOLANT_TEMPERATURE:
-                    data.value = convert_coolant_temperature(data.value);
-                    break;
+        if (xQueueReceive(queue_data_raw, &data, portMAX_DELAY) != pdPASS) {
+            continue;
+        }
 
-                case SENSOR_ID_BATTERY_VOLTAGE:
-                    data.value = convert_battery_voltage(data.value);
-                    break;
+        switch (data.id) {
+            case SENSOR_ID_COOLANT_TEMPERATURE:
+                data.value = convert_coolant_temperature(data.value);
+                break;
 
-                case SENSOR_ID_FUEL_LEVEL:
-                    data.value = convert_fuel_level(data.value);
-                    break;
+            case SENSOR_ID_BATTERY_VOLTAGE:
+                data.value = convert_battery_voltage(data.value);
+                break;
 
-                case SENSOR_ID_TURN_SIGNAL:
-                case SENSOR_ID_HIGH_BEAM:
-                case SENSOR_ID_OIL_PRESSURE_0_3_BAR:
-                case SENSOR_ID_OIL_PRESSURE_1_8_BAR:
-                    // No conversion needed for binary signals
-                    break;
+            case SENSOR_ID_FUEL_LEVEL:
+                data.value = convert_fuel_level(data.value);
+                break;
 
-                default:
-                    HAL_UART_Transmit(&huart3, (uint8_t*)"conversion: Unknown sensor id\n", strlen("conversion: Unknown sensor id\n"), HAL_MAX_DELAY);
-                    continue;
-            }
+            case SENSOR_ID_TURN_SIGNAL:
+            case SENSOR_ID_HIGH_BEAM:
+            case SENSOR_ID_OIL_PRESSURE_0_3_BAR:
+            case SENSOR_ID_OIL_PRESSURE_1_8_BAR:
+                // No conversion needed for binary signals
+                break;
 
-            if (xQueueSend(queue_data_converted, &data, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
-                HAL_UART_Transmit(&huart3, (uint8_t*)"conversion: xQueueSend error\n", strlen("conversion: xQueueSend error\n"), HAL_MAX_DELAY);
-            }
+            default:
+                HAL_UART_Transmit(&huart3, (uint8_t*)"conversion: Unknown sensor id\n", strlen("conversion: Unknown sensor id\n"), HAL_MAX_DELAY);
+                continue;
+        }
+
+        if (xQueueSend(queue_data_converted, &data, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
+            HAL_UART_Transmit(&huart3, (uint8_t*)"conversion: xQueueSend error\n", strlen("conversion: xQueueSend error\n"), HAL_MAX_DELAY);
         }
     }
 }

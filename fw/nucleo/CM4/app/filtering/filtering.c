@@ -41,44 +41,46 @@ void filtering_task(void* params)
     (void)params; // Unused
 
     while (true) {
-        if (xQueueReceive(queue_data_converted, &data, portMAX_DELAY) == pdPASS) {
-            switch (data.id) {
-                case SENSOR_ID_COOLANT_TEMPERATURE:
-                    data.value = filter_coolant_temperature(data.value);
-                    break;
+        if (xQueueReceive(queue_data_converted, &data, portMAX_DELAY) != pdPASS) {
+            continue;
+        }
 
-                case SENSOR_ID_BATTERY_VOLTAGE:
-                    data.value = filter_battery_voltage(data.value);
-                    break;
+        switch (data.id) {
+            case SENSOR_ID_COOLANT_TEMPERATURE:
+                data.value = filter_coolant_temperature(data.value);
+                break;
 
-                case SENSOR_ID_FUEL_LEVEL:
-                    data.value = filter_fuel_level(data.value);
-                    break;
+            case SENSOR_ID_BATTERY_VOLTAGE:
+                data.value = filter_battery_voltage(data.value);
+                break;
 
-                case SENSOR_ID_TURN_SIGNAL:
-                    data.value = debounce_turn_signal(data.value);
-                    break;
+            case SENSOR_ID_FUEL_LEVEL:
+                data.value = filter_fuel_level(data.value);
+                break;
 
-                case SENSOR_ID_HIGH_BEAM:
-                    data.value = debounce_high_beam(data.value);
-                    break;
+            case SENSOR_ID_TURN_SIGNAL:
+                data.value = debounce_turn_signal(data.value);
+                break;
 
-                case SENSOR_ID_OIL_PRESSURE_0_3_BAR:
-                    data.value = debounce_oil_pressure_0_3_bar(data.value);
-                    break;
+            case SENSOR_ID_HIGH_BEAM:
+                data.value = debounce_high_beam(data.value);
+                break;
 
-                case SENSOR_ID_OIL_PRESSURE_1_8_BAR:
-                    data.value = debounce_oil_pressure_1_8_bar(data.value);
-                    break;
+            case SENSOR_ID_OIL_PRESSURE_0_3_BAR:
+                data.value = debounce_oil_pressure_0_3_bar(data.value);
+                break;
 
-                default:
-                    HAL_UART_Transmit(&huart3, (uint8_t*)"filtering: Unknown sensor id\n", strlen("filtering: Unknown sensor id\n"), HAL_MAX_DELAY);
-                    continue;
-            }
+            case SENSOR_ID_OIL_PRESSURE_1_8_BAR:
+                data.value = debounce_oil_pressure_1_8_bar(data.value);
+                break;
 
-            if (xQueueSend(queue_data_filtered, &data, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
-                HAL_UART_Transmit(&huart3, (uint8_t*)"filtering: xQueueSend error\n", strlen("filtering: xQueueSend error\n"), HAL_MAX_DELAY);
-            }
+            default:
+                HAL_UART_Transmit(&huart3, (uint8_t*)"filtering: Unknown sensor id\n", strlen("filtering: Unknown sensor id\n"), HAL_MAX_DELAY);
+                continue;
+        }
+
+        if (xQueueSend(queue_data_filtered, &data, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
+            HAL_UART_Transmit(&huart3, (uint8_t*)"filtering: xQueueSend error\n", strlen("filtering: xQueueSend error\n"), HAL_MAX_DELAY);
         }
     }
 }
