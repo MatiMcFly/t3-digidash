@@ -77,30 +77,30 @@ static void acquire_binary_sensors(void)
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
-    BaseType_t higher_priority_task_woken = pdFALSE;
+    BaseType_t    higher_priority_task_woken = pdFALSE;
+    sensor_data_t coolant_temperature        = {.id = SENSOR_ID_COOLANT_TEMPERATURE, .value = 0};
+    sensor_data_t battery_voltage            = {.id = SENSOR_ID_BATTERY_VOLTAGE, .value = 0};
+    sensor_data_t fuel_level                 = {.id = SENSOR_ID_FUEL_LEVEL, .value = 0};
 
-    if (hadc->Instance == ADC1) {
-        sensor_data_t coolant_temperature = {.id = SENSOR_ID_COOLANT_TEMPERATURE, .value = 0};
-        sensor_data_t battery_voltage     = {.id = SENSOR_ID_BATTERY_VOLTAGE, .value = 0};
-        sensor_data_t fuel_level          = {.id = SENSOR_ID_FUEL_LEVEL, .value = 0};
-
-        coolant_temperature.value = adc1_buffer[0];
-        battery_voltage.value     = adc1_buffer[1];
-        fuel_level.value          = adc1_buffer[2];
-
-        if (xQueueSendFromISR(queue_data_raw, &coolant_temperature, &higher_priority_task_woken) != pdPASS) {
-            HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSendFromISR error\n", strlen("acquisition: xQueueSendFromISR error\n"), HAL_MAX_DELAY);
-        }
-
-        if (xQueueSendFromISR(queue_data_raw, &battery_voltage, &higher_priority_task_woken) != pdPASS) {
-            HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSendFromISR error\n", strlen("acquisition: xQueueSendFromISR error\n"), HAL_MAX_DELAY);
-        }
-
-        if (xQueueSendFromISR(queue_data_raw, &fuel_level, &higher_priority_task_woken) != pdPASS) {
-            HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSendFromISR error\n", strlen("acquisition: xQueueSendFromISR error\n"), HAL_MAX_DELAY);
-        }
-    } else {
+    if (hadc->Instance != ADC1) {
         HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: Unknown ADC instance\n", strlen("acquisition: Unknown ADC instance\n"), HAL_MAX_DELAY);
+        return;
+    }
+
+    coolant_temperature.value = adc1_buffer[0];
+    battery_voltage.value     = adc1_buffer[1];
+    fuel_level.value          = adc1_buffer[2];
+
+    if (xQueueSendFromISR(queue_data_raw, &coolant_temperature, &higher_priority_task_woken) != pdPASS) {
+        HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSendFromISR error\n", strlen("acquisition: xQueueSendFromISR error\n"), HAL_MAX_DELAY);
+    }
+
+    if (xQueueSendFromISR(queue_data_raw, &battery_voltage, &higher_priority_task_woken) != pdPASS) {
+        HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSendFromISR error\n", strlen("acquisition: xQueueSendFromISR error\n"), HAL_MAX_DELAY);
+    }
+
+    if (xQueueSendFromISR(queue_data_raw, &fuel_level, &higher_priority_task_woken) != pdPASS) {
+        HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSendFromISR error\n", strlen("acquisition: xQueueSendFromISR error\n"), HAL_MAX_DELAY);
     }
 
     portYIELD_FROM_ISR(higher_priority_task_woken);
