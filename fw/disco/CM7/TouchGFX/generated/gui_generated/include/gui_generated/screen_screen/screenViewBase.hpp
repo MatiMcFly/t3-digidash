@@ -32,7 +32,28 @@ protected:
     touchgfx::Box box2_1;
     touchgfx::Box box2_1_1;
     touchgfx::Image rpm_scale;
+    touchgfx::Box box2_1_2;
+    touchgfx::Box box2_1_2_1;
     touchgfx::TextureMapper textureMapper1;
+    touchgfx::Box box3;
+    touchgfx::Box box3_1;
+    touchgfx::Box box3_1_1;
+    touchgfx::Box box2_2;
+    touchgfx::Box box2_1_3;
+    touchgfx::Box box2_1_1_1;
+    touchgfx::Box box2_1_2_2;
+    touchgfx::Box box2_1_2_1_1;
+    touchgfx::Box box3_2;
+    touchgfx::Box box3_1_2;
+    touchgfx::Box box3_1_1_1;
+    touchgfx::Box box2_2_1;
+    touchgfx::Box box2_1_3_1;
+    touchgfx::Box box2_1_1_1_1;
+    touchgfx::Box box2_1_2_2_1;
+    touchgfx::Box box2_1_2_1_1_1;
+    touchgfx::Box box3_2_1;
+    touchgfx::Box box3_1_2_1;
+    touchgfx::Box box3_1_1_1_1;
 
 private:
 

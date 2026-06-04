@@ -244,18 +244,11 @@ static const LcdInitCmd kLcdInitSequence[] = {
     {0x0077U, 1U, {0x33U}},
     {0x0078U, 1U, {0x43U}},
     {0x00E0U, 1U, {0x00U}},
-    {0x003AU, 1U, {0x77U}}, // Set Pixel Format: 0x77 = 24bpp (RGB888)
     {0x0011U, 0U, {0x00U}}, // Sleep Out
     {LCD_CMD_DELAY, 120U, {0x00U}},
     {0x0029U, 0U, {0x00U}}, // Display On
     {LCD_CMD_DELAY, 5U, {0x00U}},
     {0x0035U, 1U, {0x00U}}, // Tearing Effect ON, V-blanking only (TEM=0)
-    // -------- Backlight control (used by panels with internal LED driver, e.g.
-    // STM32H747I-DISCO MB1166 / OTM8009A). Ignored by panels whose backlight
-    // is driven by an external GPIO. --------
-    {0x0051U, 1U, {0xFFU}}, // Write Display Brightness = max
-    {0x0053U, 1U, {0x2CU}}, // Write CTRL Display: BCTRL=1, DD=1, BL=1
-    {0x0055U, 1U, {0x02U}}, // Write CABC: still image
     {LCD_CMD_END, 0U, {0x00U}},
 };
 

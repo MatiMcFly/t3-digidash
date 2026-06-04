@@ -103,6 +103,7 @@ static void MX_QUADSPI_Init(void);
 #define SDRAM_MODEREG_BURST_LENGTH_1             0x0000U
 #define SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL      0x0000U
 #define SDRAM_MODEREG_CAS_LATENCY_2              0x0020U
+#define SDRAM_MODEREG_CAS_LATENCY_3              0x0030U
 #define SDRAM_MODEREG_OPERATING_MODE_STANDARD    0x0000U
 #define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE     0x0200U
 
@@ -138,7 +139,7 @@ static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram)
 
   mode = SDRAM_MODEREG_BURST_LENGTH_1 |
          SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL |
-         SDRAM_MODEREG_CAS_LATENCY_2 |
+         SDRAM_MODEREG_CAS_LATENCY_3 |
          SDRAM_MODEREG_OPERATING_MODE_STANDARD |
          SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;
 
@@ -645,6 +646,21 @@ static void MX_LTDC_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN LTDC_Init 2 */
+
+  /* centering the image */
+  #define LTDC_H_SHIFT_LEFT  39U
+  MODIFY_REG(hltdc.Instance->BPCR, LTDC_BPCR_AHBP,
+             0);
+  MODIFY_REG(hltdc.Instance->AWCR, LTDC_AWCR_AAW,
+             ((759U - LTDC_H_SHIFT_LEFT) << LTDC_AWCR_AAW_Pos));
+
+  /* Shift image 5 pixels DOWN: increase both AccumulatedVBP and
+   * AccumulatedActiveH by the same amount. */
+  #define LTDC_V_SHIFT_DOWN  2U
+  MODIFY_REG(hltdc.Instance->BPCR, LTDC_BPCR_AVBP,
+             ((15U + LTDC_V_SHIFT_DOWN) << LTDC_BPCR_AVBP_Pos));
+  MODIFY_REG(hltdc.Instance->AWCR, LTDC_AWCR_AAH,
+             ((735U + LTDC_V_SHIFT_DOWN) << LTDC_AWCR_AAH_Pos));
 
   /* USER CODE END LTDC_Init 2 */
 

@@ -33,6 +33,10 @@ extern "C" {
 
 using namespace touchgfx;
 
+/* Tracks which framebuffer LTDC is currently scanning. Initialized to FB0
+ * because MX_LTDC_Init programs layer 0 base = 0xD0000000. */
+static uint16_t* s_activeTftFrameBuffer = reinterpret_cast<uint16_t*>(0xD0000000);
+
 void TouchGFXHAL::initialize()
 {
     // Calling parent implementation of initialize().
@@ -51,12 +55,7 @@ void TouchGFXHAL::initialize()
  */
 uint16_t* TouchGFXHAL::getTFTFrameBuffer() const
 {
-    // Calling parent implementation of getTFTFrameBuffer().
-    //
-    // To overwrite the generated implementation, omit the call to the parent function
-    // and implement the needed functionality here.
-
-    return TouchGFXGeneratedHAL::getTFTFrameBuffer();
+    return s_activeTftFrameBuffer;
 }
 
 /**
@@ -66,10 +65,11 @@ uint16_t* TouchGFXHAL::getTFTFrameBuffer() const
  */
 void TouchGFXHAL::setTFTFrameBuffer(uint16_t* address)
 {
-    // Calling parent implementation of setTFTFrameBuffer(uint16_t* address).
-    //
-    // To overwrite the generated implementation, omit the call to the parent function
-    // and implement the needed functionality here.
+    /* Reprogram LTDC layer 0 base address for double buffering. The reload
+     * is triggered on next VSYNC so the change is tear-free. */
+    HAL_LTDC_SetAddress_NoReload(&hltdc, (uint32_t)address, 0);
+    HAL_LTDC_Reload(&hltdc, LTDC_RELOAD_VERTICAL_BLANKING);
+    s_activeTftFrameBuffer = address;
 
     TouchGFXGeneratedHAL::setTFTFrameBuffer(address);
 }

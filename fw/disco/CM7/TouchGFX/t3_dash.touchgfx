@@ -18,30 +18,33 @@
           {
             "Type": "Box",
             "Name": "box2",
-            "X": 299,
-            "Y": 558,
+            "X": 304,
+            "Y": 516,
             "Width": 50,
             "Height": 50,
             "Color": {
-              "Red": 255
+              "Red": 255,
+              "Green": 128
             }
           },
           {
             "Type": "Box",
             "Name": "box2_1",
-            "X": 228,
-            "Y": 644,
+            "X": 432,
+            "Y": 516,
             "Width": 50,
             "Height": 50,
             "Color": {
-              "Green": 255
+              "Red": 255,
+              "Green": 255,
+              "Blue": 255
             }
           },
           {
             "Type": "Box",
             "Name": "box2_1_1",
-            "X": 361,
-            "Y": 644,
+            "X": 240,
+            "Y": 516,
             "Width": 50,
             "Height": 50,
             "Color": {
@@ -52,9 +55,33 @@
             "Type": "Image",
             "Name": "rpm_scale",
             "X": 1,
+            "Y": -1,
             "Width": 720,
             "Height": 712,
+            "LockPosition": true,
             "RelativeFilename": "t3-rpm-scale.png"
+          },
+          {
+            "Type": "Box",
+            "Name": "box2_1_2",
+            "X": 496,
+            "Y": 516,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Red": 192
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box2_1_2_1",
+            "X": 560,
+            "Y": 516,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Green": 192
+            }
           },
           {
             "Type": "TextureMapper",
@@ -73,6 +100,227 @@
             "YOrigo": 95.0,
             "ZOrigo": 1000.0,
             "CameraDistance": 1000.0
+          },
+          {
+            "Type": "Box",
+            "Name": "box3",
+            "X": 368,
+            "Y": 516,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Red": 128,
+              "Green": 128,
+              "Blue": 128
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box3_1",
+            "X": 176,
+            "Y": 516,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Green": 255
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box3_1_1",
+            "X": 112,
+            "Y": 516,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Red": 255
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box2_2",
+            "X": 305,
+            "Y": 576,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Red": 255,
+              "Green": 128
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box2_1_3",
+            "X": 433,
+            "Y": 576,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Red": 255,
+              "Green": 255,
+              "Blue": 255
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box2_1_1_1",
+            "X": 241,
+            "Y": 576,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Blue": 255
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box2_1_2_2",
+            "X": 497,
+            "Y": 576,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Red": 192
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box2_1_2_1_1",
+            "X": 561,
+            "Y": 576,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Green": 192
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box3_2",
+            "X": 369,
+            "Y": 576,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Red": 128,
+              "Green": 128,
+              "Blue": 128
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box3_1_2",
+            "X": 177,
+            "Y": 576,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Green": 255
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box3_1_1_1",
+            "X": 113,
+            "Y": 576,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Red": 255
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box2_2_1",
+            "X": 303,
+            "Y": 635,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Red": 255,
+              "Green": 128
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box2_1_3_1",
+            "X": 431,
+            "Y": 635,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Red": 255,
+              "Green": 255,
+              "Blue": 255
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box2_1_1_1_1",
+            "X": 239,
+            "Y": 635,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Blue": 255
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box2_1_2_2_1",
+            "X": 495,
+            "Y": 635,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Red": 192
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box2_1_2_1_1_1",
+            "X": 559,
+            "Y": 635,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Green": 192
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box3_2_1",
+            "X": 367,
+            "Y": 635,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Red": 128,
+              "Green": 128,
+              "Blue": 128
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box3_1_2_1",
+            "X": 175,
+            "Y": 635,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Green": 255
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box3_1_1_1_1",
+            "X": 111,
+            "Y": 635,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Red": 255
+            }
           }
         ],
         "Interactions": []
