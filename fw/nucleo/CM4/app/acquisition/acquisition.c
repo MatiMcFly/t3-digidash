@@ -1,6 +1,7 @@
 #include "acquisition.h"
 
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "FreeRTOS.h"
@@ -32,11 +33,6 @@ void acquisition_task(void* params)
 
     (void)params; // Unused
 
-    // Start all pulse sensor acquisitions
-    if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) != HAL_OK) { // SENSOR_ID_ROTATION_SPEED
-        HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: HAL_TIM_IC_Start_IT error\n", strlen("acquisition: HAL_TIM_IC_Start_IT error\n"), HAL_MAX_DELAY);
-    }
-
     while (true) {
 
         // Start all analog sensor acquisitions
@@ -46,6 +42,11 @@ void acquisition_task(void* params)
 
         // Read all binary sensors
         acquire_binary_sensors();
+
+        // Start pulse sensor acquisition
+        if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) != HAL_OK) { // SENSOR_ID_ROTATION_SPEED
+            HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: HAL_TIM_IC_Start_IT error\n", strlen("acquisition: HAL_TIM_IC_Start_IT error\n"), HAL_MAX_DELAY);
+        }
 
         vTaskDelayUntil(&last_wakeup, pdMS_TO_TICKS(MEASUREMENT_PERIOD_MS));
     }
@@ -164,6 +165,10 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim)
     if (xQueueSendFromISR(queue_data_raw, &rotation_speed, &higher_priority_task_woken) != pdPASS) {
         HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSendFromISR error\n", strlen("acquisition: xQueueSendFromISR error\n"), HAL_MAX_DELAY);
     }
+
+    // Reset and get ready for next measurement period
+    HAL_TIM_IC_Stop_IT(&htim2, TIM_CHANNEL_1);
+    is_first_capture = true;
 
     portYIELD_FROM_ISR(higher_priority_task_woken);
 }
