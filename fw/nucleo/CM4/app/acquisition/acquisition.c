@@ -20,6 +20,7 @@ extern TIM_HandleTypeDef htim2;
 static volatile uint16_t adc1_buffer[ADC1_BUFFER_SIZE] = {0};
 
 static void    acquire_binary_sensors(void);
+static void    start_pulse_sensors(void);
 static int16_t pulse_period_to_pulses_per_minute(uint32_t pulse_period_us);
 
 /**
@@ -43,10 +44,8 @@ void acquisition_task(void* params)
         // Read all binary sensors
         acquire_binary_sensors();
 
-        // Start pulse sensor acquisition
-        if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) != HAL_OK) { // SENSOR_ID_ROTATION_SPEED
-            HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: HAL_TIM_IC_Start_IT error\n", strlen("acquisition: HAL_TIM_IC_Start_IT error\n"), HAL_MAX_DELAY);
-        }
+        // Start all pulse sensor acquisitions
+        start_pulse_sensors();
 
         vTaskDelayUntil(&last_wakeup, pdMS_TO_TICKS(MEASUREMENT_PERIOD_MS));
     }
@@ -78,6 +77,13 @@ static void acquire_binary_sensors(void)
 
     if (xQueueSend(queue_data_raw, &oil_pressure_1_8_bar, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
         HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSend error\n", strlen("acquisition: xQueueSend error\n"), HAL_MAX_DELAY);
+    }
+}
+
+static void start_pulse_sensors(void)
+{
+    if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) != HAL_OK) { // SENSOR_ID_ROTATION_SPEED
+        HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: HAL_TIM_IC_Start_IT error\n", strlen("acquisition: HAL_TIM_IC_Start_IT error\n"), HAL_MAX_DELAY);
     }
 }
 
