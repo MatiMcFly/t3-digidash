@@ -31,6 +31,10 @@ screenViewBase::screenViewBase()
     rpm_needle.setAngles(0.0f, 0.0f, 3.65f);
     rpm_needle.setRenderingAlgorithm(touchgfx::TextureMapper::NEAREST_NEIGHBOR);
     add(rpm_needle);
+
+    box2.setPosition(0, 0, 110, 110);
+    box2.setColor(touchgfx::Color::getColorFromRGB(0, 255, 0));
+    add(box2);
 }
 
 screenViewBase::~screenViewBase()

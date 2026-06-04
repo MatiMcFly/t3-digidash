@@ -41,6 +41,15 @@
             "YOrigo": 350.5,
             "ZOrigo": 1000.0,
             "CameraDistance": 1000.0
+          },
+          {
+            "Type": "Box",
+            "Name": "box2",
+            "Width": 110,
+            "Height": 110,
+            "Color": {
+              "Green": 255
+            }
           }
         ],
         "Interactions": []

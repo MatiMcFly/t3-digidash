@@ -238,4 +238,14 @@ void LTDC_IRQHandler(void)
   HAL_LTDC_IRQHandler(&hltdc);
 }
 
+/* MDMA IRQ — drives the TouchGFX partial-framebuffer block-transmit path.
+ * HAL_MDMA_IRQHandler dispatches to the XferCpltCallback / XferErrorCallback
+ * hooks registered in TouchGFXHAL::initialize, which clears the
+ * "transmit active" flag and tells the framework to start the next block. */
+extern MDMA_HandleTypeDef hmdma_display;
+void MDMA_IRQHandler(void)
+{
+  HAL_MDMA_IRQHandler(&hmdma_display);
+}
+
 /* USER CODE END 1 */

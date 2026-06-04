@@ -78,6 +78,13 @@ SDRAM_HandleTypeDef hsdram1;
 
 /* USER CODE BEGIN PV */
 
+/* MDMA channel used by TouchGFX partial-framebuffer strategy to push a
+ * fully-rendered block from AXI-SRAM into the LTDC framebuffer in SDRAM
+ * without occupying DMA2D (which is reserved for the rendering queue
+ * inside STM32DMA.cpp). MDMA has its own AXI master path so it does not
+ * fight DMA2D for AHB bandwidth. */
+MDMA_HandleTypeDef hmdma_display;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -199,6 +206,45 @@ static void ConfigureMpuForSdram(void)
   HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 }
 
+/* MDMA setup for the TouchGFX partial-framebuffer block-transmit path.
+ * Source = block buffer in AXI-SRAM (cacheable WB; framework calls
+ * FlushCache before this is invoked). Destination = LTDC framebuffer in
+ * SDRAM (non-cacheable per ConfigureMpuForSdram). MDMA copies a
+ * rectangular region using its 2D-stride support: BlockDataLength = one
+ * row of the dirty rect, BlockCount = number of rows. The destination
+ * block-address-offset register is patched per-transfer so that the
+ * destination pointer jumps a full LTDC stride after each row. */
+static void MX_MDMA_Init(void)
+{
+  __HAL_RCC_MDMA_CLK_ENABLE();
+
+  hmdma_display.Instance = MDMA_Channel0;
+  hmdma_display.Init.Request = MDMA_REQUEST_SW;
+  hmdma_display.Init.TransferTriggerMode = MDMA_REPEAT_BLOCK_TRANSFER;
+  hmdma_display.Init.Priority = MDMA_PRIORITY_HIGH;
+  hmdma_display.Init.Endianness = MDMA_LITTLE_ENDIANNESS_PRESERVE;
+  hmdma_display.Init.SourceInc = MDMA_SRC_INC_BYTE;
+  hmdma_display.Init.DestinationInc = MDMA_DEST_INC_BYTE;
+  hmdma_display.Init.SourceDataSize = MDMA_SRC_DATASIZE_BYTE;
+  hmdma_display.Init.DestDataSize = MDMA_DEST_DATASIZE_BYTE;
+  hmdma_display.Init.DataAlignment = MDMA_DATAALIGN_PACKENABLE;
+  hmdma_display.Init.BufferTransferLength = 128;
+  hmdma_display.Init.SourceBurst = MDMA_SOURCE_BURST_16BEATS;
+  hmdma_display.Init.DestBurst = MDMA_DEST_BURST_16BEATS;
+  hmdma_display.Init.SourceBlockAddressOffset = 0;
+  hmdma_display.Init.DestBlockAddressOffset = 0;
+
+  if (HAL_MDMA_Init(&hmdma_display) != HAL_OK) {
+    Error_Handler();
+  }
+
+  /* Priority NVIC: must be numerically >= configMAX_SYSCALL_INTERRUPT_PRIORITY
+   * (5) because the TC callback signals the TouchGFX engine via the
+   * generated startNewTransfer() path which may hit FreeRTOS APIs. */
+  HAL_NVIC_SetPriority(MDMA_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(MDMA_IRQn);
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -283,6 +329,8 @@ Error_Handler();
   /* USER CODE BEGIN 2 */
 
   ConfigureMpuForSdram();
+
+  MX_MDMA_Init();
 
   /* External QSPI NOR (2x MT25TL01G) -> map at 0x90000000 so TouchGFX
    * can fetch images/fonts placed in ExtFlashSection / FontFlashSection.
@@ -551,8 +599,8 @@ static void MX_DSIHOST_DSI_Init(void)
   VidCfg.HorizontalBackPorch = 20;
   VidCfg.HorizontalLine = 1250;
   VidCfg.VerticalSyncActive = 4;
-  VidCfg.VerticalBackPorch = 12;
-  VidCfg.VerticalFrontPorch = 24;
+  VidCfg.VerticalBackPorch = 14;
+  VidCfg.VerticalFrontPorch = 22;
   VidCfg.VerticalActive = 720;
   VidCfg.LPCommandEnable = DSI_LP_COMMAND_DISABLE;
   VidCfg.LPLargestPacketSize = 0;
@@ -611,12 +659,12 @@ static void MX_LTDC_Init(void)
   hltdc.Init.VSPolarity = LTDC_VSPOLARITY_AL;
   hltdc.Init.DEPolarity = LTDC_DEPOLARITY_AL;
   hltdc.Init.PCPolarity = LTDC_PCPOLARITY_IPC;
-  hltdc.Init.HorizontalSync = 19;
+  hltdc.Init.HorizontalSync = 0;
   hltdc.Init.VerticalSync = 3;
-  hltdc.Init.AccumulatedHBP = 39;
-  hltdc.Init.AccumulatedVBP = 15;
-  hltdc.Init.AccumulatedActiveW = 759;
-  hltdc.Init.AccumulatedActiveH = 735;
+  hltdc.Init.AccumulatedHBP = 0;
+  hltdc.Init.AccumulatedVBP = 17;
+  hltdc.Init.AccumulatedActiveW = 720;
+  hltdc.Init.AccumulatedActiveH = 737;
   hltdc.Init.TotalWidth = 799;
   hltdc.Init.TotalHeigh = 759;
   hltdc.Init.Backcolor.Blue = 0;
@@ -646,21 +694,6 @@ static void MX_LTDC_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN LTDC_Init 2 */
-
-  /* centering the image */
-  #define LTDC_H_SHIFT_LEFT  39U
-  MODIFY_REG(hltdc.Instance->BPCR, LTDC_BPCR_AHBP,
-             0);
-  MODIFY_REG(hltdc.Instance->AWCR, LTDC_AWCR_AAW,
-             ((759U - LTDC_H_SHIFT_LEFT) << LTDC_AWCR_AAW_Pos));
-
-  /* Shift image 5 pixels DOWN: increase both AccumulatedVBP and
-   * AccumulatedActiveH by the same amount. */
-  #define LTDC_V_SHIFT_DOWN  2U
-  MODIFY_REG(hltdc.Instance->BPCR, LTDC_BPCR_AVBP,
-             ((15U + LTDC_V_SHIFT_DOWN) << LTDC_BPCR_AVBP_Pos));
-  MODIFY_REG(hltdc.Instance->AWCR, LTDC_AWCR_AAH,
-             ((735U + LTDC_V_SHIFT_DOWN) << LTDC_AWCR_AAH_Pos));
 
   /* USER CODE END LTDC_Init 2 */
 
