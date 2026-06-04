@@ -82,8 +82,16 @@ static void acquire_binary_sensors(void)
 
 static void start_pulse_sensors(void)
 {
-    if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) != HAL_OK) { // SENSOR_ID_ROTATION_SPEED
-        HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: HAL_TIM_IC_Start_IT error\n", strlen("acquisition: HAL_TIM_IC_Start_IT error\n"), HAL_MAX_DELAY);
+    if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) == HAL_OK) { // SENSOR_ID_ROTATION_SPEE
+        return;
+    }
+
+    // Timer could not be started, because it is still running --> timeout after 0.1 s
+    // Therefore, send 0 pulses per minute
+    sensor_data_t rotation_speed = {.id = SENSOR_ID_ROTATION_SPEED, .value = 0};
+
+    if (xQueueSend(queue_data_raw, &rotation_speed, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
+        HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSend error\n", strlen("acquisition: xQueueSend error\n"), HAL_MAX_DELAY);
     }
 }
 
