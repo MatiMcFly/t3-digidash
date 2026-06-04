@@ -57,6 +57,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define SENSOR_02_ROTATION_SPEED_Pin GPIO_PIN_0
+#define SENSOR_02_ROTATION_SPEED_GPIO_Port GPIOA
 #define SENSOR_03_BATTERY_VOLTAGE_Pin GPIO_PIN_6
 #define SENSOR_03_BATTERY_VOLTAGE_GPIO_Port GPIOA
 #define LD1_Pin GPIO_PIN_0
