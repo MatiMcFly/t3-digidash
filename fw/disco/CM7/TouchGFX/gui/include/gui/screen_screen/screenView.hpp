@@ -12,13 +12,20 @@ public:
     virtual void setupScreen();
     virtual void tearDownScreen();
     virtual void handleTickEvent();
+
+    /* Maps an RPM value (0 .. kMaxRpm) to the rpm_needle Z angle.
+     * 0 RPM      -> 0.0 rad
+     * kMaxRpm    -> kMaxAngle rad (matches Designer redline pose) */
+    void setRPM(uint16_t rpm);
+
 protected:
-    /* Test pattern: animate box2 size between 110x110 and 720x720 to
-     * help debug LTDC / SDRAM bandwidth issues during dirty-rect
-     * propagation. Step in pixels per tick (TouchGFX tick = ~16.6 ms
-     * at 60 fps), direction 1 = grow, -1 = shrink. */
-    int16_t box2Size;
-    int8_t  box2Dir;
+    /* Test pattern: sweep RPM 0 -> kMaxRpm -> 0 to exercise the
+     * TextureMapper redraw path through the partial-FB pipeline. */
+    static constexpr uint16_t kMaxRpm   = 6000;
+    static constexpr float    kMaxAngle = 3.65f;
+
+    int32_t  testRpm;     /* signed so we can detect under/overshoot */
+    int16_t  testRpmStep; /* +N -> accel, -N -> decel */
 };
 
 #endif // SCREENVIEW_HPP

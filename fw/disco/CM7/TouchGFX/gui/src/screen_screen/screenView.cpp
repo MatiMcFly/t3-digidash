@@ -1,7 +1,7 @@
 #include <gui/screen_screen/screenView.hpp>
 
 screenView::screenView()
-    : box2Size(110), box2Dir(1)
+    : testRpm(0), testRpmStep(60)
 {
 
 }
@@ -16,31 +16,37 @@ void screenView::tearDownScreen()
     screenViewBase::tearDownScreen();
 }
 
+void screenView::setRPM(uint16_t rpm)
+{
+    if (rpm > kMaxRpm)
+    {
+        rpm = kMaxRpm;
+    }
+
+    /* Designer pose has the needle at ZAngle = kMaxAngle for redline.
+     * Linear scale: angle = rpm / kMaxRpm * kMaxAngle. X/Y angles
+     * stay 0 -- the gauge only spins in-plane around the origo. */
+    const float zAngle = (static_cast<float>(rpm) / static_cast<float>(kMaxRpm)) * kMaxAngle;
+
+    rpm_needle.setAngles(0.0f, 0.0f, zAngle);
+    rpm_needle.invalidate();
+}
+
 void screenView::handleTickEvent()
 {
-    /* Grow/shrink box2 by ~10 px per tick. At 60 fps that's a full
-     * 110 -> 720 sweep in ~1.0 s, then back. The rectangle is anchored
-     * at (0,0) so width and height grow toward the bottom-right. */
-    const int16_t kStep = 10;
-    const int16_t kMin  = 110;
-    const int16_t kMax  = 720;
-
-    box2Size += (int16_t)(box2Dir * kStep);
-    if (box2Size >= kMax)
+    /* Sweep RPM 0 -> kMaxRpm -> 0 -> ... at testRpmStep RPM/tick.
+     * At 60 fps, step=60 RPM completes a full 0->6000 sweep in ~1.7 s. */
+    testRpm += testRpmStep;
+    if (testRpm >= static_cast<int32_t>(kMaxRpm))
     {
-        box2Size = kMax;
-        box2Dir  = -1;
+        testRpm     = kMaxRpm;
+        testRpmStep = -testRpmStep;
     }
-    else if (box2Size <= kMin)
+    else if (testRpm <= 0)
     {
-        box2Size = kMin;
-        box2Dir  = 1;
+        testRpm     = 0;
+        testRpmStep = -testRpmStep;
     }
 
-    /* invalidate() the OLD area before resize so the framework knows
-     * which region to repaint, then set the new size and invalidate
-     * the NEW area. */
-    box2.invalidate();
-    box2.setWidthHeight(box2Size, box2Size);
-    box2.invalidate();
+    setRPM(static_cast<uint16_t>(testRpm));
 }

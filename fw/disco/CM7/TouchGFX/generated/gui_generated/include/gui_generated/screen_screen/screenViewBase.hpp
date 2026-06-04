@@ -30,7 +30,6 @@ protected:
     touchgfx::Box box1;
     touchgfx::Image rpm_scale;
     touchgfx::TextureMapper rpm_needle;
-    touchgfx::Box box2;
 
 private:
 

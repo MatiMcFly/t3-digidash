@@ -35,21 +35,11 @@
             "FileNameImage": "t3-rpm-gauge.png",
             "XBitmapPosition": 23.5,
             "YBitmapPosition": 316.0,
-            "ZAngle": 3.65,
             "Scale": 1.0,
             "XOrigo": 358.0,
             "YOrigo": 350.5,
             "ZOrigo": 1000.0,
             "CameraDistance": 1000.0
-          },
-          {
-            "Type": "Box",
-            "Name": "box2",
-            "Width": 110,
-            "Height": 110,
-            "Color": {
-              "Green": 255
-            }
           }
         ],
         "Interactions": []
