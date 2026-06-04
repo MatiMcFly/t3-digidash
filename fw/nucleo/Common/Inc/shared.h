@@ -6,7 +6,7 @@
 
 typedef enum {
     SENSOR_ID_COOLANT_TEMPERATURE  = 1, // analog signal
-    SENSOR_ID_ROTATION_SPEED       = 2, // pulsed signal (TODO)
+    SENSOR_ID_ROTATION_SPEED       = 2, // pulsed signal
     SENSOR_ID_BATTERY_VOLTAGE      = 3, // analog signal
     SENSOR_ID_FUEL_LEVEL           = 4, // analog signal
     SENSOR_ID_TURN_SIGNAL          = 5, // binary signal

@@ -56,6 +56,10 @@ void publication_task(void* params)
                 snprintf(string, sizeof(string), "Oil Pressure 1.8 bar: %d\n", data.value);
                 break;
 
+            case SENSOR_ID_ROTATION_SPEED:
+                snprintf(string, sizeof(string), "Rotation Speed:       %d rpm\n", data.value);
+                break;
+
             default:
                 HAL_UART_Transmit(&huart3, (uint8_t*)"publication: Unknown sensor id\n", strlen("publication: Unknown sensor id\n"), HAL_MAX_DELAY);
                 continue;
