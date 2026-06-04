@@ -15,118 +15,22 @@ screenViewBase::screenViewBase()
     box1.setColor(touchgfx::Color::getColorFromRGB(19, 19, 21));
     add(box1);
 
-    box2.setPosition(304, 516, 50, 50);
-    box2.setColor(touchgfx::Color::getColorFromRGB(255, 128, 0));
-    add(box2);
-
-    box2_1.setPosition(432, 516, 50, 50);
-    box2_1.setColor(touchgfx::Color::getColorFromRGB(255, 255, 255));
-    add(box2_1);
-
-    box2_1_1.setPosition(240, 516, 50, 50);
-    box2_1_1.setColor(touchgfx::Color::getColorFromRGB(0, 0, 255));
-    add(box2_1_1);
-
     rpm_scale.setXY(1, -1);
     rpm_scale.setBitmap(touchgfx::Bitmap(BITMAP_T3_RPM_SCALE_ID));
     add(rpm_scale);
 
-    box2_1_2.setPosition(496, 516, 50, 50);
-    box2_1_2.setColor(touchgfx::Color::getColorFromRGB(192, 0, 0));
-    add(box2_1_2);
-
-    box2_1_2_1.setPosition(560, 516, 50, 50);
-    box2_1_2_1.setColor(touchgfx::Color::getColorFromRGB(0, 192, 0));
-    add(box2_1_2_1);
-
-    textureMapper1.setXY(1, 260);
-    textureMapper1.setBitmap(touchgfx::Bitmap(BITMAP_T3_RPM_GAUGE_ID));
-    textureMapper1.setWidth(720);
-    textureMapper1.setHeight(190);
-    textureMapper1.setBitmapPosition(0.0f, -261.0f);
-    textureMapper1.setScale(1.0f);
-    textureMapper1.setCameraDistance(1000.0f);
-    textureMapper1.setOrigo(360.0f, 95.0f, 1000.0f);
-    textureMapper1.setCamera(360.0f, 95.0f);
-    textureMapper1.setAngles(0.0f, 0.0f, 0.0f);
-    textureMapper1.setRenderingAlgorithm(touchgfx::TextureMapper::NEAREST_NEIGHBOR);
-    add(textureMapper1);
-
-    box3.setPosition(368, 516, 50, 50);
-    box3.setColor(touchgfx::Color::getColorFromRGB(128, 128, 128));
-    add(box3);
-
-    box3_1.setPosition(176, 516, 50, 50);
-    box3_1.setColor(touchgfx::Color::getColorFromRGB(0, 255, 0));
-    add(box3_1);
-
-    box3_1_1.setPosition(112, 516, 50, 50);
-    box3_1_1.setColor(touchgfx::Color::getColorFromRGB(255, 0, 0));
-    add(box3_1_1);
-
-    box2_2.setPosition(305, 576, 50, 50);
-    box2_2.setColor(touchgfx::Color::getColorFromRGB(255, 128, 0));
-    add(box2_2);
-
-    box2_1_3.setPosition(433, 576, 50, 50);
-    box2_1_3.setColor(touchgfx::Color::getColorFromRGB(255, 255, 255));
-    add(box2_1_3);
-
-    box2_1_1_1.setPosition(241, 576, 50, 50);
-    box2_1_1_1.setColor(touchgfx::Color::getColorFromRGB(0, 0, 255));
-    add(box2_1_1_1);
-
-    box2_1_2_2.setPosition(497, 576, 50, 50);
-    box2_1_2_2.setColor(touchgfx::Color::getColorFromRGB(192, 0, 0));
-    add(box2_1_2_2);
-
-    box2_1_2_1_1.setPosition(561, 576, 50, 50);
-    box2_1_2_1_1.setColor(touchgfx::Color::getColorFromRGB(0, 192, 0));
-    add(box2_1_2_1_1);
-
-    box3_2.setPosition(369, 576, 50, 50);
-    box3_2.setColor(touchgfx::Color::getColorFromRGB(128, 128, 128));
-    add(box3_2);
-
-    box3_1_2.setPosition(177, 576, 50, 50);
-    box3_1_2.setColor(touchgfx::Color::getColorFromRGB(0, 255, 0));
-    add(box3_1_2);
-
-    box3_1_1_1.setPosition(113, 576, 50, 50);
-    box3_1_1_1.setColor(touchgfx::Color::getColorFromRGB(255, 0, 0));
-    add(box3_1_1_1);
-
-    box2_2_1.setPosition(303, 635, 50, 50);
-    box2_2_1.setColor(touchgfx::Color::getColorFromRGB(255, 128, 0));
-    add(box2_2_1);
-
-    box2_1_3_1.setPosition(431, 635, 50, 50);
-    box2_1_3_1.setColor(touchgfx::Color::getColorFromRGB(255, 255, 255));
-    add(box2_1_3_1);
-
-    box2_1_1_1_1.setPosition(239, 635, 50, 50);
-    box2_1_1_1_1.setColor(touchgfx::Color::getColorFromRGB(0, 0, 255));
-    add(box2_1_1_1_1);
-
-    box2_1_2_2_1.setPosition(495, 635, 50, 50);
-    box2_1_2_2_1.setColor(touchgfx::Color::getColorFromRGB(192, 0, 0));
-    add(box2_1_2_2_1);
-
-    box2_1_2_1_1_1.setPosition(559, 635, 50, 50);
-    box2_1_2_1_1_1.setColor(touchgfx::Color::getColorFromRGB(0, 192, 0));
-    add(box2_1_2_1_1_1);
-
-    box3_2_1.setPosition(367, 635, 50, 50);
-    box3_2_1.setColor(touchgfx::Color::getColorFromRGB(128, 128, 128));
-    add(box3_2_1);
-
-    box3_1_2_1.setPosition(175, 635, 50, 50);
-    box3_1_2_1.setColor(touchgfx::Color::getColorFromRGB(0, 255, 0));
-    add(box3_1_2_1);
-
-    box3_1_1_1_1.setPosition(111, 635, 50, 50);
-    box3_1_1_1_1.setColor(touchgfx::Color::getColorFromRGB(255, 0, 0));
-    add(box3_1_1_1_1);
+    rpm_needle.setXY(0, 0);
+    rpm_needle.setBitmap(touchgfx::Bitmap(BITMAP_T3_RPM_GAUGE_ID));
+    rpm_needle.setWidth(720);
+    rpm_needle.setHeight(609);
+    rpm_needle.setBitmapPosition(23.5f, 316.0f);
+    rpm_needle.setScale(1.0f);
+    rpm_needle.setCameraDistance(1000.0f);
+    rpm_needle.setOrigo(358.0f, 350.5f, 1000.0f);
+    rpm_needle.setCamera(360.0f, 304.5f);
+    rpm_needle.setAngles(0.0f, 0.0f, 3.65f);
+    rpm_needle.setRenderingAlgorithm(touchgfx::TextureMapper::NEAREST_NEIGHBOR);
+    add(rpm_needle);
 }
 
 screenViewBase::~screenViewBase()
