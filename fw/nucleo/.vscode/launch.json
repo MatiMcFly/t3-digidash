@@ -13,10 +13,10 @@
             "svdPath": "C:/ST/STM32CubeCLT_1.19.0/STMicroelectronics_CMSIS_SVD/STM32H745_CM7.svd",
             "imagesAndSymbols": [
                 {
-                    "imageFileName": "${workspaceFolder}/CM4/build/t3-dash_CM4.elf"
+                    "imageFileName": "${workspaceFolder}/CM4/build/t3-digidash_CM4.elf"
                 },
                 {
-                    "imageFileName": "${workspaceFolder}/CM7/build/t3-dash_CM7.elf"
+                    "imageFileName": "${workspaceFolder}/CM7/build/t3-digidash_CM7.elf"
                 }
             ],
             "verbose": false
@@ -34,7 +34,7 @@
             "svdPath": "C:/ST/STM32CubeCLT_1.19.0/STMicroelectronics_CMSIS_SVD/STM32H745_CM4.svd",
             "imagesAndSymbols": [
                 {
-                    "symbolFileName": "${workspaceFolder}/CM4/build/t3-dash_CM4.elf"
+                    "symbolFileName": "${workspaceFolder}/CM4/build/t3-digidash_CM4.elf"
                 }
             ],
             "verbose": false

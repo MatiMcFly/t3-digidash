@@ -14,6 +14,7 @@ static float   adc_to_voltage(uint16_t raw_value);
 static int16_t convert_coolant_temperature(uint16_t raw_value);
 static int16_t convert_battery_voltage(uint16_t raw_value);
 static int16_t convert_fuel_level(uint16_t raw_value);
+static int16_t convert_rotation_speed(uint16_t pulses_per_min);
 
 static const float VREF_V = 3.3f;
 
@@ -51,6 +52,10 @@ void conversion_task(void* params)
             case SENSOR_ID_OIL_PRESSURE_0_3_BAR:
             case SENSOR_ID_OIL_PRESSURE_1_8_BAR:
                 // No conversion needed for binary signals
+                break;
+
+            case SENSOR_ID_ROTATION_SPEED:
+                data.value = convert_rotation_speed(data.value);
                 break;
 
             default:
@@ -152,4 +157,20 @@ static int16_t convert_fuel_level(uint16_t raw_value)
     float vol_l = OHM_TO_L * rv1_ohm + VOL0_L;
 
     return (int16_t)(vol_l * 10.0f);
+}
+
+/**
+ * @brief Convert pulses per minute to rotation speed in RPM
+ *
+ * @param pulses_per_min -- Pulses per minute (e.g., 4000 means 4000 pulses per minute)
+ *
+ * @return int16_t -- Rotation speed in RPM (e.g., 1000 means 1000 RPM)
+ */
+static int16_t convert_rotation_speed(uint16_t pulses_per_min)
+{
+    // 1 motor rotation generates 4 pulses
+    // ==> pulses_per_min / 4 --> RPM
+    const int16_t PULSES_PER_ROTATION = 4;
+
+    return pulses_per_min / PULSES_PER_ROTATION;
 }

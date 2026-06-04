@@ -23,6 +23,7 @@ M4 core handles all sensor data related operations and then sends processed sens
 | Function                       | Core | Peripheral | Pins                 |
 | ------------------------------ | ---- | ---------- | -------------------- |
 | Sensor 1: Coolant temperature  | M4   | ADC1_INP2  | PF11                 |
+| Sensor 2: Rotation speed       | M4   | TIM2_CH1   | PA0                  |
 | Sensor 3: Battery voltage      | M4   | ADC1_INP3  | PA6                  |
 | Sensor 4: Fuel level           | M4   | ADC1_INP5  | PB1                  |
 | Sensor 5: Turn signal          | M4   | GPIO       | D0                   |
