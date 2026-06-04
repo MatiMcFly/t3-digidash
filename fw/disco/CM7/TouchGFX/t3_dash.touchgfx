@@ -16,49 +16,63 @@
             }
           },
           {
-            "Type": "Gauge",
-            "Name": "gauge1",
-            "X": 240,
-            "Y": 89,
-            "Width": 240,
-            "Height": 240,
-            "Preset": "alternate_theme\\presets\\gauges\\medium\\active.json",
-            "FileNameBackground": "__generated\\alternate_theme_images_widgets_gauge_medium_backgrounds_active.png",
-            "RotationCenterX": 120.0,
-            "RotationCenterY": 120.0,
-            "StartAngle": -113.0,
-            "EndAngle": 112.0,
-            "RangeMax": 100.0,
-            "InitialValue": 50.0,
-            "Easing": "Linear",
-            "EasingOption": "In",
-            "FileNameNeedle": "__generated\\alternate_theme_images_widgets_gauge_medium_needles_smooth.png",
-            "NeedleRotationCenterX": 7.0,
-            "NeedleRotationCenterY": 67.0,
-            "NeedleMovingRenderingAlgorithm": "Bilinear Interpolation",
-            "NeedleSteadyRenderingAlgorithm": "Bilinear Interpolation",
-            "ArcColor": {
-              "Red": 20,
-              "Green": 151,
-              "Blue": 197
-            },
-            "ArcCapStyle": "Butt"
+            "Type": "Box",
+            "Name": "box2",
+            "X": 299,
+            "Y": 558,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Red": 255
+            }
           },
           {
-            "Type": "TextArea",
-            "Name": "textArea1",
-            "X": 314,
-            "Y": 360,
-            "Width": 76,
-            "Height": 24,
-            "TextId": "__SingleUse_ZA2Z",
-            "TextRotation": "0",
+            "Type": "Box",
+            "Name": "box2_1",
+            "X": 228,
+            "Y": 644,
+            "Width": 50,
+            "Height": 50,
             "Color": {
-              "Red": 222,
-              "Green": 64,
-              "Blue": 209
-            },
-            "AutoSize": true
+              "Green": 255
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "box2_1_1",
+            "X": 361,
+            "Y": 644,
+            "Width": 50,
+            "Height": 50,
+            "Color": {
+              "Blue": 255
+            }
+          },
+          {
+            "Type": "Image",
+            "Name": "rpm_scale",
+            "X": 1,
+            "Width": 720,
+            "Height": 712,
+            "RelativeFilename": "t3-rpm-scale.png"
+          },
+          {
+            "Type": "TextureMapper",
+            "Name": "textureMapper1",
+            "X": 1,
+            "Y": 260,
+            "Width": 720,
+            "Height": 190,
+            "RenderingAlgorithm": "Nearest-neighbor",
+            "FileNameImage": "t3-rpm-gauge.png",
+            "LockBitmapToCenter": true,
+            "YBitmapPosition": -261.0,
+            "Scale": 1.0,
+            "LockOrigoToCenter": true,
+            "XOrigo": 360.0,
+            "YOrigo": 95.0,
+            "ZOrigo": 1000.0,
+            "CameraDistance": 1000.0
           }
         ],
         "Interactions": []

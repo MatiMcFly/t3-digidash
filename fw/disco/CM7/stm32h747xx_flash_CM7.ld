@@ -42,6 +42,10 @@ FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 1024K
 RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 128K
 ITCMRAM (xrw)      : ORIGIN = 0x00000000, LENGTH = 64K
 SDRAM (xrw)     : ORIGIN = 0xD0000000, LENGTH = 32M
+/* External QSPI NOR (MT25TL01G die-1, Bank1 single-flash mode),
+   memory-mapped. Bank2 / dual-flash unavailable on this project
+   (CubeMX exposes only Bank1 with the current pin allocation). */
+QSPI (rx)       : ORIGIN = 0x90000000, LENGTH = 128M
 }
 /* Highest address of the user mode stack */
 _estack = 0x20020000;    /* end of RAM */
@@ -132,7 +136,7 @@ SECTIONS
   _sidata = LOADADDR(.data);
 
   /* Initialized data sections goes into RAM, load LMA copy after code */
-  .data : 
+  .data :
   {
     . = ALIGN(4);
     _sdata = .;        /* create a global symbol at data start */
@@ -167,7 +171,7 @@ SECTIONS
   PROVIDE( __data_source_size = __data_source_end - __data_source );
 
 
-  
+
   /* Uninitialized data section */
   /* Uninitialized TLS data section */
   .tbss (NOLOAD) : ALIGN(4)
@@ -220,7 +224,7 @@ SECTIONS
     . = ALIGN(8);
   } >RAM
 
-  
+
 
   /* Remove information from the standard libraries */
   /DISCARD/ :
@@ -240,6 +244,24 @@ SECTIONS
     *(.ExtRAM*)
     . = ALIGN(4);
   } >SDRAM
+
+  /* TouchGFX images & raw video go here (LOCATION_ATTRIBUTE("ExtFlashSection")) */
+  .ExtFlashSection :
+  {
+    . = ALIGN(4);
+    *(ExtFlashSection ExtFlashSection.*)
+    *(.ExtFlashSection .ExtFlashSection.*)
+    . = ALIGN(4);
+  } >QSPI
+
+  /* TouchGFX font glyphs/tables (LOCATION_ATTRIBUTE("FontFlashSection")) */
+  .FontFlashSection :
+  {
+    . = ALIGN(4);
+    *(FontFlashSection FontFlashSection.*)
+    *(.FontFlashSection .FontFlashSection.*)
+    . = ALIGN(4);
+  } >QSPI
 }
 
 

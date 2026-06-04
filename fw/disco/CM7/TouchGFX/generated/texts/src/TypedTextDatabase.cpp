@@ -36,7 +36,7 @@ const touchgfx::TypedText::TypedTextData* getInstance(touchgfx::LanguageId id)
 
 uint16_t getInstanceSize()
 {
-    return sizeof(typedText_database_DEFAULT) / sizeof(touchgfx::TypedText::TypedTextData);
+    return 0;
 }
 
 const touchgfx::Font** getFonts()

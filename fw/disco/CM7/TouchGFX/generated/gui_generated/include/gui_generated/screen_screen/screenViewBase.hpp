@@ -8,8 +8,8 @@
 #include <mvp/View.hpp>
 #include <gui/screen_screen/screenPresenter.hpp>
 #include <touchgfx/widgets/Box.hpp>
-#include <touchgfx/widgets/Gauge.hpp>
-#include <touchgfx/widgets/TextArea.hpp>
+#include <touchgfx/widgets/Image.hpp>
+#include <touchgfx/widgets/TextureMapper.hpp>
 
 class screenViewBase : public touchgfx::View<screenPresenter>
 {
@@ -28,8 +28,11 @@ protected:
      */
     touchgfx::Box __background;
     touchgfx::Box box1;
-    touchgfx::Gauge gauge1;
-    touchgfx::TextArea textArea1;
+    touchgfx::Box box2;
+    touchgfx::Box box2_1;
+    touchgfx::Box box2_1_1;
+    touchgfx::Image rpm_scale;
+    touchgfx::TextureMapper textureMapper1;
 
 private:
 

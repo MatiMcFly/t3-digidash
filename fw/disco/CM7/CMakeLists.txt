@@ -83,6 +83,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/Application/App.c
     Core/Application/Backlight.c
     Core/Application/Display.c
+    Core/Application/QspiFlash.c
     Core/Src/freertos_hooks.c
     # FreeRTOS kernel
     ${CMAKE_SOURCE_DIR}/../Drivers/FreeRTOS-Kernel/tasks.c

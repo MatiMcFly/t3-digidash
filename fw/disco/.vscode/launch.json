@@ -20,6 +20,12 @@
                     "symbolFileName": "${workspaceFolder}/CM7/build/t3_dash_CM7.elf"
                 }
             ],
+            "serverExtLoader": [
+                {
+                    "loader": "C:/ST/STM32CubeCLT_1.21.0/STM32CubeProgrammer/bin/ExternalLoader/MT25TL01G_STM32H747I-DISCO.stldr",
+                    "initialize": true
+                }
+            ],
             "verbose": false
         },
         {

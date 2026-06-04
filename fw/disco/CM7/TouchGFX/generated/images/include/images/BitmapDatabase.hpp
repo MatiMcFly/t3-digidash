@@ -6,8 +6,8 @@
 #include <touchgfx/hal/Types.hpp>
 #include <touchgfx/Bitmap.hpp>
 
-const uint16_t BITMAP_ALTERNATE_THEME_IMAGES_WIDGETS_GAUGE_MEDIUM_BACKGROUNDS_ACTIVE_ID = 0;
-const uint16_t BITMAP_ALTERNATE_THEME_IMAGES_WIDGETS_GAUGE_MEDIUM_NEEDLES_SMOOTH_ID = 1;
+const uint16_t BITMAP_T3_RPM_GAUGE_ID = 0;
+const uint16_t BITMAP_T3_RPM_SCALE_ID = 1;
 
 namespace BitmapDatabase
 {

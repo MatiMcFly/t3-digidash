@@ -4,7 +4,6 @@
 #include <gui_generated/screen_screen/screenViewBase.hpp>
 #include <touchgfx/Color.hpp>
 #include <images/BitmapDatabase.hpp>
-#include <texts/TextKeysAndLanguages.hpp>
 
 screenViewBase::screenViewBase()
 {
@@ -16,22 +15,34 @@ screenViewBase::screenViewBase()
     box1.setColor(touchgfx::Color::getColorFromRGB(19, 19, 21));
     add(box1);
 
-    gauge1.setBackground(touchgfx::Bitmap(BITMAP_ALTERNATE_THEME_IMAGES_WIDGETS_GAUGE_MEDIUM_BACKGROUNDS_ACTIVE_ID));
-    gauge1.setPosition(240, 89, 240, 240);
-    gauge1.setCenter(120, 120);
-    gauge1.setStartEndAngle(-113, 112);
-    gauge1.setRange(0, 100);
-    gauge1.setValue(50);
-    gauge1.setNeedle(BITMAP_ALTERNATE_THEME_IMAGES_WIDGETS_GAUGE_MEDIUM_NEEDLES_SMOOTH_ID, 7, 67);
-    gauge1.setMovingNeedleRenderingAlgorithm(touchgfx::TextureMapper::BILINEAR_INTERPOLATION);
-    gauge1.setSteadyNeedleRenderingAlgorithm(touchgfx::TextureMapper::BILINEAR_INTERPOLATION);
-    add(gauge1);
+    box2.setPosition(299, 558, 50, 50);
+    box2.setColor(touchgfx::Color::getColorFromRGB(255, 0, 0));
+    add(box2);
 
-    textArea1.setXY(314, 360);
-    textArea1.setColor(touchgfx::Color::getColorFromRGB(222, 64, 209));
-    textArea1.setLinespacing(0);
-    textArea1.setTypedText(touchgfx::TypedText(T___SINGLEUSE_ZA2Z));
-    add(textArea1);
+    box2_1.setPosition(228, 644, 50, 50);
+    box2_1.setColor(touchgfx::Color::getColorFromRGB(0, 255, 0));
+    add(box2_1);
+
+    box2_1_1.setPosition(361, 644, 50, 50);
+    box2_1_1.setColor(touchgfx::Color::getColorFromRGB(0, 0, 255));
+    add(box2_1_1);
+
+    rpm_scale.setXY(1, 0);
+    rpm_scale.setBitmap(touchgfx::Bitmap(BITMAP_T3_RPM_SCALE_ID));
+    add(rpm_scale);
+
+    textureMapper1.setXY(1, 260);
+    textureMapper1.setBitmap(touchgfx::Bitmap(BITMAP_T3_RPM_GAUGE_ID));
+    textureMapper1.setWidth(720);
+    textureMapper1.setHeight(190);
+    textureMapper1.setBitmapPosition(0.0f, -261.0f);
+    textureMapper1.setScale(1.0f);
+    textureMapper1.setCameraDistance(1000.0f);
+    textureMapper1.setOrigo(360.0f, 95.0f, 1000.0f);
+    textureMapper1.setCamera(360.0f, 95.0f);
+    textureMapper1.setAngles(0.0f, 0.0f, 0.0f);
+    textureMapper1.setRenderingAlgorithm(touchgfx::TextureMapper::NEAREST_NEIGHBOR);
+    add(textureMapper1);
 }
 
 screenViewBase::~screenViewBase()

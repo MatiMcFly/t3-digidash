@@ -76,13 +76,11 @@ void AppRun(void) {
     /* Ramp up: 0 -> 100 % */
     for (uint8_t d = 0U; d <= BACKLIGHT_DUTY_MAX; d++) {
       BacklightSetDuty(d);
-      DisplayTask();
       vTaskDelay(pdMS_TO_TICKS(BL_GLOW_STEP_MS));
     }
     /* Ramp down: 100 -> 0 % */
     for (uint8_t d = BACKLIGHT_DUTY_MAX; d-- > 0U; ) {
       BacklightSetDuty(d);
-      DisplayTask();
       vTaskDelay(pdMS_TO_TICKS(BL_GLOW_STEP_MS));
     }
   }

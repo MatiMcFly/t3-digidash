@@ -290,6 +290,14 @@ void SystemInit (void)
   /* Configure the Vector Table location -------------------------------------*/
 #if defined(USER_VECT_TAB_ADDRESS)
   SCB->VTOR = VECT_TAB_BASE_ADDRESS | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal D1 AXI-RAM or in Internal FLASH */
+#else
+  /* On STM32H747, VTOR is loaded from option byte BOOT_CM7_ADD0 at reset.
+   * If that option byte points at FLASH bank 2 (0x08100000) instead of bank 1,
+   * SysTick / all exceptions vector into the CM4 image and uwTick never
+   * increments (HAL_Delay hangs forever). Force VTOR to our CM7 vector table
+   * unconditionally so the build is independent of option-byte state. */
+  extern uint32_t g_pfnVectors;
+  SCB->VTOR = (uint32_t)&g_pfnVectors;
 #endif /* USER_VECT_TAB_ADDRESS */
 
 #else
