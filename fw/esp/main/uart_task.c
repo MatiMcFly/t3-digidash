@@ -1,6 +1,7 @@
 #include "uart_task.h"
 
 #include <limits.h>
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -27,6 +28,40 @@
 #define UART_LOG_EVERY 50
 
 static const char *TAG = "ESP32C3_UART_TO_NUCLEO";
+
+static float clampf(float value, float min_value, float max_value)
+{
+    if (value < min_value) {
+        return min_value;
+    }
+    if (value > max_value) {
+        return max_value;
+    }
+    return value;
+}
+
+static int16_t scale_water_temp_ui(int16_t raw_deci_c)
+{
+    float temp_c = (float)raw_deci_c / 10.0f;
+    float scaled = (temp_c + 10.0f) * (100.0f / 160.0f);
+    scaled = clampf(scaled, 0.0f, 100.0f);
+    return (int16_t)lroundf(scaled);
+}
+
+static int16_t scale_tank_level_ui(uint16_t raw_deci_l)
+{
+    float liters = (float)raw_deci_l / 10.0f;
+    float scaled = liters * (100.0f / 70.0f);
+    scaled = clampf(scaled, 0.0f, 100.0f);
+    return (int16_t)lroundf(scaled);
+}
+
+static float scale_batt_volts(uint16_t raw_10mv)
+{
+    float volts = (float)raw_10mv / 100.0f;
+    float rounded = floorf((volts * 100.0f) + 0.5f) / 100.0f;
+    return clampf(rounded, 0.0f, 20.0f);
+}
 
 static void uart_task_esp_to_nucleo(void *arg)
 {
@@ -93,12 +128,12 @@ static void uart_task_esp_to_nucleo(void *arg)
                             uint8_t turn = (uint8_t)turn_signal;
                             uint8_t high = (uint8_t)high_beam;
                             int16_t rpm_value = (int16_t)rpm;
-                            float batt_v_out = (float)batt_v;
+                            float batt_v_out = scale_batt_volts(batt_v);
 
                             uint8_t oil_03 = (uint8_t)oil_pressure_switch_3b;
                             uint8_t oil_18 = (uint8_t)oil_pressure_switch_18b;
-                            int8_t water_temp = (int8_t)water_c;
-                            int8_t tank = (int8_t)tank_level;
+                            int8_t water_temp = (int8_t)scale_water_temp_ui(water_c);
+                            int8_t tank = (int8_t)scale_tank_level_ui(tank_level);
 
                             remotexy_set_outputs(turn, high, rpm_value,
                                                  batt_v_out, oil_03, oil_18,
