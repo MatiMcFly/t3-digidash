@@ -8,6 +8,8 @@
 
 #define UART_PARSER_BUF_SIZE 256
 
+static const char *TAG = "UART_PARSER";
+
 bool parse_uart_values(const char *text, int16_t *water_c, uint16_t *rpm, uint16_t *batt_v , uint16_t *tank_level, bool *turn_signal,
                        bool *high_beam, bool *oil_pressure_switch_3b, bool *oil_pressure_switch_18b)
 {
@@ -39,6 +41,7 @@ bool parse_uart_values(const char *text, int16_t *water_c, uint16_t *rpm, uint16
             // pointer to the value string (after the ':')
             char *value = sep + 1;
 
+            ESP_LOGI(TAG, "Parsed id=%ld value=%s", (long)id, value);
             switch (id) {
             case UART_FIELD_WATER_TEMP:
                 if (water_c) {
@@ -96,6 +99,7 @@ bool parse_uart_values(const char *text, int16_t *water_c, uint16_t *rpm, uint16
             }
         } else {
             had_error = true;
+            ESP_LOGW(TAG, "Malformed token (missing ':'): %s", pairs);
         }
         // move to the next pair
         pairs = strtok_r(NULL, ";", &context);

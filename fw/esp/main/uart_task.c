@@ -59,7 +59,8 @@ static void uart_task_esp_to_nucleo(void *arg)
 
             size_t start = 0;
             for (size_t i = 0; i < stream_len; ++i) {
-                if (stream_buf[i] == '\n' || stream_buf[i] == '\r') {
+                //if (stream_buf[i] == ';' || stream_buf[i] == '\n' || stream_buf[i] == '\r') {
+                if (stream_buf[i] == ';') {
                     size_t line_len = i - start;
                     if (line_len > 0) {
                         char line[UART_BUF_SIZE];
@@ -67,9 +68,7 @@ static void uart_task_esp_to_nucleo(void *arg)
                         memcpy(line, &stream_buf[start], copy_len);
                         line[copy_len] = '\0';
                         line_count++;
-                        if ((line_count % UART_LOG_EVERY) == 0U) {
-                            ESP_LOGI(TAG, "Received line: %s", line);
-                        }
+                        ESP_LOGI(TAG, "UART token: %s", line);
 
                         uint16_t rpm = car_signals_get_rpm();
                         bool turn_signal = car_signals_get_turn_signal();
