@@ -145,6 +145,219 @@
                 "CameraDistance": 1000.0
               }
             ]
+          },
+          {
+            "Type": "Container",
+            "Name": "cont_middle_disp",
+            "X": 275,
+            "Y": 467,
+            "Width": 160,
+            "Height": 235,
+            "Components": [
+              {
+                "Type": "Container",
+                "Name": "cont_battery",
+                "X": 80,
+                "Y": 117,
+                "Width": 79,
+                "Height": 96,
+                "Components": [
+                  {
+                    "Type": "Image",
+                    "Name": "img_battery",
+                    "X": 14,
+                    "Y": -1,
+                    "Width": 52,
+                    "Height": 47,
+                    "RelativeFilename": "t3-battery-icon.png"
+                  },
+                  {
+                    "Type": "Circle",
+                    "Name": "bg_battery",
+                    "X": 24,
+                    "Y": 57,
+                    "Width": 32,
+                    "Height": 33,
+                    "Color": {
+                      "Red": 8
+                    },
+                    "CenterX": 16.0,
+                    "CenterY": 16.0,
+                    "Radius": 16.0,
+                    "EndAngle": 360.0,
+                    "CapPrecision": "Butt"
+                  },
+                  {
+                    "Type": "Circle",
+                    "Name": "led_battery",
+                    "X": 26,
+                    "Y": 59,
+                    "Width": 28,
+                    "Height": 30,
+                    "Color": {
+                      "Red": 18
+                    },
+                    "CenterX": 14.0,
+                    "CenterY": 14.0,
+                    "Radius": 14.0,
+                    "EndAngle": 360.0,
+                    "CapPrecision": "Butt"
+                  }
+                ]
+              },
+              {
+                "Type": "Container",
+                "Name": "cont_oil",
+                "X": 1,
+                "Y": 117,
+                "Width": 79,
+                "Height": 96,
+                "Components": [
+                  {
+                    "Type": "Image",
+                    "Name": "img_oil",
+                    "X": 12,
+                    "Y": 17,
+                    "Width": 57,
+                    "Height": 21,
+                    "RelativeFilename": "t3-oil-icon.png"
+                  },
+                  {
+                    "Type": "Circle",
+                    "Name": "bg_oil",
+                    "X": 25,
+                    "Y": 57,
+                    "Width": 32,
+                    "Height": 33,
+                    "Color": {
+                      "Red": 8
+                    },
+                    "CenterX": 16.0,
+                    "CenterY": 16.0,
+                    "Radius": 16.0,
+                    "EndAngle": 360.0,
+                    "CapPrecision": "Butt"
+                  },
+                  {
+                    "Type": "Circle",
+                    "Name": "led_oil",
+                    "X": 27,
+                    "Y": 59,
+                    "Width": 28,
+                    "Height": 30,
+                    "LockPosition": true,
+                    "Color": {
+                      "Red": 18
+                    },
+                    "CenterX": 14.0,
+                    "CenterY": 14.0,
+                    "Radius": 14.0,
+                    "EndAngle": 360.0,
+                    "CapPrecision": "Butt"
+                  }
+                ]
+              },
+              {
+                "Type": "Container",
+                "Name": "cont_high_beam",
+                "X": 80,
+                "Width": 79,
+                "Height": 96,
+                "Components": [
+                  {
+                    "Type": "Image",
+                    "Name": "img_high_beam",
+                    "X": 14,
+                    "Y": 9,
+                    "Width": 50,
+                    "Height": 30,
+                    "RelativeFilename": "t3-high-beam-icon.png"
+                  },
+                  {
+                    "Type": "Circle",
+                    "Name": "bg_high_beam",
+                    "X": 23,
+                    "Y": 48,
+                    "Width": 32,
+                    "Height": 33,
+                    "Color": {
+                      "Blue": 8
+                    },
+                    "CenterX": 16.0,
+                    "CenterY": 16.0,
+                    "Radius": 16.0,
+                    "EndAngle": 360.0,
+                    "CapPrecision": "Butt"
+                  },
+                  {
+                    "Type": "Circle",
+                    "Name": "led_high_beam",
+                    "X": 25,
+                    "Y": 50,
+                    "Width": 28,
+                    "Height": 30,
+                    "Color": {
+                      "Blue": 18
+                    },
+                    "CenterX": 14.0,
+                    "CenterY": 14.0,
+                    "Radius": 14.0,
+                    "EndAngle": 360.0,
+                    "CapPrecision": "Butt"
+                  }
+                ]
+              },
+              {
+                "Type": "Container",
+                "Name": "cont_indicator",
+                "X": 1,
+                "Width": 79,
+                "Height": 96,
+                "Components": [
+                  {
+                    "Type": "Image",
+                    "Name": "img_indicator",
+                    "X": 14,
+                    "Y": 12,
+                    "Width": 55,
+                    "Height": 24,
+                    "RelativeFilename": "t3-indicator-icon.png"
+                  },
+                  {
+                    "Type": "Circle",
+                    "Name": "bg_indicator",
+                    "X": 25,
+                    "Y": 48,
+                    "Width": 32,
+                    "Height": 33,
+                    "Color": {
+                      "Green": 8
+                    },
+                    "CenterX": 16.0,
+                    "CenterY": 16.0,
+                    "Radius": 16.0,
+                    "EndAngle": 360.0,
+                    "CapPrecision": "Butt"
+                  },
+                  {
+                    "Type": "Circle",
+                    "Name": "led_indicator",
+                    "X": 27,
+                    "Y": 50,
+                    "Width": 28,
+                    "Height": 30,
+                    "Color": {
+                      "Green": 18
+                    },
+                    "CenterX": 14.0,
+                    "CenterY": 14.0,
+                    "Radius": 14.0,
+                    "EndAngle": 360.0,
+                    "CapPrecision": "Butt"
+                  }
+                ]
+              }
+            ]
           }
         ],
         "Interactions": []

@@ -43,6 +43,31 @@ protected:
     touchgfx::Container cont_fuel_gauge;
     touchgfx::Image img_fuel_scale;
     touchgfx::TextureMapper fuel_needle;
+    touchgfx::Container cont_middle_disp;
+    touchgfx::Container cont_battery;
+    touchgfx::Image img_battery;
+    touchgfx::Circle bg_battery;
+    touchgfx::PainterRGB888 bg_batteryPainter;
+    touchgfx::Circle led_battery;
+    touchgfx::PainterRGB888 led_batteryPainter;
+    touchgfx::Container cont_oil;
+    touchgfx::Image img_oil;
+    touchgfx::Circle bg_oil;
+    touchgfx::PainterRGB888 bg_oilPainter;
+    touchgfx::Circle led_oil;
+    touchgfx::PainterRGB888 led_oilPainter;
+    touchgfx::Container cont_high_beam;
+    touchgfx::Image img_high_beam;
+    touchgfx::Circle bg_high_beam;
+    touchgfx::PainterRGB888 bg_high_beamPainter;
+    touchgfx::Circle led_high_beam;
+    touchgfx::PainterRGB888 led_high_beamPainter;
+    touchgfx::Container cont_indicator;
+    touchgfx::Image img_indicator;
+    touchgfx::Circle bg_indicator;
+    touchgfx::PainterRGB888 bg_indicatorPainter;
+    touchgfx::Circle led_indicator;
+    touchgfx::PainterRGB888 led_indicatorPainter;
 
 private:
 

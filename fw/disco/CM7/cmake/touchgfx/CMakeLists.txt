@@ -45,7 +45,11 @@ set(TouchGFX_Src
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/BitmapDatabase.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/SVGDatabase.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_t3-aux-needle.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_t3-battery-icon.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_t3-fuel-scale.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_t3-high-beam-icon.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_t3-indicator-icon.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_t3-oil-icon.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_t3-rpm-gauge.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_t3-rpm-scale.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_t3-temperature-scale.cpp

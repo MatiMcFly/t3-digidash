@@ -92,6 +92,109 @@ screenViewBase::screenViewBase()
     cont_fuel_gauge.add(fuel_needle);
 
     add(cont_fuel_gauge);
+
+    cont_middle_disp.setPosition(275, 467, 160, 235);
+    cont_battery.setPosition(80, 117, 79, 96);
+    img_battery.setXY(14, -1);
+    img_battery.setBitmap(touchgfx::Bitmap(BITMAP_T3_BATTERY_ICON_ID));
+    cont_battery.add(img_battery);
+
+    bg_battery.setPosition(24, 57, 32, 33);
+    bg_battery.setCenter(16, 16);
+    bg_battery.setRadius(16);
+    bg_battery.setLineWidth(0);
+    bg_battery.setArc(0, 360);
+    bg_batteryPainter.setColor(touchgfx::Color::getColorFromRGB(8, 0, 0));
+    bg_battery.setPainter(bg_batteryPainter);
+    cont_battery.add(bg_battery);
+
+    led_battery.setPosition(26, 59, 28, 30);
+    led_battery.setCenter(14, 14);
+    led_battery.setRadius(14);
+    led_battery.setLineWidth(0);
+    led_battery.setArc(0, 360);
+    led_batteryPainter.setColor(touchgfx::Color::getColorFromRGB(18, 0, 0));
+    led_battery.setPainter(led_batteryPainter);
+    cont_battery.add(led_battery);
+
+    cont_middle_disp.add(cont_battery);
+
+    cont_oil.setPosition(1, 117, 79, 96);
+    img_oil.setXY(12, 17);
+    img_oil.setBitmap(touchgfx::Bitmap(BITMAP_T3_OIL_ICON_ID));
+    cont_oil.add(img_oil);
+
+    bg_oil.setPosition(25, 57, 32, 33);
+    bg_oil.setCenter(16, 16);
+    bg_oil.setRadius(16);
+    bg_oil.setLineWidth(0);
+    bg_oil.setArc(0, 360);
+    bg_oilPainter.setColor(touchgfx::Color::getColorFromRGB(8, 0, 0));
+    bg_oil.setPainter(bg_oilPainter);
+    cont_oil.add(bg_oil);
+
+    led_oil.setPosition(27, 59, 28, 30);
+    led_oil.setCenter(14, 14);
+    led_oil.setRadius(14);
+    led_oil.setLineWidth(0);
+    led_oil.setArc(0, 360);
+    led_oilPainter.setColor(touchgfx::Color::getColorFromRGB(18, 0, 0));
+    led_oil.setPainter(led_oilPainter);
+    cont_oil.add(led_oil);
+
+    cont_middle_disp.add(cont_oil);
+
+    cont_high_beam.setPosition(80, 0, 79, 96);
+    img_high_beam.setXY(14, 9);
+    img_high_beam.setBitmap(touchgfx::Bitmap(BITMAP_T3_HIGH_BEAM_ICON_ID));
+    cont_high_beam.add(img_high_beam);
+
+    bg_high_beam.setPosition(23, 48, 32, 33);
+    bg_high_beam.setCenter(16, 16);
+    bg_high_beam.setRadius(16);
+    bg_high_beam.setLineWidth(0);
+    bg_high_beam.setArc(0, 360);
+    bg_high_beamPainter.setColor(touchgfx::Color::getColorFromRGB(0, 0, 8));
+    bg_high_beam.setPainter(bg_high_beamPainter);
+    cont_high_beam.add(bg_high_beam);
+
+    led_high_beam.setPosition(25, 50, 28, 30);
+    led_high_beam.setCenter(14, 14);
+    led_high_beam.setRadius(14);
+    led_high_beam.setLineWidth(0);
+    led_high_beam.setArc(0, 360);
+    led_high_beamPainter.setColor(touchgfx::Color::getColorFromRGB(0, 0, 18));
+    led_high_beam.setPainter(led_high_beamPainter);
+    cont_high_beam.add(led_high_beam);
+
+    cont_middle_disp.add(cont_high_beam);
+
+    cont_indicator.setPosition(1, 0, 79, 96);
+    img_indicator.setXY(14, 12);
+    img_indicator.setBitmap(touchgfx::Bitmap(BITMAP_T3_INDICATOR_ICON_ID));
+    cont_indicator.add(img_indicator);
+
+    bg_indicator.setPosition(25, 48, 32, 33);
+    bg_indicator.setCenter(16, 16);
+    bg_indicator.setRadius(16);
+    bg_indicator.setLineWidth(0);
+    bg_indicator.setArc(0, 360);
+    bg_indicatorPainter.setColor(touchgfx::Color::getColorFromRGB(0, 8, 0));
+    bg_indicator.setPainter(bg_indicatorPainter);
+    cont_indicator.add(bg_indicator);
+
+    led_indicator.setPosition(27, 50, 28, 30);
+    led_indicator.setCenter(14, 14);
+    led_indicator.setRadius(14);
+    led_indicator.setLineWidth(0);
+    led_indicator.setArc(0, 360);
+    led_indicatorPainter.setColor(touchgfx::Color::getColorFromRGB(0, 18, 0));
+    led_indicator.setPainter(led_indicatorPainter);
+    cont_indicator.add(led_indicator);
+
+    cont_middle_disp.add(cont_indicator);
+
+    add(cont_middle_disp);
 }
 
 screenViewBase::~screenViewBase()
