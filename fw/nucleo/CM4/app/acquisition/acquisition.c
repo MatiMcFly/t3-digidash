@@ -19,6 +19,8 @@ extern TIM_HandleTypeDef htim2;
 #define ADC1_BUFFER_SIZE 3
 static volatile uint16_t adc1_buffer[ADC1_BUFFER_SIZE] = {0};
 
+static volatile bool tim2_is_first_capture = true;
+
 static void    acquire_binary_sensors(void);
 static void    start_pulse_sensors(void);
 static int16_t pulse_period_to_pulses_per_minute(uint32_t pulse_period_us);
@@ -87,7 +89,11 @@ static void start_pulse_sensors(void)
     }
 
     // Timer could not be started, because it is still running --> timeout after 0.1 s
-    // Therefore, send 0 pulses per minute
+    // Therefore, reset the timer and send 0 pulses per minute
+    HAL_TIM_IC_Stop_IT(&htim2, TIM_CHANNEL_1);
+    tim2_is_first_capture = true;
+    HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1);
+
     sensor_data_t rotation_speed = {.id = SENSOR_ID_ROTATION_SPEED, .value = 0};
 
     if (xQueueSend(queue_data_raw, &rotation_speed, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
@@ -152,7 +158,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim)
 {
-    static bool     is_first_capture           = true;
     static uint32_t capture_value_prev_us      = 0;
     BaseType_t      higher_priority_task_woken = pdFALSE;
     sensor_data_t   rotation_speed             = {.id = SENSOR_ID_ROTATION_SPEED, .value = 0};
@@ -164,9 +169,9 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim)
 
     uint32_t capture_value_us = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
 
-    if (is_first_capture) {
+    if (tim2_is_first_capture) {
         capture_value_prev_us = capture_value_us;
-        is_first_capture      = false;
+        tim2_is_first_capture = false;
         return;
     }
 
@@ -182,7 +187,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim)
 
     // Reset and get ready for next measurement period
     HAL_TIM_IC_Stop_IT(&htim2, TIM_CHANNEL_1);
-    is_first_capture = true;
+    tim2_is_first_capture = true;
 
     portYIELD_FROM_ISR(higher_priority_task_woken);
 }
