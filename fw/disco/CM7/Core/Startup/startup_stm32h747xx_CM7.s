@@ -43,11 +43,6 @@ defined in linker script */
 .word  _sbss
 /* end address for the .bss section. defined in linker script */
 .word  _ebss
-/* AXISRAM-resident bss (TouchGFX block allocator etc). Lives in a
- * separate memory region; the standard _sbss.._ebss loop below
- * does NOT cover it, so we add a dedicated zero-fill pass. */
-.word  _saxisram_bss
-.word  _eaxisram_bss
 /* stack used for SystemInit_ExtMemCtl; always internal RAM used */
 
 /**
@@ -99,21 +94,6 @@ FillZerobss:
 LoopFillZerobss:
   cmp r2, r4
   bcc FillZerobss
-
-/* Zero fill the AXISRAM-resident bss (TouchGFX block allocator).
- * Must run before __libc_init_array so C++ constructors see zeros. */
-  ldr r2, =_saxisram_bss
-  ldr r4, =_eaxisram_bss
-  movs r3, #0
-  b LoopFillZeroAxisramBss
-
-FillZeroAxisramBss:
-  str  r3, [r2]
-  adds r2, r2, #4
-
-LoopFillZeroAxisramBss:
-  cmp r2, r4
-  bcc FillZeroAxisramBss
 
 /* Call static constructors */
     bl __libc_init_array

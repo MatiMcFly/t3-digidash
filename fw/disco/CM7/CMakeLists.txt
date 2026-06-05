@@ -85,6 +85,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/Application/Display.c
     Core/Application/QspiFlash.c
     Core/Src/freertos_hooks.c
+    Core/Src/axisram_bss_init.c
     # FreeRTOS kernel
     ${CMAKE_SOURCE_DIR}/../Drivers/FreeRTOS-Kernel/tasks.c
     ${CMAKE_SOURCE_DIR}/../Drivers/FreeRTOS-Kernel/queue.c

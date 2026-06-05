@@ -158,8 +158,8 @@ static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram)
     Error_Handler();
   }
 
-  /* 100MHz SDRAM clock: (64ms / 8192) * 100MHz - margin(20) = 761 */
-  if (HAL_SDRAM_ProgramRefreshRate(hsdram, 761U) != HAL_OK)
+  /* SDRAM refresh count (FMC_SDRTR.COUNT field). This improves performance of the SDRAM when heating up. */
+  if (HAL_SDRAM_ProgramRefreshRate(hsdram, 120U) != HAL_OK)
   {
     Error_Handler();
   }
@@ -283,6 +283,13 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+
+  /* Enable Cortex-M7 instruction and data caches. */
+  SCB_EnableICache();
+  SCB_EnableDCache();
+
+  /* AXI bus-matrix QoS: enable read-issuing override on the FMC target. */
+  *((volatile uint32_t *)0x51008108U) |= 0x00000001U;
 
   /* USER CODE END Init */
 
