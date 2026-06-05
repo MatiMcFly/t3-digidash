@@ -10,6 +10,9 @@
 #include <touchgfx/widgets/Box.hpp>
 #include <touchgfx/widgets/Image.hpp>
 #include <touchgfx/widgets/TextureMapper.hpp>
+#include <touchgfx/containers/Container.hpp>
+#include <touchgfx/widgets/canvas/Circle.hpp>
+#include <touchgfx/widgets/canvas/PainterRGB888.hpp>
 
 class screenViewBase : public touchgfx::View<screenPresenter>
 {
@@ -30,8 +33,24 @@ protected:
     touchgfx::Box box1;
     touchgfx::Image rpm_scale;
     touchgfx::TextureMapper rpm_needle;
+    touchgfx::Container cont_temp_gauge;
+    touchgfx::Image img_temp_scale;
+    touchgfx::Circle bg_overtemp;
+    touchgfx::PainterRGB888 bg_overtempPainter;
+    touchgfx::Circle led_overtemp;
+    touchgfx::PainterRGB888 led_overtempPainter;
+    touchgfx::TextureMapper temperature_needle;
+    touchgfx::Container cont_fuel_gauge;
+    touchgfx::Image img_fuel_scale;
+    touchgfx::TextureMapper fuel_needle;
 
 private:
+
+    /*
+     * Canvas Buffer Size
+     */
+    static const uint32_t CANVAS_BUFFER_SIZE = 10800;
+    uint8_t canvasBuffer[CANVAS_BUFFER_SIZE];
 
 };
 

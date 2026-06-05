@@ -44,8 +44,11 @@ set(TouchGFX_Src
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/gui_generated/src/screen_screen/screenViewBase.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/BitmapDatabase.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/SVGDatabase.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_t3-aux-needle.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_t3-fuel-scale.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_t3-rpm-gauge.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_t3-rpm-scale.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_t3-temperature-scale.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/texts/src/LanguageGb.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/texts/src/Texts.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/texts/src/TypedTextDatabase.cpp

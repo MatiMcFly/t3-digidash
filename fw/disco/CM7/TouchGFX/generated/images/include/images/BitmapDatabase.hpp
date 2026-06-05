@@ -6,8 +6,11 @@
 #include <touchgfx/hal/Types.hpp>
 #include <touchgfx/Bitmap.hpp>
 
-const uint16_t BITMAP_T3_RPM_GAUGE_ID = 0;
-const uint16_t BITMAP_T3_RPM_SCALE_ID = 1;
+const uint16_t BITMAP_T3_AUX_NEEDLE_ID = 0;
+const uint16_t BITMAP_T3_FUEL_SCALE_ID = 1;
+const uint16_t BITMAP_T3_RPM_GAUGE_ID = 2;
+const uint16_t BITMAP_T3_RPM_SCALE_ID = 3;
+const uint16_t BITMAP_T3_TEMPERATURE_SCALE_ID = 4;
 
 namespace BitmapDatabase
 {
