@@ -7,6 +7,17 @@
 class screenView : public screenViewBase
 {
 public:
+    /* Identifies one of the 5 indicator LEDs on the dashboard. */
+    enum class Led : uint8_t
+    {
+        HighBeam,
+        Indicator,
+        Overtemp,
+        Oil,
+        Battery,
+        Count
+    };
+
     screenView();
     virtual ~screenView() {}
     virtual void setupScreen();
@@ -29,6 +40,11 @@ public:
      * 40 C  (cold) -> kTempAngleCold rad
      * 140 C (hot)  -> kTempAngleHot  rad */
     void setTemperature(int16_t temperatureC);
+
+    /* Sets one of the indicator LEDs on/off. The LED's painter is
+     * recolored between its "lit" and "dark" tones (see screenView.cpp)
+     * and then invalidated so the change is rendered next frame. */
+    void led_set(Led led, bool on);
 
 protected:
     /* Test pattern: sweep RPM 0 -> kMaxRpm -> 0 to exercise the
@@ -56,6 +72,36 @@ protected:
 
     int32_t  testTemp;     /* deg C, swept across [kMin..kMax]TempC      */
     int16_t  testTempStep;
+
+    /* ---- LED test pattern state ----
+     * Patterns are driven from HAL_GetTick() (1 ms SysTick), so the
+     * timing is independent of the actual handleTickEvent rate -- the
+     * partial-FB render path can tick at anywhere from ~10 to ~70 Hz
+     * depending on what's redrawing this frame, but seconds are
+     * seconds. All durations below are in milliseconds. */
+
+    /* Indicator: 1 Hz blink (500 ms on / 500 ms off) for 5 s, then
+     * 5 s idle off. */
+    static constexpr uint32_t kIndicatorBlinkOn   = 500U;
+    static constexpr uint32_t kIndicatorBlinkOff  = 500U;
+    static constexpr uint32_t kIndicatorBlinkSpan = 5000U;
+    static constexpr uint32_t kIndicatorIdleSpan  = 5000U;
+    static constexpr uint32_t kIndicatorPeriod    = kIndicatorBlinkSpan + kIndicatorIdleSpan;
+
+    /* High beam: two 200 ms flashes back-to-back, then 6 s off. */
+    static constexpr uint32_t kHighBeamPulse      = 200U;
+    static constexpr uint32_t kHighBeamIdle       = 6000U;
+    static constexpr uint32_t kHighBeamPeriod     = 4U * kHighBeamPulse + kHighBeamIdle;
+
+    /* Battery: 50% duty cycle, toggles every 5 s. */
+    static constexpr uint32_t kBatteryHalfPeriod  = 5000U;
+    static constexpr uint32_t kBatteryPeriod      = 2U * kBatteryHalfPeriod;
+
+    /* Oil: brief 200 ms flash once every 5 s. */
+    static constexpr uint32_t kOilFlash           = 200U;
+    static constexpr uint32_t kOilPeriod          = 5000U;
+
+    bool ledState[static_cast<int>(Led::Count)]; /* cached on/off    */
 };
 
 #endif // SCREENVIEW_HPP
