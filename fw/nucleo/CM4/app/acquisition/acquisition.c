@@ -14,8 +14,8 @@
 extern ADC_HandleTypeDef hadc1;
 extern TIM_HandleTypeDef htim2;
 
-#define MEASUREMENT_PERIOD_MS         100
-#define ROTATION_SPEED_TIMEOUT_CYCLES 10 // Number of measurement periods after which rotation speed is assumed to be 0 if no new pulse is captured
+#define MEASUREMENT_PERIOD_MS    100
+#define MOTOR_RPM_TIMEOUT_CYCLES 10 // Number of measurement periods after which motor RPM is assumed to be 0 if no new pulse is captured
 
 #define ADC1_BUFFER_SIZE 3
 static volatile uint16_t adc1_buffer[ADC1_BUFFER_SIZE] = {0};
@@ -87,14 +87,14 @@ static void start_pulse_sensors(void)
 {
     static uint8_t timeout_counter = 0;
 
-    if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) == HAL_OK) { // SENSOR_ID_ROTATION_SPEE
+    if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) == HAL_OK) { // SENSOR_ID_MOTOR_RPM
         timeout_counter = 0;
         return;
     }
 
     ++timeout_counter;
 
-    if (timeout_counter < ROTATION_SPEED_TIMEOUT_CYCLES) {
+    if (timeout_counter < MOTOR_RPM_TIMEOUT_CYCLES) {
         return; // Timeout not yet reached
     }
 
@@ -104,9 +104,9 @@ static void start_pulse_sensors(void)
     tim2_is_first_capture = true;
     HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1);
 
-    sensor_data_t rotation_speed = {.id = SENSOR_ID_ROTATION_SPEED, .value = 0};
+    sensor_data_t motor_rpm = {.id = SENSOR_ID_MOTOR_RPM, .value = 0};
 
-    if (xQueueSend(queue_data_raw, &rotation_speed, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
+    if (xQueueSend(queue_data_raw, &motor_rpm, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
         HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSend error\n", strlen("acquisition: xQueueSend error\n"), HAL_MAX_DELAY);
     }
 
@@ -172,7 +172,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim)
 {
     static uint32_t capture_value_prev_us      = 0;
     BaseType_t      higher_priority_task_woken = pdFALSE;
-    sensor_data_t   rotation_speed             = {.id = SENSOR_ID_ROTATION_SPEED, .value = 0};
+    sensor_data_t   motor_rpm                  = {.id = SENSOR_ID_MOTOR_RPM, .value = 0};
 
     if (htim->Instance != TIM2 || htim->Channel != HAL_TIM_ACTIVE_CHANNEL_1) {
         HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: Unknown timer instance or channel\n", strlen("acquisition: Unknown timer instance or channel\n"), HAL_MAX_DELAY);
@@ -189,11 +189,11 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim)
 
     uint32_t capture_diff_us = capture_value_us - capture_value_prev_us; // unsinged subtraction handles timer overflow
 
-    rotation_speed.value = pulse_period_to_pulses_per_minute(capture_diff_us);
+    motor_rpm.value = pulse_period_to_pulses_per_minute(capture_diff_us);
 
     capture_value_prev_us = capture_value_us;
 
-    if (xQueueSendFromISR(queue_data_raw, &rotation_speed, &higher_priority_task_woken) != pdPASS) {
+    if (xQueueSendFromISR(queue_data_raw, &motor_rpm, &higher_priority_task_woken) != pdPASS) {
         HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSendFromISR error\n", strlen("acquisition: xQueueSendFromISR error\n"), HAL_MAX_DELAY);
     }
 

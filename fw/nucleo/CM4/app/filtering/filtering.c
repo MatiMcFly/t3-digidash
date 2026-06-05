@@ -12,7 +12,7 @@
 #define FILTER_SIZE_COOLANT_TEMPERATURE 20
 #define FILTER_SIZE_BATTERY_VOLTAGE     20
 #define FILTER_SIZE_FUEL_LEVEL          300
-#define FILTER_SIZE_ROTATION_SPEED      2
+#define FILTER_SIZE_MOTOR_RPM           2
 
 #define DEBOUNCE_SIZE_TURN_SIGNAL          2
 #define DEBOUNCE_SIZE_HIGH_BEAM            2
@@ -22,7 +22,7 @@
 static int16_t filter_coolant_temperature(int16_t value);
 static int16_t filter_battery_voltage(int16_t value);
 static int16_t filter_fuel_level(int16_t value);
-static int16_t filter_rotation_speed(int16_t value);
+static int16_t filter_motor_rpm(int16_t value);
 static int16_t debounce_turn_signal(int16_t value);
 static int16_t debounce_high_beam(int16_t value);
 static int16_t debounce_oil_pressure_0_3_bar(int16_t value);
@@ -76,8 +76,8 @@ void filtering_task(void* params)
                 data.value = debounce_oil_pressure_1_8_bar(data.value);
                 break;
 
-            case SENSOR_ID_ROTATION_SPEED:
-                data.value = filter_rotation_speed(data.value);
+            case SENSOR_ID_MOTOR_RPM:
+                data.value = filter_motor_rpm(data.value);
                 break;
 
             default:
@@ -121,10 +121,10 @@ static int16_t filter_fuel_level(int16_t value)
     return ringbuf_mean(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]));
 }
 
-static int16_t filter_rotation_speed(int16_t value)
+static int16_t filter_motor_rpm(int16_t value)
 {
-    static int16_t  ringbuf[FILTER_SIZE_ROTATION_SPEED] = {0};
-    static uint16_t index                               = 0;
+    static int16_t  ringbuf[FILTER_SIZE_MOTOR_RPM] = {0};
+    static uint16_t index                          = 0;
 
     ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
 
