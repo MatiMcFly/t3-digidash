@@ -158,8 +158,8 @@ static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram)
     Error_Handler();
   }
 
-  /* SDRAM refresh count (FMC_SDRTR.COUNT field). This improves performance of the SDRAM when heating up. */
-  if (HAL_SDRAM_ProgramRefreshRate(hsdram, 120U) != HAL_OK)
+  /* 100MHz SDRAM clock: (64ms / 8192) * 100MHz - margin(20) = 761 */
+  if (HAL_SDRAM_ProgramRefreshRate(hsdram, 761U) != HAL_OK)
   {
     Error_Handler();
   }
@@ -287,9 +287,6 @@ int main(void)
   /* Enable Cortex-M7 instruction and data caches. */
   SCB_EnableICache();
   SCB_EnableDCache();
-
-  /* AXI bus-matrix QoS: enable read-issuing override on the FMC target. */
-  *((volatile uint32_t *)0x51008108U) |= 0x00000001U;
 
   /* USER CODE END Init */
 
@@ -681,6 +678,14 @@ static void MX_LTDC_Init(void)
   {
     Error_Handler();
   }
+
+  /* USER CODE BEGIN LTDC_Init 2 - AXI bus matrix QoS */
+
+  /* Give the LTDC initiator port the highest read priority on the AXI interconnect. */
+  WRITE_REG(GPV->AXI_INI5_READ_QOS,  0x0FU);
+  WRITE_REG(GPV->AXI_INI5_WRITE_QOS, 0x0FU);  /* harmless: LTDC is read-only */
+
+  /* USER CODE END LTDC_Init 2 - AXI bus matrix QoS */
   pLayerCfg.WindowX0 = 0;
   pLayerCfg.WindowX1 = 720;
   pLayerCfg.WindowY0 = 0;

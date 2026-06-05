@@ -86,6 +86,52 @@ extern "C" void touchgfxDisplayDriverTransmitBlock(const uint8_t* pixels,
     SCB_CleanDCache_by_Addr(reinterpret_cast<uint32_t*>(const_cast<uint8_t*>(pixels)),
                             static_cast<int32_t>(rowBytes * h));
 
+    /* Tear-avoidance gate: do NOT start the MDMA blit while LTDC's scan
+     * is currently inside the destination rect. If we did, MDMA writes
+     * would race the beam reading the same lines and visible
+     * glitching/flicker would result.
+     *
+     * LTDC->CPSR.CYPOS is the panel-line currently being shifted out
+     * (in panel coordinates including the back porch). Active-area line
+     * 0 maps to CYPOS = AccumulatedVBP + 1. So the danger window in
+     * CPSR coords is [avbp1 + y, avbp1 + y + h).
+     *
+     * Strategy:
+     *   - If CYPOS < danger_lo: LTDC is above our rect this frame.
+     *     MDMA has at least (danger_lo - CYPOS) line-times before
+     *     LTDC reaches our lines. With LTDC AXI priority bumped and
+     *     SDRAM bandwidth we have, MDMA finishes well within that.
+     *   - If CYPOS >= danger_hi: LTDC has already scanned past our
+     *     rect this frame. MDMA writes are safe; LTDC will only re-
+     *     read these lines on the next frame, by which time MDMA is
+     *     long done.
+     *   - If CYPOS in [danger_lo, danger_hi): LTDC is currently
+     *     reading our rect. Busy-wait until it leaves the danger
+     *     window (rolls past danger_hi or wraps around to start of
+     *     next frame).
+     *
+     * Cost: the busy-wait can stall the render task for at most one
+     * frame's-worth of scan-out across the rect height. For our
+     * 720x720 panel at 60 Hz that's ~22 us per scanline, so a 235-line
+     * gauge rect = ~5.2 ms worst case. In practice TouchGFX schedules
+     * blocks in y-order so we usually start above CYPOS and the wait
+     * is zero. */
+    {
+        extern LTDC_HandleTypeDef hltdc;
+        const uint32_t avbp1     = ((hltdc.Instance->BPCR & LTDC_BPCR_AVBP) >> LTDC_BPCR_AVBP_Pos) + 1U;
+        const uint32_t danger_lo = avbp1 + static_cast<uint32_t>(y);
+        const uint32_t danger_hi = danger_lo + static_cast<uint32_t>(h);
+        for (;;) {
+            const uint32_t cypos = (LTDC->CPSR & LTDC_CPSR_CYPOS_Msk) >> LTDC_CPSR_CYPOS_Pos;
+            if ((cypos < danger_lo) || (cypos >= danger_hi)) {
+                break;
+            }
+            /* Hot loop -- LTDC scan typically clears the rect within
+             * a few hundred microseconds. No need to yield: the
+             * render task is already the busy producer here. */
+        }
+    }
+
     s_transmitActive = 1;
 
     /* Patch only the destination block-update value (DUV, upper 16 bits
