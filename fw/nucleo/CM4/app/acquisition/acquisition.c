@@ -14,7 +14,8 @@
 extern ADC_HandleTypeDef hadc1;
 extern TIM_HandleTypeDef htim2;
 
-#define MEASUREMENT_PERIOD_MS 100
+#define MEASUREMENT_PERIOD_MS         100
+#define ROTATION_SPEED_TIMEOUT_CYCLES 10 // Number of measurement periods after which rotation speed is assumed to be 0 if no new pulse is captured
 
 #define ADC1_BUFFER_SIZE 3
 static volatile uint16_t adc1_buffer[ADC1_BUFFER_SIZE] = {0};
@@ -84,11 +85,20 @@ static void acquire_binary_sensors(void)
 
 static void start_pulse_sensors(void)
 {
+    static uint8_t timeout_counter = 0;
+
     if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) == HAL_OK) { // SENSOR_ID_ROTATION_SPEE
+        timeout_counter = 0;
         return;
     }
 
-    // Timer could not be started, because it is still running --> timeout after 0.1 s
+    ++timeout_counter;
+
+    if (timeout_counter < ROTATION_SPEED_TIMEOUT_CYCLES) {
+        return; // Timeout not yet reached
+    }
+
+    // Timer could not be started, because it is still running --> timeout after 1 s
     // Therefore, reset the timer and send 0 pulses per minute
     HAL_TIM_IC_Stop_IT(&htim2, TIM_CHANNEL_1);
     tim2_is_first_capture = true;
@@ -99,6 +109,8 @@ static void start_pulse_sensors(void)
     if (xQueueSend(queue_data_raw, &rotation_speed, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
         HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: xQueueSend error\n", strlen("acquisition: xQueueSend error\n"), HAL_MAX_DELAY);
     }
+
+    timeout_counter = 0;
 }
 
 static int16_t pulse_period_to_pulses_per_minute(uint32_t pulse_period_us)
