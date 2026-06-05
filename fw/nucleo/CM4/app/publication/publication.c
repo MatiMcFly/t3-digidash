@@ -56,8 +56,8 @@ void publication_task(void* params)
                 snprintf(string, sizeof(string), "Oil Pressure 1.8 bar: %d\n", data.value);
                 break;
 
-            case SENSOR_ID_ROTATION_SPEED:
-                snprintf(string, sizeof(string), "Rotation Speed:       %d rpm\n", data.value);
+            case SENSOR_ID_MOTOR_RPM:
+                snprintf(string, sizeof(string), "Motor RPM:            %d rpm\n", data.value);
                 break;
 
             default:
