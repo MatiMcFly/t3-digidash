@@ -35,7 +35,7 @@ static float adc_to_voltage(uint16_t raw_value)
  *
  * @return int16_t -- Temperature in deci-°C (e.g., 234 means 23.4°C)
  */
-int16_t convert_coolant_temperature(uint16_t raw_value)
+int16_t conversion_coolant_temperature(uint16_t raw_value)
 {
     const float R2_OHM = 470.0f;
     const float R0_OHM = 1100.0f;
@@ -67,7 +67,7 @@ int16_t convert_coolant_temperature(uint16_t raw_value)
  *
  * @return int16_t -- Battery voltage in centi-V (e.g., 1234 means 12.34V)
  */
-int16_t convert_battery_voltage(uint16_t raw_value)
+int16_t conversion_battery_voltage(uint16_t raw_value)
 {
     const float R4_OHM = 10000.0f;
     const float R5_OHM = 2200.0f;
@@ -86,7 +86,7 @@ int16_t convert_battery_voltage(uint16_t raw_value)
  *
  * @return int16_t -- Fuel level in deci-l (e.g., 123 means 12.3 l)
  */
-int16_t convert_fuel_level(uint16_t raw_value)
+int16_t conversion_fuel_level(uint16_t raw_value)
 {
     const float R1_OHM   = 330.0f;
     const float VOL0_L   = 80.8f;
@@ -111,7 +111,7 @@ int16_t convert_fuel_level(uint16_t raw_value)
  *
  * @return int16_t -- Rotation speed in RPM (e.g., 1000 means 1000 RPM)
  */
-int16_t convert_motor_rpm(uint16_t pulses_per_min)
+int16_t conversion_motor_rpm(uint16_t pulses_per_min)
 {
     // 1 motor rotation generates 4 pulses
     // ==> pulses_per_min / 4 --> RPM

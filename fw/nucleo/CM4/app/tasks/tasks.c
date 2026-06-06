@@ -30,10 +30,10 @@ void acquisition_task(void* params)
         }
 
         // Read all binary sensors
-        acquire_binary_sensors();
+        acquisition_binary_sensors();
 
         // Start all pulse sensor acquisitions
-        start_pulse_sensors();
+        acquisition_pulse_sensors();
 
         vTaskDelayUntil(&last_wakeup, pdMS_TO_TICKS(MEASUREMENT_PERIOD_MS));
     }
@@ -57,15 +57,15 @@ void conversion_task(void* params)
 
         switch (data.id) {
             case SENSOR_ID_COOLANT_TEMPERATURE:
-                data.value = convert_coolant_temperature(data.value);
+                data.value = conversion_coolant_temperature(data.value);
                 break;
 
             case SENSOR_ID_BATTERY_VOLTAGE:
-                data.value = convert_battery_voltage(data.value);
+                data.value = conversion_battery_voltage(data.value);
                 break;
 
             case SENSOR_ID_FUEL_LEVEL:
-                data.value = convert_fuel_level(data.value);
+                data.value = conversion_fuel_level(data.value);
                 break;
 
             case SENSOR_ID_TURN_SIGNAL:
@@ -76,7 +76,7 @@ void conversion_task(void* params)
                 break;
 
             case SENSOR_ID_MOTOR_RPM:
-                data.value = convert_motor_rpm(data.value);
+                data.value = conversion_motor_rpm(data.value);
                 break;
 
             default:
@@ -108,35 +108,35 @@ void filtering_task(void* params)
 
         switch (data.id) {
             case SENSOR_ID_COOLANT_TEMPERATURE:
-                data.value = filter_coolant_temperature(data.value);
+                data.value = filtering_filter_coolant_temperature(data.value);
                 break;
 
             case SENSOR_ID_BATTERY_VOLTAGE:
-                data.value = filter_battery_voltage(data.value);
+                data.value = filtering_filter_battery_voltage(data.value);
                 break;
 
             case SENSOR_ID_FUEL_LEVEL:
-                data.value = filter_fuel_level(data.value);
+                data.value = filtering_filter_fuel_level(data.value);
                 break;
 
             case SENSOR_ID_TURN_SIGNAL:
-                data.value = debounce_turn_signal(data.value);
+                data.value = filtering_debounce_turn_signal(data.value);
                 break;
 
             case SENSOR_ID_HIGH_BEAM:
-                data.value = debounce_high_beam(data.value);
+                data.value = filtering_debounce_high_beam(data.value);
                 break;
 
             case SENSOR_ID_OIL_PRESSURE_0_3_BAR:
-                data.value = debounce_oil_pressure_0_3_bar(data.value);
+                data.value = filtering_debounce_oil_pressure_0_3_bar(data.value);
                 break;
 
             case SENSOR_ID_OIL_PRESSURE_1_8_BAR:
-                data.value = debounce_oil_pressure_1_8_bar(data.value);
+                data.value = filtering_debounce_oil_pressure_1_8_bar(data.value);
                 break;
 
             case SENSOR_ID_MOTOR_RPM:
-                data.value = filter_motor_rpm(data.value);
+                data.value = filtering_filter_motor_rpm(data.value);
                 break;
 
             default:

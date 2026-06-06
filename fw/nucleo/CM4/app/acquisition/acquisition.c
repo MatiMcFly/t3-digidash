@@ -21,7 +21,7 @@ static volatile bool tim2_is_first_capture = true;
 
 static int16_t pulse_period_to_pulses_per_minute(uint32_t pulse_period_us);
 
-void acquire_binary_sensors(void)
+void acquisition_binary_sensors(void)
 {
     sensor_data_t turn_signal          = {.id = SENSOR_ID_TURN_SIGNAL, .value = 0};
     sensor_data_t high_beam            = {.id = SENSOR_ID_HIGH_BEAM, .value = 0};
@@ -50,7 +50,7 @@ void acquire_binary_sensors(void)
     }
 }
 
-void start_pulse_sensors(void)
+void acquisition_pulse_sensors(void)
 {
     static uint8_t timeout_counter = 0;
 
