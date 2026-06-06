@@ -4,10 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "FreeRTOS.h"
 #include "app.h"
-#include "queue.h"
-#include "shared.h"
 
 #define FILTER_SIZE_COOLANT_TEMPERATURE 20
 #define FILTER_SIZE_BATTERY_VOLTAGE     20

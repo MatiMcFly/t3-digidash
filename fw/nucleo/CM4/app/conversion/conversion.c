@@ -5,11 +5,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "FreeRTOS.h"
-#include "app.h"
-#include "queue.h"
-#include "shared.h"
-
 static float adc_to_voltage(uint16_t raw_value);
 
 static const float VREF_V = 3.3f;
