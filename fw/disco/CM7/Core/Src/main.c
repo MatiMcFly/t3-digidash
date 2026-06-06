@@ -657,6 +657,10 @@ static void MX_LTDC_Init(void)
 
   /* USER CODE BEGIN LTDC_Init 1 */
 
+  /* Give the LTDC initiator port the highest read priority on the AXI interconnect. */
+  WRITE_REG(GPV->AXI_INI5_READ_QOS,  0x0FU);
+  WRITE_REG(GPV->AXI_INI5_WRITE_QOS, 0x0FU);  /* harmless: LTDC is read-only */
+
   /* USER CODE END LTDC_Init 1 */
   hltdc.Instance = LTDC;
   hltdc.Init.HSPolarity = LTDC_HSPOLARITY_AL;
@@ -678,14 +682,6 @@ static void MX_LTDC_Init(void)
   {
     Error_Handler();
   }
-
-  /* USER CODE BEGIN LTDC_Init 2 - AXI bus matrix QoS */
-
-  /* Give the LTDC initiator port the highest read priority on the AXI interconnect. */
-  WRITE_REG(GPV->AXI_INI5_READ_QOS,  0x0FU);
-  WRITE_REG(GPV->AXI_INI5_WRITE_QOS, 0x0FU);  /* harmless: LTDC is read-only */
-
-  /* USER CODE END LTDC_Init 2 - AXI bus matrix QoS */
   pLayerCfg.WindowX0 = 0;
   pLayerCfg.WindowX1 = 720;
   pLayerCfg.WindowY0 = 0;
