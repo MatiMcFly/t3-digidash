@@ -1,0 +1,420 @@
+{
+  "Application": {
+    "Screens": [
+      {
+        "Name": "screen",
+        "CanvasBufferSize": 10800,
+        "Components": [
+          {
+            "Type": "Box",
+            "Name": "box1",
+            "Width": 720,
+            "Height": 720,
+            "Color": {
+              "Red": 10,
+              "Green": 10,
+              "Blue": 10
+            }
+          },
+          {
+            "Type": "Image",
+            "Name": "rpm_scale",
+            "X": 1,
+            "Y": -1,
+            "Width": 720,
+            "Height": 712,
+            "LockPosition": true,
+            "RelativeFilename": "t3-rpm-scale.png"
+          },
+          {
+            "Type": "TextureMapper",
+            "Name": "rpm_needle",
+            "Width": 720,
+            "Height": 609,
+            "LockPosition": true,
+            "RenderingAlgorithm": "Nearest-neighbor",
+            "FileNameImage": "t3-rpm-gauge.png",
+            "XBitmapPosition": 23.5,
+            "YBitmapPosition": 316.0,
+            "Scale": 1.0,
+            "XOrigo": 358.0,
+            "YOrigo": 350.5,
+            "ZOrigo": 1000.0,
+            "CameraDistance": 1000.0
+          },
+          {
+            "Type": "Container",
+            "Name": "cont_temp_gauge",
+            "X": 33,
+            "Y": 454,
+            "Width": 242,
+            "Height": 235,
+            "Components": [
+              {
+                "Type": "Image",
+                "Name": "img_temp_scale",
+                "Width": 242,
+                "Height": 235,
+                "RelativeFilename": "t3-temperature-scale.png"
+              },
+              {
+                "Type": "Circle",
+                "Name": "bg_overtemp",
+                "X": 96,
+                "Y": 113,
+                "Width": 32,
+                "Height": 33,
+                "Color": {
+                  "Red": 8
+                },
+                "CenterX": 16.0,
+                "CenterY": 16.0,
+                "Radius": 16.0,
+                "EndAngle": 360.0,
+                "CapPrecision": "Butt"
+              },
+              {
+                "Type": "Circle",
+                "Name": "led_overtemp",
+                "X": 98,
+                "Y": 115,
+                "Width": 28,
+                "Height": 30,
+                "Color": {
+                  "Red": 18
+                },
+                "CenterX": 14.0,
+                "CenterY": 14.0,
+                "Radius": 14.0,
+                "EndAngle": 360.0,
+                "CapPrecision": "Butt"
+              },
+              {
+                "Type": "TextureMapper",
+                "Name": "temperature_needle",
+                "X": 24,
+                "Y": -322,
+                "Width": 505,
+                "Height": 535,
+                "RenderingAlgorithm": "Nearest-neighbor",
+                "FileNameImage": "t3-aux-needle.png",
+                "XBitmapPosition": 281.1,
+                "YBitmapPosition": 445.2,
+                "ZAngle": 0.55,
+                "Scale": 1.0,
+                "LockOrigoToCenter": true,
+                "XOrigo": 252.5,
+                "YOrigo": 267.5,
+                "ZOrigo": 1000.0,
+                "CameraDistance": 1000.0
+              }
+            ]
+          },
+          {
+            "Type": "Container",
+            "Name": "cont_fuel_gauge",
+            "X": 435,
+            "Y": 454,
+            "Width": 254,
+            "Height": 232,
+            "Components": [
+              {
+                "Type": "Image",
+                "Name": "img_fuel_scale",
+                "Width": 254,
+                "Height": 235,
+                "RelativeFilename": "t3-fuel-scale.png"
+              },
+              {
+                "Type": "TextureMapper",
+                "Name": "fuel_needle",
+                "X": -250,
+                "Y": -299,
+                "Width": 467,
+                "Height": 489,
+                "RenderingAlgorithm": "Nearest-neighbor",
+                "FileNameImage": "t3-aux-needle.png",
+                "XBitmapPosition": 263.8,
+                "YBitmapPosition": 413.7,
+                "ZAngle": 6.2,
+                "Scale": 1.0,
+                "LockOrigoToCenter": true,
+                "XOrigo": 233.5,
+                "YOrigo": 244.5,
+                "ZOrigo": 1000.0,
+                "CameraDistance": 1000.0
+              }
+            ]
+          },
+          {
+            "Type": "Container",
+            "Name": "cont_middle_disp",
+            "X": 275,
+            "Y": 467,
+            "Width": 160,
+            "Height": 235,
+            "Components": [
+              {
+                "Type": "Container",
+                "Name": "cont_battery",
+                "X": 80,
+                "Y": 117,
+                "Width": 79,
+                "Height": 96,
+                "Components": [
+                  {
+                    "Type": "Image",
+                    "Name": "img_battery",
+                    "X": 14,
+                    "Y": -1,
+                    "Width": 52,
+                    "Height": 47,
+                    "RelativeFilename": "t3-battery-icon.png"
+                  },
+                  {
+                    "Type": "Circle",
+                    "Name": "bg_battery",
+                    "X": 24,
+                    "Y": 57,
+                    "Width": 32,
+                    "Height": 33,
+                    "Color": {
+                      "Red": 8
+                    },
+                    "CenterX": 16.0,
+                    "CenterY": 16.0,
+                    "Radius": 16.0,
+                    "EndAngle": 360.0,
+                    "CapPrecision": "Butt"
+                  },
+                  {
+                    "Type": "Circle",
+                    "Name": "led_battery",
+                    "X": 26,
+                    "Y": 59,
+                    "Width": 28,
+                    "Height": 30,
+                    "Color": {
+                      "Red": 18
+                    },
+                    "CenterX": 14.0,
+                    "CenterY": 14.0,
+                    "Radius": 14.0,
+                    "EndAngle": 360.0,
+                    "CapPrecision": "Butt"
+                  }
+                ]
+              },
+              {
+                "Type": "Container",
+                "Name": "cont_oil",
+                "X": 1,
+                "Y": 117,
+                "Width": 79,
+                "Height": 96,
+                "Components": [
+                  {
+                    "Type": "Image",
+                    "Name": "img_oil",
+                    "X": 12,
+                    "Y": 17,
+                    "Width": 57,
+                    "Height": 21,
+                    "RelativeFilename": "t3-oil-icon.png"
+                  },
+                  {
+                    "Type": "Circle",
+                    "Name": "bg_oil",
+                    "X": 25,
+                    "Y": 57,
+                    "Width": 32,
+                    "Height": 33,
+                    "Color": {
+                      "Red": 8
+                    },
+                    "CenterX": 16.0,
+                    "CenterY": 16.0,
+                    "Radius": 16.0,
+                    "EndAngle": 360.0,
+                    "CapPrecision": "Butt"
+                  },
+                  {
+                    "Type": "Circle",
+                    "Name": "led_oil",
+                    "X": 27,
+                    "Y": 59,
+                    "Width": 28,
+                    "Height": 30,
+                    "LockPosition": true,
+                    "Color": {
+                      "Red": 18
+                    },
+                    "CenterX": 14.0,
+                    "CenterY": 14.0,
+                    "Radius": 14.0,
+                    "EndAngle": 360.0,
+                    "CapPrecision": "Butt"
+                  }
+                ]
+              },
+              {
+                "Type": "Container",
+                "Name": "cont_high_beam",
+                "X": 80,
+                "Width": 79,
+                "Height": 96,
+                "Components": [
+                  {
+                    "Type": "Image",
+                    "Name": "img_high_beam",
+                    "X": 14,
+                    "Y": 9,
+                    "Width": 50,
+                    "Height": 30,
+                    "RelativeFilename": "t3-high-beam-icon.png"
+                  },
+                  {
+                    "Type": "Circle",
+                    "Name": "bg_high_beam",
+                    "X": 23,
+                    "Y": 48,
+                    "Width": 32,
+                    "Height": 33,
+                    "Color": {
+                      "Blue": 8
+                    },
+                    "CenterX": 16.0,
+                    "CenterY": 16.0,
+                    "Radius": 16.0,
+                    "EndAngle": 360.0,
+                    "CapPrecision": "Butt"
+                  },
+                  {
+                    "Type": "Circle",
+                    "Name": "led_high_beam",
+                    "X": 25,
+                    "Y": 50,
+                    "Width": 28,
+                    "Height": 30,
+                    "Color": {
+                      "Blue": 18
+                    },
+                    "CenterX": 14.0,
+                    "CenterY": 14.0,
+                    "Radius": 14.0,
+                    "EndAngle": 360.0,
+                    "CapPrecision": "Butt"
+                  }
+                ]
+              },
+              {
+                "Type": "Container",
+                "Name": "cont_indicator",
+                "X": 1,
+                "Width": 79,
+                "Height": 96,
+                "Components": [
+                  {
+                    "Type": "Image",
+                    "Name": "img_indicator",
+                    "X": 14,
+                    "Y": 12,
+                    "Width": 55,
+                    "Height": 24,
+                    "RelativeFilename": "t3-indicator-icon.png"
+                  },
+                  {
+                    "Type": "Circle",
+                    "Name": "bg_indicator",
+                    "X": 25,
+                    "Y": 48,
+                    "Width": 32,
+                    "Height": 33,
+                    "Color": {
+                      "Green": 8
+                    },
+                    "CenterX": 16.0,
+                    "CenterY": 16.0,
+                    "Radius": 16.0,
+                    "EndAngle": 360.0,
+                    "CapPrecision": "Butt"
+                  },
+                  {
+                    "Type": "Circle",
+                    "Name": "led_indicator",
+                    "X": 27,
+                    "Y": 50,
+                    "Width": 28,
+                    "Height": 30,
+                    "Color": {
+                      "Green": 18
+                    },
+                    "CenterX": 14.0,
+                    "CenterY": 14.0,
+                    "Radius": 14.0,
+                    "EndAngle": 360.0,
+                    "CapPrecision": "Butt"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "Interactions": []
+      }
+    ],
+    "CustomContainerDefinitions": [],
+    "Name": "t3_dash",
+    "Resolution": {
+      "Width": 720,
+      "Height": 720
+    },
+    "SelectedColorDepth": 24,
+    "StartupScreenName": "screen",
+    "SelectedStartupLanguage": "GB",
+    "TouchGfxPath": "../Middlewares/ST/touchgfx",
+    "UIPath": ".",
+    "AvailableColorDepths": [
+      24
+    ],
+    "AvailableLCDs": {
+      "24": "LCD24bpp"
+    },
+    "AvailableSections": [
+      "ExtFlashSection",
+      "IntFlashSection"
+    ],
+    "AvailableResolutions": [
+      {
+        "Width": 720,
+        "Height": 720
+      }
+    ],
+    "PhysicalButtons": [],
+    "FrameworkFeatures": {
+      "LCD24bpp": {
+        "Id": "LCD24bpp",
+        "IsEnabled": true
+      }
+    },
+    "GenerateAssetsCommand": "make -f simulator/gcc/Makefile assets -j8",
+    "PostGenerateCommand": "touchgfx update_project --project-file=simulator/msvs/Application.vcxproj",
+    "PostGenerateTargetCommand": "touchgfx update_project",
+    "CompileSimulatorCommand": "make -f simulator/gcc/Makefile -j8",
+    "RunSimulatorCommand": "build\\bin\\simulator.exe",
+    "LandscapeSkinX": 0,
+    "LandscapeSkinY": 0,
+    "PortraitSkinX": 0,
+    "PortraitSkinY": 0,
+    "DisplayOrientation": "Landscape",
+    "Family": "STM32H7",
+    "SubFamily": "STM32H747/757",
+    "Toolchain": "CMake",
+    "Platform": "m7",
+    "ProjectFile": "../../t3_dash.ioc",
+    "OptionalComponentsRoot": "../Middlewares/ST/touchgfx_components",
+    "OptionalComponents": [],
+    "AdditionalFeatures": []
+  },
+  "Version": "4.26.1"
+}

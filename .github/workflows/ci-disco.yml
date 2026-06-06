@@ -1,0 +1,35 @@
+name: CI Disco
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'fw/disco/**'
+      - '.github/workflows/ci-disco.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        core: [CM4, CM7]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build gcc-arm-none-eabi
+
+      - name: Configure
+        working-directory: fw/disco/${{ matrix.core }}
+        run: cmake --preset Debug
+
+      - name: Build
+        working-directory: fw/disco/${{ matrix.core }}
+        run: cmake --build --preset Debug

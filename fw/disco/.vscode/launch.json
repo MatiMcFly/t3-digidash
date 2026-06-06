@@ -1,0 +1,58 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "CM7_Debug",
+            "type": "stlinkgdbtarget",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "preBuild": "${command:st-stm32-ide-debug-launch.build}",
+            "runEntry": "main",
+            "serverShared": true,
+            "serverHaltAllCores": false,
+            "imagesAndSymbols": [
+                {
+                    "imageFileName": "${workspaceFolder}/CM4/build/t3_dash_CM4.elf",
+                    "symbolFileName": "${workspaceFolder}/CM4/build/t3_dash_CM4.elf"
+                },
+                {
+                    "imageFileName": "${workspaceFolder}/CM7/build/t3_dash_CM7.elf",
+                    "symbolFileName": "${workspaceFolder}/CM7/build/t3_dash_CM7.elf"
+                }
+            ],
+            "serverExtLoader": [
+                {
+                    "loader": "C:/ST/STM32CubeCLT_1.21.0/STM32CubeProgrammer/bin/ExternalLoader/MT25TL01G_STM32H747I-DISCO.stldr",
+                    "initialize": true
+                }
+            ],
+            "verbose": false
+        },
+        {
+            "name": "CM4_Debug",
+            "type": "stlinkgdbtarget",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "runEntry": "main",
+            "serverShared": true,
+            "serverApID": "3",
+            "serverPort": "61239",
+            "serverReset": "None",
+            "imagesAndSymbols": [
+                {
+                    "symbolFileName": "${workspaceFolder}/CM4/build/t3_dash_CM4.elf"
+                }
+            ],
+            "verbose": false
+        }
+    ],
+    "compounds": [
+        {
+            "name": "DualCore_Debug",
+            "configurations": [
+                "CM7_Debug",
+                "CM4_Debug"
+            ]
+        }
+    ]
+}
