@@ -41,6 +41,25 @@ screenView::screenView()
 void screenView::setupScreen()
 {
     screenViewBase::setupScreen();
+
+    /* Paint LEDs to a known safe-default state at screen entry. Until
+     * the first matching telemetry sample arrives, the dashboard
+     * shows the oil and battery warning lamps LIT ("unknown == bad")
+     * and the rest dark. We force the cache to the opposite of the
+     * desired state so led_set() actually invalidates this frame --
+     * the constructor leaves ledState[] all-false. */
+    static constexpr struct { Led led; bool on; } kDefaults[] = {
+        { Led::HighBeam,  false },
+        { Led::Indicator, false },
+        { Led::Overtemp,  false },
+        { Led::Oil,       true  },
+        { Led::Battery,   true  },
+    };
+    for (const auto& d : kDefaults)
+    {
+        ledState[static_cast<int>(d.led)] = !d.on;
+        led_set(d.led, d.on);
+    }
 }
 
 void screenView::tearDownScreen()
