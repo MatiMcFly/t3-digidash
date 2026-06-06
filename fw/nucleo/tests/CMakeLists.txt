@@ -43,3 +43,24 @@ else()
 endif()
 
 add_test(NAME conversion_tests COMMAND conversion_tests)
+
+add_executable(filtering_tests
+    filtering_tests.c
+    ../CM4/app/filtering/filtering.c
+)
+
+target_include_directories(filtering_tests PRIVATE
+    ../CM4/app/filtering
+)
+
+target_compile_definitions(filtering_tests PRIVATE
+    UNIT_TEST
+)
+
+if(NOT MSVC)
+    target_link_libraries(filtering_tests PRIVATE unity_framework)
+else()
+    target_link_libraries(filtering_tests PRIVATE unity_framework)
+endif()
+
+add_test(NAME filtering_tests COMMAND filtering_tests)
