@@ -4,120 +4,29 @@
 #include <stdint.h>
 #include <string.h>
 
+#ifndef UNIT_TEST
 #include "app.h"
-
-#define FILTER_SIZE_COOLANT_TEMPERATURE 20
-#define FILTER_SIZE_BATTERY_VOLTAGE     20
-#define FILTER_SIZE_FUEL_LEVEL          300
-#define FILTER_SIZE_MOTOR_RPM           2
-
-#define DEBOUNCE_SIZE_TURN_SIGNAL          2
-#define DEBOUNCE_SIZE_HIGH_BEAM            2
-#define DEBOUNCE_SIZE_OIL_PRESSURE_0_3_BAR 2
-#define DEBOUNCE_SIZE_OIL_PRESSURE_1_8_BAR 2
+#endif
 
 static void    ringbuf_update(int16_t ringbuf[], uint16_t size, uint16_t* index, int16_t value);
 static int16_t ringbuf_mean(int16_t ringbuf[], uint16_t size);
 static bool    ringbuf_is_consistent(int16_t ringbuf[], uint16_t size);
 
-int16_t filtering_filter_coolant_temperature(int16_t value)
+int16_t filtering_moving_average(int16_t ringbuf[], uint16_t size, uint16_t* index, int16_t value)
 {
-    static int16_t  ringbuf[FILTER_SIZE_COOLANT_TEMPERATURE] = {0};
-    static uint16_t index                                    = 0;
-
-    ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
-
-    return ringbuf_mean(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]));
+    ringbuf_update(ringbuf, size, index, value);
+    return ringbuf_mean(ringbuf, size);
 }
 
-int16_t filtering_filter_battery_voltage(int16_t value)
+int16_t filtering_debounce(int16_t ringbuf[], uint16_t size, uint16_t* index, int16_t value, int16_t* value_previous)
 {
-    static int16_t  ringbuf[FILTER_SIZE_BATTERY_VOLTAGE] = {0};
-    static uint16_t index                                = 0;
+    ringbuf_update(ringbuf, size, index, value);
 
-    ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
-
-    return ringbuf_mean(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]));
-}
-
-int16_t filtering_filter_fuel_level(int16_t value)
-{
-    static int16_t  ringbuf[FILTER_SIZE_FUEL_LEVEL] = {0};
-    static uint16_t index                           = 0;
-
-    ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
-
-    return ringbuf_mean(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]));
-}
-
-int16_t filtering_filter_motor_rpm(int16_t value)
-{
-    static int16_t  ringbuf[FILTER_SIZE_MOTOR_RPM] = {0};
-    static uint16_t index                          = 0;
-
-    ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
-
-    return ringbuf_mean(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]));
-}
-
-int16_t filtering_debounce_turn_signal(int16_t value)
-{
-    static int16_t  ringbuf[DEBOUNCE_SIZE_TURN_SIGNAL] = {0};
-    static uint16_t index                              = 0;
-    static int16_t  previous_value                     = 0;
-
-    ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
-
-    if (ringbuf_is_consistent(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]))) {
-        previous_value = value;
+    if (ringbuf_is_consistent(ringbuf, size)) {
+        *value_previous = value;
     }
 
-    return previous_value;
-}
-
-int16_t filtering_debounce_high_beam(int16_t value)
-{
-    static int16_t  ringbuf[DEBOUNCE_SIZE_HIGH_BEAM] = {0};
-    static uint16_t index                            = 0;
-    static int16_t  previous_value                   = 0;
-
-    ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
-
-    if (ringbuf_is_consistent(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]))) {
-        previous_value = value;
-    }
-
-    return previous_value;
-}
-
-int16_t filtering_debounce_oil_pressure_0_3_bar(int16_t value)
-{
-    static int16_t  ringbuf[DEBOUNCE_SIZE_OIL_PRESSURE_0_3_BAR] = {0};
-    static uint16_t index                                       = 0;
-    static int16_t  previous_value                              = 0;
-
-    ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
-
-    if (ringbuf_is_consistent(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]))) {
-        previous_value = value;
-    }
-
-    return previous_value;
-}
-
-int16_t filtering_debounce_oil_pressure_1_8_bar(int16_t value)
-{
-    static int16_t  ringbuf[DEBOUNCE_SIZE_OIL_PRESSURE_1_8_BAR] = {0};
-    static uint16_t index                                       = 0;
-    static int16_t  previous_value                              = 0;
-
-    ringbuf_update(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]), &index, value);
-
-    if (ringbuf_is_consistent(ringbuf, sizeof(ringbuf) / sizeof(ringbuf[0]))) {
-        previous_value = value;
-    }
-
-    return previous_value;
+    return *value_previous;
 }
 
 /**
@@ -131,12 +40,16 @@ int16_t filtering_debounce_oil_pressure_1_8_bar(int16_t value)
 static void ringbuf_update(int16_t ringbuf[], uint16_t size, uint16_t* index, int16_t value)
 {
     if (size == 0) {
+#ifndef UNIT_TEST
         HAL_UART_Transmit(&huart3, (uint8_t*)"ringbuf_update: Size cannot be zero\n", strlen("ringbuf_update: Size cannot be zero\n"), HAL_MAX_DELAY);
+#endif
         return; // Invalid size
     }
 
     if (*index >= size) {
+#ifndef UNIT_TEST
         HAL_UART_Transmit(&huart3, (uint8_t*)"ringbuf_update: Invalid index\n", strlen("ringbuf_update: Invalid index\n"), HAL_MAX_DELAY);
+#endif
         *index = 0;
         return; // Invalid index
     }
@@ -158,7 +71,9 @@ static int16_t ringbuf_mean(int16_t ringbuf[], uint16_t size)
     int32_t sum = 0;
 
     if (size == 0) {
+#ifndef UNIT_TEST
         HAL_UART_Transmit(&huart3, (uint8_t*)"ringbuf_mean: Size cannot be zero\n", strlen("ringbuf_mean: Size cannot be zero\n"), HAL_MAX_DELAY);
+#endif
         return 0; // Invalid size
     }
 
@@ -181,7 +96,9 @@ static int16_t ringbuf_mean(int16_t ringbuf[], uint16_t size)
 static bool ringbuf_is_consistent(int16_t ringbuf[], uint16_t size)
 {
     if (size == 0) {
+#ifndef UNIT_TEST
         HAL_UART_Transmit(&huart3, (uint8_t*)"ringbuf_is_consistent: Size cannot be zero\n", strlen("ringbuf_is_consistent: Size cannot be zero\n"), HAL_MAX_DELAY);
+#endif
         return false; // Invalid size
     }
 

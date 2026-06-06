@@ -90,6 +90,16 @@ void conversion_task(void* params)
     }
 }
 
+#define FILTER_SIZE_COOLANT_TEMPERATURE 20
+#define FILTER_SIZE_BATTERY_VOLTAGE     20
+#define FILTER_SIZE_FUEL_LEVEL          300
+#define FILTER_SIZE_MOTOR_RPM           2
+
+#define DEBOUNCE_SIZE_TURN_SIGNAL          2
+#define DEBOUNCE_SIZE_HIGH_BEAM            2
+#define DEBOUNCE_SIZE_OIL_PRESSURE_0_3_BAR 2
+#define DEBOUNCE_SIZE_OIL_PRESSURE_1_8_BAR 2
+
 /**
  * @brief Filtering task for sensor data
  *
@@ -98,6 +108,34 @@ void conversion_task(void* params)
 void filtering_task(void* params)
 {
     sensor_data_t data;
+
+    int16_t  coolant_temperature_ringbuf[FILTER_SIZE_COOLANT_TEMPERATURE] = {0};
+    uint16_t coolant_temperature_index                                    = 0;
+
+    int16_t  battery_voltage_ringbuf[FILTER_SIZE_BATTERY_VOLTAGE] = {0};
+    uint16_t battery_voltage_index                                = 0;
+
+    int16_t  fuel_level_ringbuf[FILTER_SIZE_FUEL_LEVEL] = {0};
+    uint16_t fuel_level_index                           = 0;
+
+    int16_t  motor_rpm_ringbuf[FILTER_SIZE_MOTOR_RPM] = {0};
+    uint16_t motor_rpm_index                          = 0;
+
+    int16_t  turn_signal_ringbuf[DEBOUNCE_SIZE_TURN_SIGNAL] = {0};
+    uint16_t turn_signal_index                              = 0;
+    int16_t  turn_signal_value_previous                     = 0;
+
+    int16_t  high_beam_ringbuf[DEBOUNCE_SIZE_HIGH_BEAM] = {0};
+    uint16_t high_beam_index                            = 0;
+    int16_t  high_beam_value_previous                   = 0;
+
+    int16_t  oil_pressure_0_3_bar_ringbuf[DEBOUNCE_SIZE_OIL_PRESSURE_0_3_BAR] = {0};
+    uint16_t oil_pressure_0_3_bar_index                                       = 0;
+    int16_t  oil_pressure_0_3_bar_value_previous                              = 0;
+
+    int16_t  oil_pressure_1_8_bar_ringbuf[DEBOUNCE_SIZE_OIL_PRESSURE_1_8_BAR] = {0};
+    uint16_t oil_pressure_1_8_bar_index                                       = 0;
+    int16_t  oil_pressure_1_8_bar_value_previous                              = 0;
 
     (void)params; // Unused
 
@@ -108,35 +146,35 @@ void filtering_task(void* params)
 
         switch (data.id) {
             case SENSOR_ID_COOLANT_TEMPERATURE:
-                data.value = filtering_filter_coolant_temperature(data.value);
+                data.value = filtering_moving_average(coolant_temperature_ringbuf, FILTER_SIZE_COOLANT_TEMPERATURE, &coolant_temperature_index, data.value);
                 break;
 
             case SENSOR_ID_BATTERY_VOLTAGE:
-                data.value = filtering_filter_battery_voltage(data.value);
+                data.value = filtering_moving_average(battery_voltage_ringbuf, FILTER_SIZE_BATTERY_VOLTAGE, &battery_voltage_index, data.value);
                 break;
 
             case SENSOR_ID_FUEL_LEVEL:
-                data.value = filtering_filter_fuel_level(data.value);
+                data.value = filtering_moving_average(fuel_level_ringbuf, FILTER_SIZE_FUEL_LEVEL, &fuel_level_index, data.value);
                 break;
 
             case SENSOR_ID_TURN_SIGNAL:
-                data.value = filtering_debounce_turn_signal(data.value);
+                data.value = filtering_debounce(turn_signal_ringbuf, DEBOUNCE_SIZE_TURN_SIGNAL, &turn_signal_index, data.value, &turn_signal_value_previous);
                 break;
 
             case SENSOR_ID_HIGH_BEAM:
-                data.value = filtering_debounce_high_beam(data.value);
+                data.value = filtering_debounce(high_beam_ringbuf, DEBOUNCE_SIZE_HIGH_BEAM, &high_beam_index, data.value, &high_beam_value_previous);
                 break;
 
             case SENSOR_ID_OIL_PRESSURE_0_3_BAR:
-                data.value = filtering_debounce_oil_pressure_0_3_bar(data.value);
+                data.value = filtering_debounce(oil_pressure_0_3_bar_ringbuf, DEBOUNCE_SIZE_OIL_PRESSURE_0_3_BAR, &oil_pressure_0_3_bar_index, data.value, &oil_pressure_0_3_bar_value_previous);
                 break;
 
             case SENSOR_ID_OIL_PRESSURE_1_8_BAR:
-                data.value = filtering_debounce_oil_pressure_1_8_bar(data.value);
+                data.value = filtering_debounce(oil_pressure_1_8_bar_ringbuf, DEBOUNCE_SIZE_OIL_PRESSURE_1_8_BAR, &oil_pressure_1_8_bar_index, data.value, &oil_pressure_1_8_bar_value_previous);
                 break;
 
             case SENSOR_ID_MOTOR_RPM:
-                data.value = filtering_filter_motor_rpm(data.value);
+                data.value = filtering_moving_average(motor_rpm_ringbuf, FILTER_SIZE_MOTOR_RPM, &motor_rpm_index, data.value);
                 break;
 
             default:
