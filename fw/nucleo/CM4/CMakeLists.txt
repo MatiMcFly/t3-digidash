@@ -55,6 +55,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
     ../Common/Inc
     app/
+    app/tasks/
     app/acquisition/
     app/conversion/
     app/filtering/
@@ -73,6 +74,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../FreeRTOS ${CMAKE_BINARY_DIR}/Fre
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
     app/app.c
+    app/tasks/tasks.c
     app/acquisition/acquisition.c
     app/conversion/conversion.c
     app/filtering/filtering.c

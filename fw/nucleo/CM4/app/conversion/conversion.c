@@ -10,64 +10,9 @@
 #include "queue.h"
 #include "shared.h"
 
-static float   adc_to_voltage(uint16_t raw_value);
-static int16_t convert_coolant_temperature(uint16_t raw_value);
-static int16_t convert_battery_voltage(uint16_t raw_value);
-static int16_t convert_fuel_level(uint16_t raw_value);
-static int16_t convert_motor_rpm(uint16_t pulses_per_min);
+static float adc_to_voltage(uint16_t raw_value);
 
 static const float VREF_V = 3.3f;
-
-/**
- * @brief Conversion task for sensor data
- *
- * @param params -- Unused
- */
-void conversion_task(void* params)
-{
-    sensor_data_t data;
-
-    (void)params; // Unused
-
-    while (true) {
-        if (xQueueReceive(queue_data_raw, &data, portMAX_DELAY) != pdPASS) {
-            continue;
-        }
-
-        switch (data.id) {
-            case SENSOR_ID_COOLANT_TEMPERATURE:
-                data.value = convert_coolant_temperature(data.value);
-                break;
-
-            case SENSOR_ID_BATTERY_VOLTAGE:
-                data.value = convert_battery_voltage(data.value);
-                break;
-
-            case SENSOR_ID_FUEL_LEVEL:
-                data.value = convert_fuel_level(data.value);
-                break;
-
-            case SENSOR_ID_TURN_SIGNAL:
-            case SENSOR_ID_HIGH_BEAM:
-            case SENSOR_ID_OIL_PRESSURE_0_3_BAR:
-            case SENSOR_ID_OIL_PRESSURE_1_8_BAR:
-                // No conversion needed for binary signals
-                break;
-
-            case SENSOR_ID_MOTOR_RPM:
-                data.value = convert_motor_rpm(data.value);
-                break;
-
-            default:
-                HAL_UART_Transmit(&huart3, (uint8_t*)"conversion: Unknown sensor id\n", strlen("conversion: Unknown sensor id\n"), HAL_MAX_DELAY);
-                continue;
-        }
-
-        if (xQueueSend(queue_data_converted, &data, pdMS_TO_TICKS(QUEUE_TIMEOUT_MS)) != pdPASS) {
-            HAL_UART_Transmit(&huart3, (uint8_t*)"conversion: xQueueSend error\n", strlen("conversion: xQueueSend error\n"), HAL_MAX_DELAY);
-        }
-    }
-}
 
 /**
  * @brief Convert raw ADC value to voltage in V
@@ -90,7 +35,7 @@ static float adc_to_voltage(uint16_t raw_value)
  *
  * @return int16_t -- Temperature in deci-°C (e.g., 234 means 23.4°C)
  */
-static int16_t convert_coolant_temperature(uint16_t raw_value)
+int16_t convert_coolant_temperature(uint16_t raw_value)
 {
     const float R2_OHM = 470.0f;
     const float R0_OHM = 1100.0f;
@@ -122,7 +67,7 @@ static int16_t convert_coolant_temperature(uint16_t raw_value)
  *
  * @return int16_t -- Battery voltage in centi-V (e.g., 1234 means 12.34V)
  */
-static int16_t convert_battery_voltage(uint16_t raw_value)
+int16_t convert_battery_voltage(uint16_t raw_value)
 {
     const float R4_OHM = 10000.0f;
     const float R5_OHM = 2200.0f;
@@ -141,7 +86,7 @@ static int16_t convert_battery_voltage(uint16_t raw_value)
  *
  * @return int16_t -- Fuel level in deci-l (e.g., 123 means 12.3 l)
  */
-static int16_t convert_fuel_level(uint16_t raw_value)
+int16_t convert_fuel_level(uint16_t raw_value)
 {
     const float R1_OHM   = 330.0f;
     const float VOL0_L   = 80.8f;
@@ -166,7 +111,7 @@ static int16_t convert_fuel_level(uint16_t raw_value)
  *
  * @return int16_t -- Rotation speed in RPM (e.g., 1000 means 1000 RPM)
  */
-static int16_t convert_motor_rpm(uint16_t pulses_per_min)
+int16_t convert_motor_rpm(uint16_t pulses_per_min)
 {
     // 1 motor rotation generates 4 pulses
     // ==> pulses_per_min / 4 --> RPM

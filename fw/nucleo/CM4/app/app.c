@@ -3,14 +3,12 @@
 #include <stdbool.h>
 
 #include "FreeRTOS.h"
-#include "acquisition.h"
-#include "conversion.h"
-#include "filtering.h"
 #include "main.h"
 #include "message_buffer.h"
 #include "publication.h"
 #include "shared.h"
 #include "task.h"
+#include "tasks.h"
 
 QueueHandle_t queue_data_raw;
 QueueHandle_t queue_data_converted;

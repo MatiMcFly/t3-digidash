@@ -11,50 +11,17 @@
 #include "shared.h"
 #include "task.h"
 
-extern ADC_HandleTypeDef hadc1;
 extern TIM_HandleTypeDef htim2;
 
-#define MEASUREMENT_PERIOD_MS    100
 #define MOTOR_RPM_TIMEOUT_CYCLES 10 // Number of measurement periods after which motor RPM is assumed to be 0 if no new pulse is captured
 
-#define ADC1_BUFFER_SIZE 3
-static volatile uint16_t adc1_buffer[ADC1_BUFFER_SIZE] = {0};
+volatile uint16_t adc1_buffer[ADC1_BUFFER_SIZE] = {0};
 
 static volatile bool tim2_is_first_capture = true;
 
-static void    acquire_binary_sensors(void);
-static void    start_pulse_sensors(void);
 static int16_t pulse_period_to_pulses_per_minute(uint32_t pulse_period_us);
 
-/**
- * @brief Acquisition task for sensor data
- *
- * @param params -- Unused
- */
-void acquisition_task(void* params)
-{
-    TickType_t last_wakeup = xTaskGetTickCount();
-
-    (void)params; // Unused
-
-    while (true) {
-
-        // Start all analog sensor acquisitions
-        if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc1_buffer, ADC1_BUFFER_SIZE) != HAL_OK) {
-            HAL_UART_Transmit(&huart3, (uint8_t*)"acquisition: HAL_ADC_Start_DMA error\n", strlen("acquisition: HAL_ADC_Start_DMA error\n"), HAL_MAX_DELAY);
-        }
-
-        // Read all binary sensors
-        acquire_binary_sensors();
-
-        // Start all pulse sensor acquisitions
-        start_pulse_sensors();
-
-        vTaskDelayUntil(&last_wakeup, pdMS_TO_TICKS(MEASUREMENT_PERIOD_MS));
-    }
-}
-
-static void acquire_binary_sensors(void)
+void acquire_binary_sensors(void)
 {
     sensor_data_t turn_signal          = {.id = SENSOR_ID_TURN_SIGNAL, .value = 0};
     sensor_data_t high_beam            = {.id = SENSOR_ID_HIGH_BEAM, .value = 0};
@@ -83,7 +50,7 @@ static void acquire_binary_sensors(void)
     }
 }
 
-static void start_pulse_sensors(void)
+void start_pulse_sensors(void)
 {
     static uint8_t timeout_counter = 0;
 

@@ -9,6 +9,7 @@
 #define QUEUE_SIZE       50
 #define QUEUE_TIMEOUT_MS 0
 
+extern ADC_HandleTypeDef  hadc1;
 extern UART_HandleTypeDef huart3;
 
 extern QueueHandle_t queue_data_raw;
