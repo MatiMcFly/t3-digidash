@@ -1,8 +1,6 @@
 #include <gui/screen_screen/screenView.hpp>
 #include <touchgfx/Color.hpp>
 
-#include "stm32h7xx_hal.h"   /* HAL_GetTick() -- ms wall clock */
-
 namespace
 {
 /* RGB888 colors per LED, off (dim "ambient") and on (bright "lit"). */
@@ -33,9 +31,6 @@ const LedColors kLedColors[static_cast<int>(screenView::Led::Count)] = {
 } /* anonymous namespace */
 
 screenView::screenView()
-    : testRpm(0),  testRpmStep(60),
-      testFuel(kMinFuelLitres), testFuelStep(1),
-      testTemp(kMinTempC),      testTempStep(1)
 {
     for (auto& s : ledState)
     {
@@ -104,102 +99,6 @@ void screenView::setTemperature(int16_t temperatureC)
 
     temperature_needle.setAngles(0.0f, 0.0f, zAngle);
     temperature_needle.invalidate();
-}
-
-void screenView::handleTickEvent()
-{
-    /* Sweep RPM 0 -> kMaxRpm -> 0 -> ... at testRpmStep RPM/tick.
-     * At 60 fps, step=60 RPM completes a full 0->6000 sweep in ~1.7 s. */
-    testRpm += testRpmStep;
-    if (testRpm >= static_cast<int32_t>(kMaxRpm))
-    {
-        testRpm     = kMaxRpm;
-        testRpmStep = -testRpmStep;
-    }
-    else if (testRpm <= 0)
-    {
-        testRpm     = 0;
-        testRpmStep = -testRpmStep;
-    }
-
-    setRPM(static_cast<uint16_t>(testRpm));
-
-    /* Sweep fuel 0 -> 70 L -> 0 at testFuelStep L/tick.
-     * At 60 fps, step=1 completes a full sweep in ~1.17 s. */
-    testFuel += testFuelStep;
-    if (testFuel >= static_cast<int32_t>(kMaxFuelLitres))
-    {
-        testFuel     = kMaxFuelLitres;
-        testFuelStep = -testFuelStep;
-    }
-    else if (testFuel <= static_cast<int32_t>(kMinFuelLitres))
-    {
-        testFuel     = kMinFuelLitres;
-        testFuelStep = -testFuelStep;
-    }
-
-    setFuel(static_cast<uint16_t>(testFuel));
-
-    /* Sweep coolant 40 -> 140 C -> 40 at testTempStep C/tick.
-     * At 60 fps, step=1 completes a full sweep in ~1.67 s. */
-    testTemp += testTempStep;
-    if (testTemp >= static_cast<int32_t>(kMaxTempC))
-    {
-        testTemp     = kMaxTempC;
-        testTempStep = -testTempStep;
-    }
-    else if (testTemp <= static_cast<int32_t>(kMinTempC))
-    {
-        testTemp     = kMinTempC;
-        testTempStep = -testTempStep;
-    }
-
-    setTemperature(static_cast<int16_t>(testTemp));
-
-    /* ---- LED test patterns ----
-     * Driven from HAL_GetTick() (ms wall clock) so patterns are
-     * independent of the variable handleTickEvent rate. All four
-     * patterns share the same time base, so they stay phase-locked. */
-    const uint32_t t_ms = HAL_GetTick();
-
-    /* Indicator: 1 Hz blink (500 ms on / 500 ms off) for 5 s, then
-     * 5 s idle off. */
-    {
-        const uint32_t phase = t_ms % kIndicatorPeriod;
-        bool on = false;
-        if (phase < kIndicatorBlinkSpan)
-        {
-            const uint32_t cyc = phase % (kIndicatorBlinkOn + kIndicatorBlinkOff);
-            on = (cyc < kIndicatorBlinkOn);
-        }
-        led_set(Led::Indicator, on);
-    }
-
-    /* High beam: two short 200 ms flashes back-to-back, then 6 s off.
-     * Layout within the 6.8 s period:
-     *   [0 .. P)            on   (flash 1)
-     *   [P .. 2P)           off
-     *   [2P .. 3P)          on   (flash 2)
-     *   [3P .. period)      off  (covers final pulse + 6 s idle) */
-    {
-        const uint32_t phase = t_ms % kHighBeamPeriod;
-        const bool on = (phase < kHighBeamPulse) ||
-                        (phase >= 2U * kHighBeamPulse &&
-                         phase <  3U * kHighBeamPulse);
-        led_set(Led::HighBeam, on);
-    }
-
-    /* Battery: 50% duty cycle, on for 5 s then off for 5 s. */
-    {
-        const uint32_t phase = t_ms % kBatteryPeriod;
-        led_set(Led::Battery, phase < kBatteryHalfPeriod);
-    }
-
-    /* Oil: brief 200 ms flash once every 5 s. */
-    {
-        const uint32_t phase = t_ms % kOilPeriod;
-        led_set(Led::Oil, phase < kOilFlash);
-    }
 }
 
 void screenView::led_set(Led led, bool on)

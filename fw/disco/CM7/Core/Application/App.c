@@ -10,6 +10,7 @@
 #include "TaskDefinitions.h"
 #include "Backlight.h"
 #include "Display.h"
+#include "SensorDataPublisher.h"
 #include "UartReceiver.h"
 #include "app_touchgfx.h"
 
@@ -34,6 +35,10 @@ bool UartReceiverInit(void);
 bool AppInit(void) {
   BacklightInit();
   DisplayInit();
+
+  /* GUI bridge queue. Created BEFORE UartReceiverInit so the very
+   * first byte received by USART2 finds a valid sink. */
+  if (!SensorDataPublisherInit()) { Error_Handler(); }
 
   /* USART2 line receiver (interrupt-driven). Creates its own task. */
   if (!UartReceiverInit()) { Error_Handler(); }

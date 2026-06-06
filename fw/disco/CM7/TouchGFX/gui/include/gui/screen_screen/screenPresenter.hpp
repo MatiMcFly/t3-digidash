@@ -25,6 +25,11 @@ public:
      */
     virtual void deactivate();
 
+    /* Drained from Model::tick() once per UART telemetry sample.
+     * Dispatches by sensor_id_t onto the matching screenView setter
+     * (gauges) or LED. */
+    virtual void notifySensor(const sensor_data_t& data);
+
     virtual ~screenPresenter() {}
 
 private:
