@@ -74,10 +74,26 @@ void screenView::setRPM(uint16_t rpm)
         rpm = kMaxRpm;
     }
 
-    /* Designer pose has the needle at ZAngle = kMaxAngle for redline.
-     * Linear scale: angle = rpm / kMaxRpm * kMaxAngle. X/Y angles
-     * stay 0 -- the gauge only spins in-plane around the origo. */
-    const float zAngle = (static_cast<float>(rpm) / static_cast<float>(kMaxRpm)) * kMaxAngle;
+    /* Piecewise-linear mapping that matches the reference dial:
+     *   0    ..  kKinkRpm  ->  0          .. kKinkAngle   (compressed
+     *                                                      idle arc)
+     *   kKinkRpm .. kMaxRpm ->  kKinkAngle .. kMaxAngle    (main scale,
+     *                                                      1k..6k RPM)
+     * X/Y angles stay 0 -- the gauge only spins in-plane around the
+     * origo. */
+    float zAngle;
+    if (rpm <= kKinkRpm)
+    {
+        const float t = static_cast<float>(rpm) /
+                        static_cast<float>(kKinkRpm);
+        zAngle = t * kKinkAngle;
+    }
+    else
+    {
+        const float t = static_cast<float>(rpm - kKinkRpm) /
+                        static_cast<float>(kMaxRpm - kKinkRpm);
+        zAngle = kKinkAngle + t * (kMaxAngle - kKinkAngle);
+    }
 
     rpm_needle.setAngles(0.0f, 0.0f, zAngle);
     rpm_needle.invalidate();

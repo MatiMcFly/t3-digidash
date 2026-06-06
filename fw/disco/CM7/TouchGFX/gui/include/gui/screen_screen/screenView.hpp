@@ -46,9 +46,13 @@ public:
     void led_set(Led led, bool on);
 
 protected:
-    /* RPM gauge: needle pose at redline matches the Designer asset. */
-    static constexpr uint16_t kMaxRpm   = 6000;
-    static constexpr float    kMaxAngle = 3.65f;
+    /* RPM gauge: piecewise-linear mapping to match the reference dial.
+     * The 0 .. 1000 RPM segment is compressed into a small arc on the
+     * left of the dial; 1000 .. 6000 RPM spans the rest. */
+    static constexpr uint16_t kMaxRpm    = 6000;
+    static constexpr uint16_t kKinkRpm   = 1000;
+    static constexpr float    kMaxAngle  = 3.65f;
+    static constexpr float    kKinkAngle = 0.49f;
 
     /* Fuel gauge: empty pose at high Z angle, sweeps DOWN as tank fills. */
     static constexpr uint16_t kMinFuelLitres  = 0;
