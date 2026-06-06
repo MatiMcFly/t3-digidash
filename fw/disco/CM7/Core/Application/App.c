@@ -10,6 +10,7 @@
 #include "TaskDefinitions.h"
 #include "Backlight.h"
 #include "Display.h"
+#include "UartReceiver.h"
 #include "app_touchgfx.h"
 
 #include "stm32h7xx_hal.h"
@@ -21,15 +22,24 @@
 #include <stddef.h>
 #include <stdint.h>
 
+
+// * ************************************************************************ *
+// *                            EXTERNAL FUNCTIONS                            *
+// * ************************************************************************ *
+bool UartReceiverInit(void);
+
 // * ************************************************************************ *
 // *                             GLOBAL FUNCTIONS                             *
 // * ************************************************************************ *
 bool AppInit(void) {
-
-  // DisplayInit();
   BacklightInit();
   DisplayInit();
 
+  /* USART2 line receiver (interrupt-driven). Creates its own task. */
+  if (!UartReceiverInit()) { Error_Handler(); }
+
+
+  /* task inits */
   /* TouchGFX render task */
   BaseType_t ok;
   ok = xTaskCreate((TaskFunction_t)MX_TouchGFX_Process,
