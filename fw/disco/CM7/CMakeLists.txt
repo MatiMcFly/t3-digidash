@@ -71,6 +71,9 @@ enable_language(C ASM)
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
     Core/Application
+    # Project-wide shared types (sensor_id_t, sensor_data_t).
+    # Mirrors the nucleo layout so the same shared.h can be used on both sides.
+    ${CMAKE_SOURCE_DIR}/../Common/Inc
     # FreeRTOS kernel + port + project config
     ${CMAKE_SOURCE_DIR}/../Drivers/FreeRTOS-Kernel/include
     ${CMAKE_SOURCE_DIR}/../Drivers/FreeRTOS-Kernel/portable/GCC/ARM_CM7/r0p1
@@ -84,6 +87,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/Application/Backlight.c
     Core/Application/Display.c
     Core/Application/QspiFlash.c
+    Core/Application/UartReceiver.c
     Core/Src/freertos_hooks.c
     Core/Src/axisram_bss_init.c
     # FreeRTOS kernel
