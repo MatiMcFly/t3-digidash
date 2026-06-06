@@ -23,9 +23,10 @@ void screenPresenter::notifySensor(const sensor_data_t& data)
     uint16_t litres;
     /* Map the wire-protocol sensor_id_t onto the screenView setters.
      * Binary signals are interpreted as "lit when value != 0". The
-     * 0.3 bar oil-pressure threshold drives the dashboard's oil
-     * warning lamp; the 1.8 bar threshold and battery voltage are
-     * not yet wired to any widget. */
+     * oil warning lamp is driven by the COMBINATION of the 0.3 bar
+     * and 1.8 bar threshold signals (see updateOilLamp). The battery
+     * lamp lights when the measured voltage is below 13.00 V; the
+     * wire value is in 10 mV units (1300 == 13.00 V). */
     switch (data.id)
     {
     case SENSOR_ID_COOLANT_TEMPERATURE:
@@ -55,14 +56,33 @@ void screenPresenter::notifySensor(const sensor_data_t& data)
         break;
 
     case SENSOR_ID_OIL_PRESSURE_0_3_BAR:
-        /* Lamp lit when oil pressure is BELOW the 0.3 bar threshold. */
-        view.led_set(screenView::Led::Oil, data.value == 0);
+        oil03BarOk = (data.value != 0);
+        updateOilLamp();
+        break;
+
+    case SENSOR_ID_OIL_PRESSURE_1_8_BAR:
+        oil18BarOk = (data.value != 0);
+        updateOilLamp();
         break;
 
     case SENSOR_ID_BATTERY_VOLTAGE:
-    case SENSOR_ID_OIL_PRESSURE_1_8_BAR:
+        /* value is in 10 mV units; threshold 13.00 V == 1300. */
+        /* TODO: this signal should actually be compared to "Klemme 61" from the alternator.*/
+        view.led_set(screenView::Led::Battery, data.value < 1300);
+        break;
+
     default:
         /* Not wired to a widget yet. */
         break;
     }
+}
+
+void screenPresenter::updateOilLamp()
+{
+    /* Lamp OFF only when both threshold signals are asserted (oil
+     * pressure healthy at both check points). Any other combination
+     * -- low pressure, sensor disagreement, or one signal not yet
+     * received -- lights the warning. */
+    const bool warn = !(oil03BarOk && oil18BarOk);
+    view.led_set(screenView::Led::Oil, warn);
 }

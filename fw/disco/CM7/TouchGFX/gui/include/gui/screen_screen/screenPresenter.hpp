@@ -35,7 +35,16 @@ public:
 private:
     screenPresenter();
 
+    /* Recompute the oil-pressure warning lamp from the latched
+     * 0.3 bar / 1.8 bar threshold signals. The lamp is OFF only when
+     * BOTH thresholds are high (== 1); any other combination lights
+     * it. Default-initialised to false -> lamp is lit until both are received. */
+    void updateOilLamp();
+
     screenView& view;
+
+    bool oil03BarOk = false; /* last sample of SENSOR_ID_OIL_PRESSURE_0_3_BAR */
+    bool oil18BarOk = false; /* last sample of SENSOR_ID_OIL_PRESSURE_1_8_BAR */
 };
 
 #endif // SCREENPRESENTER_HPP
