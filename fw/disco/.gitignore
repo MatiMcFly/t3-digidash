@@ -16,6 +16,10 @@ CM7/build/
 *.so
 *.dylib
 
+# Except vendor-shipped TouchGFX prebuilt libraries, otherwise build fails
+!CM7/Middlewares/ST/touchgfx/lib/**/*.a
+!CM7/Middlewares/ST/touchgfx/lib/**/*.lib
+
 # CMake
 CMakeCache.txt
 CMakeFiles/
