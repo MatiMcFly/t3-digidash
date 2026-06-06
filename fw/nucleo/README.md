@@ -129,6 +129,18 @@ Open the workspace `fw/nucleo/` in VS Code.
   - Assign projects to corresponding cores
 - Ctrl-Shift-B: Use **CMake: clean rebuild** or **CMake: build**
 
+### Unit Tests
+
+The conversion module can be tested natively on the host without building the STM32 firmware target.
+
+From `fw/nucleo/` run:
+
+```powershell
+cmake -S tests -B tests/build
+cmake --build tests/build
+ctest --test-dir tests/build --output-on-failure
+```
+
 ### Debugging
 
 - Start debugging session "DualCore_Debug"

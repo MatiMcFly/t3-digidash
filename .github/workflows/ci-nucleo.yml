@@ -51,3 +51,28 @@ jobs:
       - name: Build
         working-directory: fw/nucleo/${{ matrix.core }}
         run: cmake --build --preset Debug
+
+  unit-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build
+
+      - name: Configure unit tests
+        working-directory: fw/nucleo
+        run: cmake -S tests -B tests/build -G Ninja
+
+      - name: Build unit tests
+        working-directory: fw/nucleo
+        run: cmake --build tests/build
+
+      - name: Run unit tests
+        working-directory: fw/nucleo
+        run: ctest --test-dir tests/build --output-on-failure

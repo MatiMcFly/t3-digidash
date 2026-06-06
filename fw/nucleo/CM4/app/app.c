@@ -3,14 +3,12 @@
 #include <stdbool.h>
 
 #include "FreeRTOS.h"
-#include "acquisition.h"
-#include "conversion.h"
-#include "filtering.h"
 #include "main.h"
 #include "message_buffer.h"
 #include "publication.h"
 #include "shared.h"
 #include "task.h"
+#include "tasks.h"
 
 QueueHandle_t queue_data_raw;
 QueueHandle_t queue_data_converted;
@@ -38,23 +36,23 @@ void app(void)
         while (true) {} // TODO: Error handling
     }
 
-    if (xTaskCreate(heartbeat_task, "Heartbeat Task", 512, NULL, 1, NULL) != pdPASS) {
+    if (xTaskCreate(heartbeat_task, "Heartbeat Task", 2048 / sizeof(StackType_t), NULL, 1, NULL) != pdPASS) {
         while (true) {} // TODO: Error handling
     }
 
-    if (xTaskCreate(acquisition_task, "Acquisition Task", 512, NULL, 3, NULL) != pdPASS) {
+    if (xTaskCreate(acquisition_task, "Acquisition Task", 2048 / sizeof(StackType_t), NULL, 3, NULL) != pdPASS) {
         while (true) {} // TODO: Error handling
     }
 
-    if (xTaskCreate(conversion_task, "Conversion Task", 512, NULL, 2, NULL) != pdPASS) {
+    if (xTaskCreate(conversion_task, "Conversion Task", 2048 / sizeof(StackType_t), NULL, 2, NULL) != pdPASS) {
         while (true) {} // TODO: Error handling
     }
 
-    if (xTaskCreate(filtering_task, "Filtering Task", 512, NULL, 2, NULL) != pdPASS) {
+    if (xTaskCreate(filtering_task, "Filtering Task", 2048 / sizeof(StackType_t), NULL, 2, NULL) != pdPASS) {
         while (true) {} // TODO: Error handling
     }
 
-    if (xTaskCreate(publication_task, "Publication Task", 512, NULL, 2, NULL) != pdPASS) {
+    if (xTaskCreate(publication_task, "Publication Task", 2048 / sizeof(StackType_t), NULL, 2, NULL) != pdPASS) {
         while (true) {} // TODO: Error handling
     }
 
