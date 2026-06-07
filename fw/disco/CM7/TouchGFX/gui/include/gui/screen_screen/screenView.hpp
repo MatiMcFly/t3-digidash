@@ -22,7 +22,6 @@ public:
     virtual ~screenView() {}
     virtual void setupScreen();
     virtual void tearDownScreen();
-    virtual void handleTickEvent();
 
     /* Maps an RPM value (0 .. kMaxRpm) to the rpm_needle Z angle.
      * 0 RPM      -> 0.0 rad
@@ -47,10 +46,13 @@ public:
     void led_set(Led led, bool on);
 
 protected:
-    /* Test pattern: sweep RPM 0 -> kMaxRpm -> 0 to exercise the
-     * TextureMapper redraw path through the partial-FB pipeline. */
-    static constexpr uint16_t kMaxRpm   = 6000;
-    static constexpr float    kMaxAngle = 3.65f;
+    /* RPM gauge: piecewise-linear mapping to match the reference dial.
+     * The 0 .. 1000 RPM segment is compressed into a small arc on the
+     * left of the dial; 1000 .. 6000 RPM spans the rest. */
+    static constexpr uint16_t kMaxRpm    = 6000;
+    static constexpr uint16_t kKinkRpm   = 1000;
+    static constexpr float    kMaxAngle  = 3.65f;
+    static constexpr float    kKinkAngle = 0.49f;
 
     /* Fuel gauge: empty pose at high Z angle, sweeps DOWN as tank fills. */
     static constexpr uint16_t kMinFuelLitres  = 0;
@@ -64,44 +66,10 @@ protected:
     static constexpr float    kTempAngleCold = 0.55f;
     static constexpr float    kTempAngleHot  = 1.40f;
 
-    int32_t  testRpm;      /* signed so we can detect under/overshoot */
-    int16_t  testRpmStep;  /* +N -> accel, -N -> decel */
-
-    int32_t  testFuel;     /* litres, swept across [kMin..kMax]FuelLitres */
-    int16_t  testFuelStep;
-
-    int32_t  testTemp;     /* deg C, swept across [kMin..kMax]TempC      */
-    int16_t  testTempStep;
-
-    /* ---- LED test pattern state ----
-     * Patterns are driven from HAL_GetTick() (1 ms SysTick), so the
-     * timing is independent of the actual handleTickEvent rate -- the
-     * partial-FB render path can tick at anywhere from ~10 to ~70 Hz
-     * depending on what's redrawing this frame, but seconds are
-     * seconds. All durations below are in milliseconds. */
-
-    /* Indicator: 1 Hz blink (500 ms on / 500 ms off) for 5 s, then
-     * 5 s idle off. */
-    static constexpr uint32_t kIndicatorBlinkOn   = 500U;
-    static constexpr uint32_t kIndicatorBlinkOff  = 500U;
-    static constexpr uint32_t kIndicatorBlinkSpan = 5000U;
-    static constexpr uint32_t kIndicatorIdleSpan  = 5000U;
-    static constexpr uint32_t kIndicatorPeriod    = kIndicatorBlinkSpan + kIndicatorIdleSpan;
-
-    /* High beam: two 200 ms flashes back-to-back, then 6 s off. */
-    static constexpr uint32_t kHighBeamPulse      = 200U;
-    static constexpr uint32_t kHighBeamIdle       = 6000U;
-    static constexpr uint32_t kHighBeamPeriod     = 4U * kHighBeamPulse + kHighBeamIdle;
-
-    /* Battery: 50% duty cycle, toggles every 5 s. */
-    static constexpr uint32_t kBatteryHalfPeriod  = 5000U;
-    static constexpr uint32_t kBatteryPeriod      = 2U * kBatteryHalfPeriod;
-
-    /* Oil: brief 200 ms flash once every 5 s. */
-    static constexpr uint32_t kOilFlash           = 200U;
-    static constexpr uint32_t kOilPeriod          = 5000U;
-
-    bool ledState[static_cast<int>(Led::Count)]; /* cached on/off    */
+    /* Cached LED on/off state. led_set() short-circuits when the new
+     * state matches the cache, so static signals (e.g. high beam off
+     * for minutes at a time) don't dirty their rect every frame. */
+    bool ledState[static_cast<int>(Led::Count)];
 };
 
 #endif // SCREENVIEW_HPP

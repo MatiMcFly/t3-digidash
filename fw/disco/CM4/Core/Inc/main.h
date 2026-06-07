@@ -92,10 +92,6 @@ void MX_USART1_UART_Init(void);
 #define SAI1_SD_A_GPIO_Port GPIOE
 #define CEC_CK_MCO1_Pin GPIO_PIN_8
 #define CEC_CK_MCO1_GPIO_Port GPIOA
-#define SPI2_SCK_Pin GPIO_PIN_12
-#define SPI2_SCK_GPIO_Port GPIOA
-#define PMOD_1_Pin GPIO_PIN_11
-#define PMOD_1_GPIO_Port GPIOA
 #define ULPI_DIR_Pin GPIO_PIN_11
 #define ULPI_DIR_GPIO_Port GPIOI
 #define SAI1_MCLK_A_Pin GPIO_PIN_7
@@ -120,10 +116,6 @@ void MX_USART1_UART_Init(void);
 #define ARD_D11_GPIO_Port GPIOJ
 #define ETH_MDC_SAI4_D1_Pin GPIO_PIN_1
 #define ETH_MDC_SAI4_D1_GPIO_Port GPIOC
-#define PMOD_3_Pin GPIO_PIN_2
-#define PMOD_3_GPIO_Port GPIOC
-#define PMOD_2_Pin GPIO_PIN_3
-#define PMOD_2_GPIO_Port GPIOC
 #define ARD_D0_Pin GPIO_PIN_9
 #define ARD_D0_GPIO_Port GPIOJ
 #define ETH_MDIO_Pin GPIO_PIN_2

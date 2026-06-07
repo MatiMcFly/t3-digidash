@@ -7,8 +7,11 @@
 
 /// @brief Main application file
 #include "App.h"
+#include "TaskDefinitions.h"
 #include "Backlight.h"
 #include "Display.h"
+#include "SensorDataPublisher.h"
+#include "UartReceiver.h"
 #include "app_touchgfx.h"
 
 #include "stm32h7xx_hal.h"
@@ -20,34 +23,28 @@
 #include <stddef.h>
 #include <stdint.h>
 
-// * ************************************************************************ *
-// *                                DEFINES                                   *
-// * ************************************************************************ *
-
-/* Step interval for the glow sweep: 10 ms/step -> ~1 s per 0->100 % ramp.  */
-#define BL_GLOW_STEP_MS  10U
 
 // * ************************************************************************ *
-// *                                 TYPES                                    *
+// *                            EXTERNAL FUNCTIONS                            *
 // * ************************************************************************ *
-
-// * ************************************************************************ *
-// *                             STATIC VARIABLES                             *
-// * ************************************************************************ *
-
-// * ************************************************************************ *
-// *                           FORWARD DECLARATIONS                           *
-// * ************************************************************************ *
+bool UartReceiverInit(void);
 
 // * ************************************************************************ *
 // *                             GLOBAL FUNCTIONS                             *
 // * ************************************************************************ *
 bool AppInit(void) {
-
-  // DisplayInit();
   BacklightInit();
   DisplayInit();
 
+  /* GUI bridge queue. Created BEFORE UartReceiverInit so the very
+   * first byte received by USART2 finds a valid sink. */
+  if (!SensorDataPublisherInit()) { Error_Handler(); }
+
+  /* USART2 line receiver (interrupt-driven). Creates its own task. */
+  if (!UartReceiverInit()) { Error_Handler(); }
+
+
+  /* task inits */
   /* TouchGFX render task */
   BaseType_t ok;
   ok = xTaskCreate((TaskFunction_t)MX_TouchGFX_Process,
