@@ -129,14 +129,17 @@ static void uart_task_esp_to_nucleo(void *arg)
                             uint8_t high = (uint8_t)high_beam;
                             int16_t rpm_value = (int16_t)rpm;
                             float batt_v_out = scale_batt_volts(batt_v);
-
-                            uint8_t oil_03 = (uint8_t)oil_pressure_switch_3b;
-                            uint8_t oil_18 = (uint8_t)oil_pressure_switch_18b;
+                            uint8_t oil_lamp;                        
+                            if(oil_pressure_switch_3b && oil_pressure_switch_18b) {
+                                oil_lamp = 0;
+                            }else{
+                                oil_lamp = 1;
+                            }
                             int8_t water_temp = (int8_t)scale_water_temp_ui(water_c);
                             int8_t tank = (int8_t)scale_tank_level_ui(tank_level);
 
                             remotexy_set_outputs(turn, high, rpm_value,
-                                                 batt_v_out, oil_03, oil_18,
+                                                 batt_v_out, oil_lamp,
                                                  water_temp, tank);
                         } else {
                             ESP_LOGW(TAG, "UART parse failed for line: %s", line);

@@ -35,30 +35,27 @@ typedef struct {
     uint8_t high_beam_w;
     int16_t rpm_w;
     float batt_volt_w;
-    uint8_t oil_03_w;
-    uint8_t oil_18_w;
+    uint8_t oil_w;
     int8_t water_temp_w;
     int8_t tank_level_w;
     uint8_t connect_flag;
 } RemoteXYData;
 #pragma pack(pop)
 
-static const uint8_t k_remotexy_conf_full[] =  { 255,0,0,12,0,40,1,19,0,0,0,0,8,1,106,200,1,1,20,0,
+static const uint8_t k_remotexy_conf_full[] =  { 255,0,0,11,0,12,1,19,0,0,0,0,8,1,106,200,1,1,18,0,
   70,12,147,8,8,16,26,147,0,70,29,147,8,8,16,26,191,0,71,15,
   5,74,74,104,16,2,31,135,0,0,0,0,0,192,218,69,0,0,122,68,
   0,0,250,67,0,0,122,67,2,0,129,9,142,15,4,64,17,66,108,105,
   110,107,101,114,0,129,25,142,19,4,64,17,70,101,114,110,108,105,99,104,
   116,0,129,36,2,37,5,64,17,68,114,101,104,122,97,104,108,32,91,114,
   112,109,93,0,68,6,75,91,60,1,8,36,129,39,70,34,6,64,17,66,
-  97,116,116,101,114,105,101,32,91,86,93,0,129,66,142,15,5,64,17,195,
-  150,108,32,48,46,51,0,129,86,142,15,5,64,17,195,150,108,32,49,46,
-  56,0,70,68,147,8,8,16,26,37,0,70,89,147,8,8,16,26,37,0,
-  66,6,171,41,18,131,2,31,66,58,170,43,19,131,2,31,129,74,161,19,
-  5,64,17,84,97,110,107,32,91,108,93,0,129,6,162,47,4,64,17,87,
-  97,115,115,101,114,116,101,109,112,101,114,97,116,117,114,32,91,194,176,67,
-  93,0,129,7,191,8,5,64,17,45,49,48,0,129,35,191,10,5,64,17,
-  49,53,48,0,129,64,190,4,6,64,17,48,0,129,93,191,7,5,64,17,
-  55,48,0 };
+  97,116,116,101,114,105,101,32,91,86,93,0,129,79,141,6,5,64,17,195,
+  150,108,0,70,77,147,8,8,16,26,37,0,66,6,171,41,18,131,2,31,
+  66,58,170,43,19,131,2,31,129,74,161,19,5,64,17,84,97,110,107,32,
+  91,108,93,0,129,6,162,47,4,64,17,87,97,115,115,101,114,116,101,109,
+  112,101,114,97,116,117,114,32,91,194,176,67,93,0,129,7,191,8,5,64,
+  17,45,49,48,0,129,35,191,10,5,64,17,49,53,48,0,129,64,190,4,
+  6,64,17,48,0,129,93,191,7,5,64,17,55,48,0 };
 
 static RemoteXYData g_remotexy;
 static uint8_t g_rx_buffer[REMOTEXY_RX_BUFFER_SIZE];
@@ -296,8 +293,7 @@ void remotexy_init(void)
     g_remotexy.high_beam_w = 0;
     g_remotexy.rpm_w = 0;
     g_remotexy.batt_volt_w = 0;
-    g_remotexy.oil_03_w = 0;
-    g_remotexy.oil_18_w = 0;
+    g_remotexy.oil_w = 0;
     g_remotexy.water_temp_w = 0;
     g_remotexy.tank_level_w = 0;
     g_remotexy.connect_flag = 0;
@@ -359,7 +355,7 @@ void remotexy_set_notify_enabled(bool enabled)
 }
 
 void remotexy_set_outputs(uint8_t turn_signal_w, uint8_t high_beam_w, int16_t rpm_w,
-                          float batt_volt_w, uint8_t oil_03_w, uint8_t oil_18_w,
+                          float batt_volt_w, uint8_t oil_w,
                           int8_t water_temp_w, int8_t tank_level_w)
 {
     bool changed = false;
@@ -380,12 +376,8 @@ void remotexy_set_outputs(uint8_t turn_signal_w, uint8_t high_beam_w, int16_t rp
         g_remotexy.batt_volt_w = batt_volt_w;
         changed = true;
     }
-    if (g_remotexy.oil_03_w != oil_03_w) {
-        g_remotexy.oil_03_w = oil_03_w;
-        changed = true;
-    }
-    if (g_remotexy.oil_18_w != oil_18_w) {
-        g_remotexy.oil_18_w = oil_18_w;
+    if (g_remotexy.oil_w != oil_w) {
+        g_remotexy.oil_w = oil_w;
         changed = true;
     }
     if (g_remotexy.water_temp_w != water_temp_w) {
@@ -423,8 +415,7 @@ static void remotexy_pack_outputs(uint8_t *buf, size_t buf_len)
     offset += sizeof(g_remotexy.rpm_w);
     memcpy(&buf[offset], &g_remotexy.batt_volt_w, sizeof(g_remotexy.batt_volt_w));
     offset += sizeof(g_remotexy.batt_volt_w);
-    buf[offset++] = g_remotexy.oil_03_w;
-    buf[offset++] = g_remotexy.oil_18_w;
+    buf[offset++] = g_remotexy.oil_w;
     memcpy(&buf[offset], &g_remotexy.water_temp_w, sizeof(g_remotexy.water_temp_w));
     offset += sizeof(g_remotexy.water_temp_w);
     memcpy(&buf[offset], &g_remotexy.tank_level_w, sizeof(g_remotexy.tank_level_w));

@@ -53,8 +53,8 @@ Field mapping:
 - `4` = tank level
 - `5` = turn signal
 - `6` = high beam
-- `7` = oil pressure switch 3B
-- `8` = oil pressure switch 18B
+- `7` = oil pressure switch 0.3B
+- `8` = oil pressure switch 1.8B
 
 The parser is tolerant of streaming input and collects bytes until it finds `;` separators.
 
