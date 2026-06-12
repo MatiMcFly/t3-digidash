@@ -170,6 +170,54 @@ void screenView::setTemperature(int16_t temperatureC)
     temperature_needle.invalidate();
 }
 
+namespace
+{
+/* Formats a fixed-point value in tenths into a Unicode buffer as
+ * "<int>.<frac>" with one decimal place. The buffer must already
+ * have been bound to its TextArea via setWildcard1(); the caller is
+ * responsible for invalidating the widget after this returns. */
+void formatTenths(touchgfx::Unicode::UnicodeChar* buf,
+                  uint16_t                        bufSize,
+                  int16_t                         tenths)
+{
+    /* Split into whole + fractional. Use unsigned arithmetic on the
+     * absolute value so the modulo always gives a non-negative
+     * single decimal digit even for negative inputs (in C, sign of
+     * % on negatives is implementation-defined for signed). */
+    const bool     neg   = (tenths < 0);
+    const uint16_t mag   = static_cast<uint16_t>(neg ? -tenths : tenths);
+    const uint16_t whole = mag / 10u;
+    const uint16_t frac  = mag % 10u;
+
+    if (neg)
+    {
+        touchgfx::Unicode::snprintf(buf, bufSize, "-%u.%u", whole, frac);
+    }
+    else
+    {
+        touchgfx::Unicode::snprintf(buf, bufSize, "%u.%u", whole, frac);
+    }
+}
+} /* anonymous namespace */
+
+void screenView::setVoltageDeciV(int16_t deciV)
+{
+    formatTenths(voltageBuffer, VOLTAGE_SIZE, deciV);
+    voltage.invalidate();
+}
+
+void screenView::setFuelDeciL(int16_t deciL)
+{
+    formatTenths(fuel_lvlBuffer, FUEL_LVL_SIZE, deciL);
+    fuel_lvl.invalidate();
+}
+
+void screenView::setTemperatureDeciC(int16_t deciC)
+{
+    formatTenths(temperatureBuffer, TEMPERATURE_SIZE, deciC);
+    temperature.invalidate();
+}
+
 void screenView::led_set(Led led, bool on)
 {
     const int idx = static_cast<int>(led);

@@ -96,6 +96,12 @@ screenViewBase::screenViewBase()
 
     cont_middle_disp_2.setPosition(280, 467, 160, 235);
     cont_middle_disp_2.setVisible(false);
+    dummy.setXY(0, 195);
+    dummy.setColor(touchgfx::Color::getColorFromRGB(0, 0, 0));
+    dummy.setLinespacing(0);
+    dummy.setTypedText(touchgfx::TypedText(T___SINGLEUSE_RQN8));
+    cont_middle_disp_2.add(dummy);
+
     lcd_bg1.setPosition(0, 0, 160, 235);
     lcd_bg1.setColor(touchgfx::Color::getColorFromRGB(75, 79, 70));
     cont_middle_disp_2.add(lcd_bg1);
@@ -110,9 +116,11 @@ screenViewBase::screenViewBase()
     header_1.setTypedText(touchgfx::TypedText(T___SINGLEUSE_PNXQ));
     cont_middle_disp_2.add(header_1);
 
-    voltage.setXY(47, 36);
+    voltage.setPosition(6, 37, 140, 40);
     voltage.setColor(touchgfx::Color::getColorFromRGB(0, 0, 0));
     voltage.setLinespacing(0);
+    Unicode::snprintf(voltageBuffer, VOLTAGE_SIZE, "%s", touchgfx::TypedText(T___SINGLEUSE_V1FQ).getText());
+    voltage.setWildcard(voltageBuffer);
     voltage.setTypedText(touchgfx::TypedText(T___SINGLEUSE_6M3F));
     cont_middle_disp_2.add(voltage);
 
@@ -122,9 +130,11 @@ screenViewBase::screenViewBase()
     header_2.setTypedText(touchgfx::TypedText(T___SINGLEUSE_ZT7W));
     cont_middle_disp_2.add(header_2);
 
-    temperature.setXY(47, 112);
+    temperature.setPosition(6, 112, 140, 40);
     temperature.setColor(touchgfx::Color::getColorFromRGB(0, 0, 0));
     temperature.setLinespacing(0);
+    Unicode::snprintf(temperatureBuffer, TEMPERATURE_SIZE, "%s", touchgfx::TypedText(T___SINGLEUSE_7OCO).getText());
+    temperature.setWildcard(temperatureBuffer);
     temperature.setTypedText(touchgfx::TypedText(T___SINGLEUSE_TEGU));
     cont_middle_disp_2.add(temperature);
 
@@ -134,9 +144,11 @@ screenViewBase::screenViewBase()
     header_3.setTypedText(touchgfx::TypedText(T___SINGLEUSE_E1RG));
     cont_middle_disp_2.add(header_3);
 
-    fuel_lvl.setXY(47, 182);
+    fuel_lvl.setPosition(6, 182, 140, 40);
     fuel_lvl.setColor(touchgfx::Color::getColorFromRGB(0, 0, 0));
     fuel_lvl.setLinespacing(0);
+    Unicode::snprintf(fuel_lvlBuffer, FUEL_LVL_SIZE, "%s", touchgfx::TypedText(T___SINGLEUSE_OJNZ).getText());
+    fuel_lvl.setWildcard(fuel_lvlBuffer);
     fuel_lvl.setTypedText(touchgfx::TypedText(T___SINGLEUSE_MK2N));
     cont_middle_disp_2.add(fuel_lvl);
 

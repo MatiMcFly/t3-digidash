@@ -156,6 +156,16 @@
             "Visible": false,
             "Components": [
               {
+                "Type": "TextArea",
+                "Name": "dummy",
+                "Y": 195,
+                "Width": 24,
+                "Height": 40,
+                "TextId": "__SingleUse_RQN8",
+                "TextRotation": "0",
+                "AutoSize": true
+              },
+              {
                 "Type": "Box",
                 "Name": "lcd_bg1",
                 "Width": 160,
@@ -193,13 +203,17 @@
               {
                 "Type": "TextArea",
                 "Name": "voltage",
-                "X": 47,
-                "Y": 36,
-                "Width": 99,
+                "X": 6,
+                "Y": 37,
+                "Width": 140,
                 "Height": 40,
                 "TextId": "__SingleUse_6M3F",
                 "TextRotation": "0",
-                "AutoSize": true
+                "Wildcard1": {
+                  "TextId": "__SingleUse_V1FQ",
+                  "UseBuffer": true,
+                  "BufferSize": 8
+                }
               },
               {
                 "Type": "TextArea",
@@ -215,13 +229,17 @@
               {
                 "Type": "TextArea",
                 "Name": "temperature",
-                "X": 47,
+                "X": 6,
                 "Y": 112,
-                "Width": 99,
+                "Width": 140,
                 "Height": 40,
                 "TextId": "__SingleUse_TEGU",
                 "TextRotation": "0",
-                "AutoSize": true
+                "Wildcard1": {
+                  "TextId": "__SingleUse_7OCO",
+                  "UseBuffer": true,
+                  "BufferSize": 8
+                }
               },
               {
                 "Type": "TextArea",
@@ -237,13 +255,17 @@
               {
                 "Type": "TextArea",
                 "Name": "fuel_lvl",
-                "X": 47,
+                "X": 6,
                 "Y": 182,
-                "Width": 99,
+                "Width": 140,
                 "Height": 40,
                 "TextId": "__SingleUse_MK2N",
                 "TextRotation": "0",
-                "AutoSize": true
+                "Wildcard1": {
+                  "TextId": "__SingleUse_OJNZ",
+                  "UseBuffer": true,
+                  "BufferSize": 8
+                }
               }
             ]
           },

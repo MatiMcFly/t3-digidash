@@ -47,6 +47,12 @@ public:
      * 140 C (hot)  -> kTempAngleHot  rad */
     void setTemperature(int16_t temperatureC);
 
+    /* Updates the alphanumeric readouts in cont_middle_disp_2.
+     * Each takes a fixed-point value in TENTHS of the displayed unit (deci) */
+    void setVoltageDeciV(int16_t deciV);
+    void setFuelDeciL(int16_t deciL);
+    void setTemperatureDeciC(int16_t deciC);
+
     /* Sets one of the indicator LEDs on/off. The LED's painter is
      * recolored between its "lit" and "dark" tones (see screenView.cpp)
      * and then invalidated so the change is rendered next frame. */
