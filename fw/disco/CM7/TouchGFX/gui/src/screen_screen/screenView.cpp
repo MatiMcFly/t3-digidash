@@ -1,6 +1,13 @@
 #include <gui/screen_screen/screenView.hpp>
 #include <touchgfx/Color.hpp>
 
+/* For JOY_SEL_Pin / JOY_SEL_GPIO_Port and HAL_GPIO_ReadPin(). main.h
+ * pulls in stm32h7xx_hal.h transitively. */
+extern "C"
+{
+#include "main.h"
+}
+
 namespace
 {
 /* RGB888 colors per LED, off (dim "ambient") and on (bright "lit"). */
@@ -36,11 +43,16 @@ screenView::screenView()
     {
         s = false;
     }
+    joySelPrev = false;
 }
 
 void screenView::setupScreen()
 {
     screenViewBase::setupScreen();
+
+    /* Re-arm the joystick edge detector on screen entry. Not pressed = low */
+    joySelPrev = (HAL_GPIO_ReadPin(JOY_SEL_GPIO_Port, JOY_SEL_Pin) ==
+                  GPIO_PIN_RESET);
 
     /* Paint LEDs to a known safe-default state at screen entry. Until
      * the first matching telemetry sample arrives, the dashboard
@@ -65,6 +77,28 @@ void screenView::setupScreen()
 void screenView::tearDownScreen()
 {
     screenViewBase::tearDownScreen();
+}
+
+void screenView::handleTickEvent()
+{
+    screenViewBase::handleTickEvent();
+
+    /* edge detection for JOY_SEL (PK2). Pressed = LOW, not pressed = HIGH. */
+    const bool joySelNow =
+        (HAL_GPIO_ReadPin(JOY_SEL_GPIO_Port, JOY_SEL_Pin) ==
+         GPIO_PIN_RESET);
+
+    if (joySelNow && !joySelPrev)
+    {
+        /* if the joystick was just pressed, toggle which middle-display container is shown */
+        const bool show2 = !cont_middle_disp_2.isVisible();
+        cont_middle_disp_1.setVisible(!show2);
+        cont_middle_disp_2.setVisible( show2);
+        cont_middle_disp_1.invalidate();
+        cont_middle_disp_2.invalidate();
+    }
+
+    joySelPrev = joySelNow;
 }
 
 void screenView::setRPM(uint16_t rpm)

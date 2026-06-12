@@ -23,6 +23,13 @@ public:
     virtual void setupScreen();
     virtual void tearDownScreen();
 
+    /* Polled every frame (~16 ms). Edge-detects the DISCO joystick
+     * SEL push (PK2, active high on the board's external pull-down)
+     * and on each rising edge alternates which middle-display
+     * container (cont_middle_disp_1 / cont_middle_disp_2) is
+     * visible. */
+    virtual void handleTickEvent();
+
     /* Maps an RPM value (0 .. kMaxRpm) to the rpm_needle Z angle.
      * 0 RPM      -> 0.0 rad
      * kMaxRpm    -> kMaxAngle rad (matches Designer redline pose) */
@@ -70,6 +77,11 @@ protected:
      * state matches the cache, so static signals (e.g. high beam off
      * for minutes at a time) don't dirty their rect every frame. */
     bool ledState[static_cast<int>(Led::Count)];
+
+    /* Previous sampled level of JOY_SEL (PK2). Used by
+     * handleTickEvent() for rising-edge detection so that holding the
+     * joystick centered only counts as one toggle. */
+    bool joySelPrev;
 };
 
 #endif // SCREENVIEW_HPP
