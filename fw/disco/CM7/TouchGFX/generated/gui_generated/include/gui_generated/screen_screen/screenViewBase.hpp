@@ -13,6 +13,7 @@
 #include <touchgfx/containers/Container.hpp>
 #include <touchgfx/widgets/canvas/Circle.hpp>
 #include <touchgfx/widgets/canvas/PainterRGB888.hpp>
+#include <touchgfx/widgets/TextArea.hpp>
 
 class screenViewBase : public touchgfx::View<screenPresenter>
 {
@@ -43,7 +44,16 @@ protected:
     touchgfx::Container cont_fuel_gauge;
     touchgfx::Image img_fuel_scale;
     touchgfx::TextureMapper fuel_needle;
-    touchgfx::Container cont_middle_disp;
+    touchgfx::Container cont_middle_disp_2;
+    touchgfx::Box lcd_bg1;
+    touchgfx::Box lcd_bg2;
+    touchgfx::TextArea header_1;
+    touchgfx::TextArea voltage;
+    touchgfx::TextArea header_2;
+    touchgfx::TextArea temperature;
+    touchgfx::TextArea header_3;
+    touchgfx::TextArea fuel_lvl;
+    touchgfx::Container cont_middle_disp_1;
     touchgfx::Container cont_battery;
     touchgfx::Image img_battery;
     touchgfx::Circle bg_battery;
