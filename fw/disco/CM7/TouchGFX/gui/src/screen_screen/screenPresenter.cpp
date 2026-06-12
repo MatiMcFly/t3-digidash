@@ -83,6 +83,8 @@ void screenPresenter::updateOilLamp()
      * pressure healthy at both check points). Any other combination
      * -- low pressure, sensor disagreement, or one signal not yet
      * received -- lights the warning. */
-    const bool warn = !(oil03BarOk && oil18BarOk);
+    // for now, only the oil03BarOk input is routed. Should be:
+    // const bool warn = !(oil03BarOk && oil18BarOk);
+    const bool warn = !oil03BarOk;
     view.led_set(screenView::Led::Oil, warn);
 }
