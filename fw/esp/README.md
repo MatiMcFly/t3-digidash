@@ -59,7 +59,7 @@ Field mapping:
 The parser is tolerant of streaming input and collects bytes until it finds `;` separators.
 
 ## BLE Services
-The firmware advertises as `ESP32C3-NimBLE`.
+The firmware advertises as `T3 DigiDash`.
 
 Available services:
 - Standard Environmental Sensing service `0x181A`

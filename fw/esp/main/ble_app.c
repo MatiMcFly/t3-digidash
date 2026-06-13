@@ -16,7 +16,7 @@
 #include "gatt_db.h"
 #include "remotexy_protocol.h"
 
-#define BLE_DEVICE_NAME "ESP32C3-NimBLE"
+#define BLE_DEVICE_NAME "T3 DigiDash"
 
 static const char *TAG_BLE = "BLE_GATT";
 

@@ -130,7 +130,7 @@ static void uart_task_esp_to_nucleo(void *arg)
                             int16_t rpm_value = (int16_t)rpm;
                             float batt_v_out = scale_batt_volts(batt_v);
                             uint8_t oil_lamp;                        
-                            if(oil_pressure_switch_3b && oil_pressure_switch_18b) {
+                            if(oil_pressure_switch_3b) {
                                 oil_lamp = 0;
                             }else{
                                 oil_lamp = 1;
