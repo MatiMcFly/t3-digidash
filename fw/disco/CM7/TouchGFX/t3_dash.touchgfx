@@ -148,8 +148,131 @@
           },
           {
             "Type": "Container",
-            "Name": "cont_middle_disp",
-            "X": 275,
+            "Name": "cont_middle_disp_2",
+            "X": 280,
+            "Y": 467,
+            "Width": 160,
+            "Height": 235,
+            "Visible": false,
+            "Components": [
+              {
+                "Type": "TextArea",
+                "Name": "dummy",
+                "Y": 195,
+                "Width": 24,
+                "Height": 40,
+                "TextId": "__SingleUse_RQN8",
+                "TextRotation": "0",
+                "AutoSize": true
+              },
+              {
+                "Type": "Box",
+                "Name": "lcd_bg1",
+                "Width": 160,
+                "Height": 235,
+                "Color": {
+                  "Red": 75,
+                  "Green": 79,
+                  "Blue": 70
+                }
+              },
+              {
+                "Type": "Box",
+                "Name": "lcd_bg2",
+                "X": 2,
+                "Y": 2,
+                "Width": 156,
+                "Height": 231,
+                "Color": {
+                  "Red": 98,
+                  "Green": 104,
+                  "Blue": 92
+                }
+              },
+              {
+                "Type": "TextArea",
+                "Name": "header_1",
+                "X": 12,
+                "Y": 9,
+                "Width": 80,
+                "Height": 20,
+                "TextId": "__SingleUse_PNXQ",
+                "TextRotation": "0",
+                "AutoSize": true
+              },
+              {
+                "Type": "TextArea",
+                "Name": "voltage",
+                "X": 6,
+                "Y": 37,
+                "Width": 140,
+                "Height": 40,
+                "TextId": "__SingleUse_6M3F",
+                "TextRotation": "0",
+                "Wildcard1": {
+                  "TextId": "__SingleUse_V1FQ",
+                  "UseBuffer": true,
+                  "BufferSize": 8
+                }
+              },
+              {
+                "Type": "TextArea",
+                "Name": "header_2",
+                "X": 15,
+                "Y": 86,
+                "Width": 64,
+                "Height": 20,
+                "TextId": "__SingleUse_ZT7W",
+                "TextRotation": "0",
+                "AutoSize": true
+              },
+              {
+                "Type": "TextArea",
+                "Name": "temperature",
+                "X": 6,
+                "Y": 112,
+                "Width": 140,
+                "Height": 40,
+                "TextId": "__SingleUse_TEGU",
+                "TextRotation": "0",
+                "Wildcard1": {
+                  "TextId": "__SingleUse_7OCO",
+                  "UseBuffer": true,
+                  "BufferSize": 8
+                }
+              },
+              {
+                "Type": "TextArea",
+                "Name": "header_3",
+                "X": 15,
+                "Y": 159,
+                "Width": 64,
+                "Height": 20,
+                "TextId": "__SingleUse_E1RG",
+                "TextRotation": "0",
+                "AutoSize": true
+              },
+              {
+                "Type": "TextArea",
+                "Name": "fuel_lvl",
+                "X": 6,
+                "Y": 182,
+                "Width": 140,
+                "Height": 40,
+                "TextId": "__SingleUse_MK2N",
+                "TextRotation": "0",
+                "Wildcard1": {
+                  "TextId": "__SingleUse_OJNZ",
+                  "UseBuffer": true,
+                  "BufferSize": 8
+                }
+              }
+            ]
+          },
+          {
+            "Type": "Container",
+            "Name": "cont_middle_disp_1",
+            "X": 280,
             "Y": 467,
             "Width": 160,
             "Height": 235,

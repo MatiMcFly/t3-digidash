@@ -5,6 +5,7 @@
 #include <touchgfx/canvas_widget_renderer/CanvasWidgetRenderer.hpp>
 #include <touchgfx/Color.hpp>
 #include <images/BitmapDatabase.hpp>
+#include <texts/TextKeysAndLanguages.hpp>
 
 screenViewBase::screenViewBase()
 {
@@ -93,7 +94,67 @@ screenViewBase::screenViewBase()
 
     add(cont_fuel_gauge);
 
-    cont_middle_disp.setPosition(275, 467, 160, 235);
+    cont_middle_disp_2.setPosition(280, 467, 160, 235);
+    cont_middle_disp_2.setVisible(false);
+    dummy.setXY(0, 195);
+    dummy.setColor(touchgfx::Color::getColorFromRGB(0, 0, 0));
+    dummy.setLinespacing(0);
+    dummy.setTypedText(touchgfx::TypedText(T___SINGLEUSE_RQN8));
+    cont_middle_disp_2.add(dummy);
+
+    lcd_bg1.setPosition(0, 0, 160, 235);
+    lcd_bg1.setColor(touchgfx::Color::getColorFromRGB(75, 79, 70));
+    cont_middle_disp_2.add(lcd_bg1);
+
+    lcd_bg2.setPosition(2, 2, 156, 231);
+    lcd_bg2.setColor(touchgfx::Color::getColorFromRGB(98, 104, 92));
+    cont_middle_disp_2.add(lcd_bg2);
+
+    header_1.setXY(12, 9);
+    header_1.setColor(touchgfx::Color::getColorFromRGB(0, 0, 0));
+    header_1.setLinespacing(0);
+    header_1.setTypedText(touchgfx::TypedText(T___SINGLEUSE_PNXQ));
+    cont_middle_disp_2.add(header_1);
+
+    voltage.setPosition(6, 37, 140, 40);
+    voltage.setColor(touchgfx::Color::getColorFromRGB(0, 0, 0));
+    voltage.setLinespacing(0);
+    Unicode::snprintf(voltageBuffer, VOLTAGE_SIZE, "%s", touchgfx::TypedText(T___SINGLEUSE_V1FQ).getText());
+    voltage.setWildcard(voltageBuffer);
+    voltage.setTypedText(touchgfx::TypedText(T___SINGLEUSE_6M3F));
+    cont_middle_disp_2.add(voltage);
+
+    header_2.setXY(15, 86);
+    header_2.setColor(touchgfx::Color::getColorFromRGB(0, 0, 0));
+    header_2.setLinespacing(0);
+    header_2.setTypedText(touchgfx::TypedText(T___SINGLEUSE_ZT7W));
+    cont_middle_disp_2.add(header_2);
+
+    temperature.setPosition(6, 112, 140, 40);
+    temperature.setColor(touchgfx::Color::getColorFromRGB(0, 0, 0));
+    temperature.setLinespacing(0);
+    Unicode::snprintf(temperatureBuffer, TEMPERATURE_SIZE, "%s", touchgfx::TypedText(T___SINGLEUSE_7OCO).getText());
+    temperature.setWildcard(temperatureBuffer);
+    temperature.setTypedText(touchgfx::TypedText(T___SINGLEUSE_TEGU));
+    cont_middle_disp_2.add(temperature);
+
+    header_3.setXY(15, 159);
+    header_3.setColor(touchgfx::Color::getColorFromRGB(0, 0, 0));
+    header_3.setLinespacing(0);
+    header_3.setTypedText(touchgfx::TypedText(T___SINGLEUSE_E1RG));
+    cont_middle_disp_2.add(header_3);
+
+    fuel_lvl.setPosition(6, 182, 140, 40);
+    fuel_lvl.setColor(touchgfx::Color::getColorFromRGB(0, 0, 0));
+    fuel_lvl.setLinespacing(0);
+    Unicode::snprintf(fuel_lvlBuffer, FUEL_LVL_SIZE, "%s", touchgfx::TypedText(T___SINGLEUSE_OJNZ).getText());
+    fuel_lvl.setWildcard(fuel_lvlBuffer);
+    fuel_lvl.setTypedText(touchgfx::TypedText(T___SINGLEUSE_MK2N));
+    cont_middle_disp_2.add(fuel_lvl);
+
+    add(cont_middle_disp_2);
+
+    cont_middle_disp_1.setPosition(280, 467, 160, 235);
     cont_battery.setPosition(80, 117, 79, 96);
     img_battery.setXY(14, -1);
     img_battery.setBitmap(touchgfx::Bitmap(BITMAP_T3_BATTERY_ICON_ID));
@@ -117,7 +178,7 @@ screenViewBase::screenViewBase()
     led_battery.setPainter(led_batteryPainter);
     cont_battery.add(led_battery);
 
-    cont_middle_disp.add(cont_battery);
+    cont_middle_disp_1.add(cont_battery);
 
     cont_oil.setPosition(1, 117, 79, 96);
     img_oil.setXY(12, 17);
@@ -142,7 +203,7 @@ screenViewBase::screenViewBase()
     led_oil.setPainter(led_oilPainter);
     cont_oil.add(led_oil);
 
-    cont_middle_disp.add(cont_oil);
+    cont_middle_disp_1.add(cont_oil);
 
     cont_high_beam.setPosition(80, 0, 79, 96);
     img_high_beam.setXY(14, 9);
@@ -167,7 +228,7 @@ screenViewBase::screenViewBase()
     led_high_beam.setPainter(led_high_beamPainter);
     cont_high_beam.add(led_high_beam);
 
-    cont_middle_disp.add(cont_high_beam);
+    cont_middle_disp_1.add(cont_high_beam);
 
     cont_indicator.setPosition(1, 0, 79, 96);
     img_indicator.setXY(14, 12);
@@ -192,9 +253,9 @@ screenViewBase::screenViewBase()
     led_indicator.setPainter(led_indicatorPainter);
     cont_indicator.add(led_indicator);
 
-    cont_middle_disp.add(cont_indicator);
+    cont_middle_disp_1.add(cont_indicator);
 
-    add(cont_middle_disp);
+    add(cont_middle_disp_1);
 }
 
 screenViewBase::~screenViewBase()
