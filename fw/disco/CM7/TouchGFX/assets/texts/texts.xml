@@ -5,11 +5,44 @@
   </Languages>
   <Texts>
     <TextGroup Id="Group1" />
-    <TextGroup Id="Unsorted" />
+    <TextGroup Id="Unsorted">
+      <Text Id="__SingleUse_RQN8" Alignment="Left" TypographyId="SevenSegBig">
+        <Translation Language="GB"></Translation>
+      </Text>
+      <Text Id="__SingleUse_OJNZ" Alignment="Left" TypographyId="Default">
+        <Translation Language="GB">69.0</Translation>
+      </Text>
+      <Text Id="__SingleUse_7OCO" Alignment="Left" TypographyId="Default">
+        <Translation Language="GB">123.4</Translation>
+      </Text>
+      <Text Id="__SingleUse_V1FQ" Alignment="Left" TypographyId="Default">
+        <Translation Language="GB">12.4</Translation>
+      </Text>
+      <Text Id="__SingleUse_E1RG" Alignment="Left" TypographyId="SevenSeg">
+        <Translation Language="GB">fuel</Translation>
+      </Text>
+      <Text Id="__SingleUse_MK2N" Alignment="Right" TypographyId="SevenSegBig">
+        <Translation Language="GB">&lt;value&gt;</Translation>
+      </Text>
+      <Text Id="__SingleUse_ZT7W" Alignment="Left" TypographyId="SevenSeg">
+        <Translation Language="GB">temp</Translation>
+      </Text>
+      <Text Id="__SingleUse_TEGU" Alignment="Right" TypographyId="SevenSegBig">
+        <Translation Language="GB">&lt;value&gt;</Translation>
+      </Text>
+      <Text Id="__SingleUse_6M3F" Alignment="Right" TypographyId="SevenSegBig">
+        <Translation Language="GB">&lt;value&gt;</Translation>
+      </Text>
+      <Text Id="__SingleUse_PNXQ" Alignment="Left" TypographyId="SevenSeg">
+        <Translation Language="GB">v_Bat</Translation>
+      </Text>
+    </TextGroup>
   </Texts>
   <Typographies>
     <Typography Id="Default" Font="verdana.ttf" Size="20" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
     <Typography Id="Large" Font="verdana.ttf" Size="40" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
     <Typography Id="Small" Font="verdana.ttf" Size="10" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
+    <Typography Id="SevenSeg" Font="DSEG7Modern-Regular.ttf" Size="20" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
+    <Typography Id="SevenSegBig" Font="DSEG7Modern-Regular.ttf" Size="40" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacters="0,1,2,3,4,5,6,7,8,9,.,\-" />
   </Typographies>
 </TextDatabase>

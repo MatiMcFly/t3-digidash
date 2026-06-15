@@ -108,9 +108,9 @@ int16_t conversion_fuel_level(uint16_t raw_value)
  */
 int16_t conversion_motor_rpm(uint16_t pulses_per_min)
 {
-    // 1 motor rotation generates 4 pulses
-    // ==> pulses_per_min / 4 --> RPM
-    const int16_t PULSES_PER_ROTATION = 4;
+    // 1 motor rotation generates 2 pulses
+    // ==> pulses_per_min / 2 --> RPM
+    const int16_t PULSES_PER_ROTATION = 2;
 
     return pulses_per_min / PULSES_PER_ROTATION;
 }

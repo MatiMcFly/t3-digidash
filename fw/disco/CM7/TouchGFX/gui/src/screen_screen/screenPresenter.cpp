@@ -21,6 +21,13 @@ void screenPresenter::notifySensor(const sensor_data_t& data)
 {
     int16_t tempC;
     uint16_t litres;
+
+    /* throttle data output to ~2s */
+    static constexpr uint8_t kTextDecim = 20;
+    static uint8_t nofPassesFuel = 0;
+    static uint8_t nofPassesBat  = 0;
+    static uint8_t nofPassesTemp = 0;
+
     /* Map the wire-protocol sensor_id_t onto the screenView setters.
      * Binary signals are interpreted as "lit when value != 0". The
      * oil warning lamp is driven by the COMBINATION of the 0.3 bar
@@ -33,6 +40,11 @@ void screenPresenter::notifySensor(const sensor_data_t& data)
         // scale to deg C from 0.1 deg C
         tempC = (data.value + 5) / 10;
         view.setTemperature(tempC);
+        if (++nofPassesTemp >= kTextDecim)
+        {
+            nofPassesTemp = 0;
+            view.setTemperatureDeciC(data.value);
+        }
         break;
 
     case SENSOR_ID_MOTOR_RPM:
@@ -45,6 +57,11 @@ void screenPresenter::notifySensor(const sensor_data_t& data)
         litres = (data.value + 5) / 10;
         view.setFuel(litres < 0 ? 0u
                                  : static_cast<uint16_t>(litres));
+        if (++nofPassesFuel >= kTextDecim)
+        {
+            nofPassesFuel = 0;
+            view.setFuelDeciL(data.value < 0 ? 0 : data.value);
+        }
         break;
 
     case SENSOR_ID_TURN_SIGNAL:
@@ -69,6 +86,13 @@ void screenPresenter::notifySensor(const sensor_data_t& data)
         /* value is in 10 mV units; threshold 13.00 V == 1300. */
         /* TODO: this signal should actually be compared to "Klemme 61" from the alternator.*/
         view.led_set(screenView::Led::Battery, data.value < 1300);
+        if (++nofPassesBat >= kTextDecim)
+        {
+            nofPassesBat = 0;
+            /* Convert centivolts (10 mV) -> deci-volts (100 mV) */
+            view.setVoltageDeciV(static_cast<int16_t>(
+                (data.value < 0 ? 0 : (data.value + 5) / 10)));
+        }
         break;
 
     default:
@@ -83,6 +107,8 @@ void screenPresenter::updateOilLamp()
      * pressure healthy at both check points). Any other combination
      * -- low pressure, sensor disagreement, or one signal not yet
      * received -- lights the warning. */
-    const bool warn = !(oil03BarOk && oil18BarOk);
+    // for now, only the oil03BarOk input is routed. Should be:
+    // const bool warn = !(oil03BarOk && oil18BarOk);
+    const bool warn = !oil03BarOk;
     view.led_set(screenView::Led::Oil, warn);
 }

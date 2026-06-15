@@ -13,6 +13,8 @@
 #include <touchgfx/containers/Container.hpp>
 #include <touchgfx/widgets/canvas/Circle.hpp>
 #include <touchgfx/widgets/canvas/PainterRGB888.hpp>
+#include <touchgfx/widgets/TextArea.hpp>
+#include <touchgfx/widgets/TextAreaWithWildcard.hpp>
 
 class screenViewBase : public touchgfx::View<screenPresenter>
 {
@@ -43,7 +45,17 @@ protected:
     touchgfx::Container cont_fuel_gauge;
     touchgfx::Image img_fuel_scale;
     touchgfx::TextureMapper fuel_needle;
-    touchgfx::Container cont_middle_disp;
+    touchgfx::Container cont_middle_disp_2;
+    touchgfx::TextArea dummy;
+    touchgfx::Box lcd_bg1;
+    touchgfx::Box lcd_bg2;
+    touchgfx::TextArea header_1;
+    touchgfx::TextAreaWithOneWildcard voltage;
+    touchgfx::TextArea header_2;
+    touchgfx::TextAreaWithOneWildcard temperature;
+    touchgfx::TextArea header_3;
+    touchgfx::TextAreaWithOneWildcard fuel_lvl;
+    touchgfx::Container cont_middle_disp_1;
     touchgfx::Container cont_battery;
     touchgfx::Image img_battery;
     touchgfx::Circle bg_battery;
@@ -68,6 +80,16 @@ protected:
     touchgfx::PainterRGB888 bg_indicatorPainter;
     touchgfx::Circle led_indicator;
     touchgfx::PainterRGB888 led_indicatorPainter;
+
+    /*
+     * Wildcard Buffers
+     */
+    static const uint16_t VOLTAGE_SIZE = 8;
+    touchgfx::Unicode::UnicodeChar voltageBuffer[VOLTAGE_SIZE];
+    static const uint16_t TEMPERATURE_SIZE = 8;
+    touchgfx::Unicode::UnicodeChar temperatureBuffer[TEMPERATURE_SIZE];
+    static const uint16_t FUEL_LVL_SIZE = 8;
+    touchgfx::Unicode::UnicodeChar fuel_lvlBuffer[FUEL_LVL_SIZE];
 
 private:
 

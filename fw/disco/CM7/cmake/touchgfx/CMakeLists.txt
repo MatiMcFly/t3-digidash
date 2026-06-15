@@ -28,13 +28,19 @@ set(TouchGFX_Src
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/CompressedFontCache.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/CompressedUnmappedFontCache.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/FontCache.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/Font_DSEG7Modern_Regular_20_4bpp_0.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/Font_DSEG7Modern_Regular_40_4bpp_0.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/Font_verdana_10_4bpp_0.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/Font_verdana_20_4bpp_0.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/Font_verdana_40_4bpp_0.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/GeneratedFont.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/Kerning_DSEG7Modern_Regular_20_4bpp.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/Kerning_DSEG7Modern_Regular_40_4bpp.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/Kerning_verdana_10_4bpp.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/Kerning_verdana_20_4bpp.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/Kerning_verdana_40_4bpp.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/Table_DSEG7Modern_Regular_20_4bpp.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/Table_DSEG7Modern_Regular_40_4bpp.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/Table_verdana_10_4bpp.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/Table_verdana_20_4bpp.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/Table_verdana_40_4bpp.cpp
