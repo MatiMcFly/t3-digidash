@@ -13,7 +13,7 @@ void test_conversion_motor_rpm(void)
 {
     TEST_ASSERT_EQUAL_INT16(0, conversion_motor_rpm(0));
     TEST_ASSERT_EQUAL_INT16(1000, conversion_motor_rpm(2000));
-    TEST_ASSERT_EQUAL_INT16(16383, conversion_motor_rpm(65535));
+    TEST_ASSERT_EQUAL_INT16(32767, conversion_motor_rpm(65535));
 }
 
 void test_conversion_battery_voltage(void)
