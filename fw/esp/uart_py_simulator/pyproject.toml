@@ -1,0 +1,22 @@
+[project]
+name = "uart-generator"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "LENSLIM5RINALDO\\rinal",email = "rinaldoleone@hotmail.ch"}
+]
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "pyserial (>=3.5,<4.0)"
+]
+
+[project.scripts]
+uart-generator = "uart_generator.__main__:main"
+
+[tool.poetry]
+packages = [{include = "uart_generator", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
